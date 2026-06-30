@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from '../utils/motion';
 import { ArrowUpRight, Zap, Volume2, TrendingUp } from 'lucide-react';
 import axios from 'axios';
-
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
+import { API_BASE_URL } from '../config/api';
 
 const Dashboard = ({ user }) => {
   const navigate = useNavigate();

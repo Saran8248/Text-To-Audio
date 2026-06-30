@@ -190,9 +190,23 @@ function isSupportedVoice(requestedVoice, requestedEngine) {
   return Boolean(voiceMap[requestedVoice]) || getEdgeVoiceSet().has(resolvedVoice);
 }
 
+const defaultAllowedOrigins = ['http://localhost:3000', 'http://localhost:5000'];
+const configuredAllowedOrigins = (process.env.CORS_ORIGINS || process.env.FRONTEND_URL || '')
+  .split(',')
+  .map((origin) => origin.trim().replace(/\/+$/, ''))
+  .filter(Boolean);
+const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...configuredAllowedOrigins])];
+
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5000'],
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin.replace(/\/+$/, ''))) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error(`CORS blocked origin: ${origin}`));
+  },
   credentials: true,
 }));
 app.use(express.json());

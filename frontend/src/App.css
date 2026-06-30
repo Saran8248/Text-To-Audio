@@ -1,0 +1,291 @@
+/* App.css - Not needed, using Tailwind CSS */
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 45%, #ffffff 100%);
+}
+
+button,
+select,
+textarea {
+  font: inherit;
+}
+
+.App {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.App-shell {
+  width: min(100%, 1080px);
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 32px;
+  box-shadow: 0 32px 80px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+.App-hero {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 32px;
+  padding: 40px 42px 24px;
+}
+
+.App-eyebrow {
+  margin: 0 0 18px;
+  font-size: 0.9rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #4338ca;
+  font-weight: 700;
+}
+
+.App-hero h1 {
+  margin: 0;
+  font-size: clamp(2.5rem, 3.5vw, 4rem);
+  line-height: 0.98;
+}
+
+.App-hero p {
+  margin: 20px 0 0;
+  max-width: 620px;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: #475569;
+}
+
+.FeatureGrid {
+  display: grid;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.FeatureCard {
+  background: #f8fafc;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.FeatureCard strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #0f172a;
+}
+
+.FeatureCard p {
+  margin: 0;
+  color: #64748b;
+}
+
+.App-summary {
+  display: grid;
+  gap: 20px;
+  align-content: start;
+}
+
+.SummaryCard {
+  background: linear-gradient(180deg, #eef2ff 0%, #eef2ff 100%);
+  border: 1px solid rgba(99, 102, 241, 0.18);
+  border-radius: 24px;
+  padding: 22px;
+}
+
+.SummaryLabel {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.SummaryValue {
+  margin: 10px 0 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.App-panel {
+  padding: 32px 42px 40px;
+  border-top: 1px solid rgba(148, 163, 184, 0.18);
+  display: grid;
+  gap: 24px;
+}
+
+.PanelHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.PanelTitle {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.PanelSubtitle {
+  margin: 8px 0 0;
+  color: #64748b;
+  line-height: 1.7;
+}
+
+.Textarea {
+  width: 100%;
+  min-height: 220px;
+  border-radius: 24px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  padding: 22px;
+  resize: vertical;
+  background: #f8fafc;
+  color: #0f172a;
+  line-height: 1.75;
+}
+
+.Textarea:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+}
+
+.Controls {
+  display: grid;
+  gap: 20px;
+}
+
+.ButtonGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+}
+
+.Button {
+  border: none;
+  border-radius: 9999px;
+  padding: 14px 22px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.Button:hover {
+  transform: translateY(-1px);
+}
+
+.Button-primary {
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  color: #ffffff;
+  box-shadow: 0 14px 28px rgba(99, 102, 241, 0.18);
+}
+
+.Button-secondary {
+  background: #f1f5f9;
+  color: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+}
+
+.PlaybackRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.PlaybackRow label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-right: 8px;
+}
+
+.PlaybackRow select,
+.PlaybackRow button {
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 9999px;
+}
+
+.PlaybackRow select {
+  padding: 12px 14px;
+  background: white;
+  min-width: 130px;
+}
+
+.PlaybackRow button {
+  background: white;
+  color: #334155;
+  padding: 12px 16px;
+}
+
+.SpeedLabel {
+  min-width: 56px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.AudioCard {
+  background: #f8fafc;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 24px;
+  padding: 24px;
+}
+
+.AudioTitle {
+  margin: 0 0 16px;
+  font-size: 1rem;
+  color: #475569;
+}
+
+.AudioCard audio {
+  width: 100%;
+  border-radius: 16px;
+}
+
+.AudioCard-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+@media (max-width: 880px) {
+  .App-hero {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .App-shell {
+    border-radius: 24px;
+  }
+
+  .App-hero,
+  .App-panel {
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .App {
+    padding: 24px 12px;
+  }
+
+  .App-hero {
+    gap: 24px;
+  }
+
+  .PlaybackRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .PlaybackRow label {
+    margin-bottom: 4px;
+  }
+}

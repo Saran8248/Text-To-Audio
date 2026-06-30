@@ -1,0 +1,5 @@
+cd c:\Users\sksar\Desktop\Text-to-Audio\frontend
+npm start
+
+cd c:\Users\sksar\Desktop\Text-to-Audio\backend
+npm start

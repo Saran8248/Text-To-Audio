@@ -5,6 +5,45 @@ import { ArrowUpRight, Zap, Volume2, TrendingUp } from 'lucide-react';
 import axios from 'axios';
 import { API_BASE_URL } from '../config/api';
 
+const formatLocalDateKey = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const buildWeeklyUsage = (history) => {
+  const today = new Date();
+  const days = Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(today);
+    date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate() - (6 - index));
+
+      return {
+        day: date.toLocaleDateString(undefined, { weekday: 'short' }),
+        dateKey: formatLocalDateKey(date),
+        usage: 0,
+      };
+  });
+
+  const usageByDay = days.reduce((acc, item) => {
+    acc[item.dateKey] = item;
+    return acc;
+  }, {});
+
+  history.forEach((item) => {
+    const date = new Date(item.timestamp);
+    if (Number.isNaN(date.getTime())) return;
+
+    const dateKey = formatLocalDateKey(date);
+    if (usageByDay[dateKey]) {
+      usageByDay[dateKey].usage += 1;
+    }
+  });
+
+  return days;
+};
+
 const Dashboard = ({ user }) => {
   const navigate = useNavigate();
   const [stats, setStats] = useState({
@@ -14,17 +53,10 @@ const Dashboard = ({ user }) => {
     cacheFiles: 0,
   });
   const [recentAudios, setRecentAudios] = useState([]);
+  const [chartData, setChartData] = useState([]);
 
-  const chartData = [
-    { day: 'Mon', usage: 120 },
-    { day: 'Tue', usage: 240 },
-    { day: 'Wed', usage: 180 },
-    { day: 'Thu', usage: 290 },
-    { day: 'Fri', usage: 340 },
-    { day: 'Sat', usage: 220 },
-    { day: 'Sun', usage: 150 },
-  ];
-  const maxUsage = Math.max(...chartData.map((item) => item.usage));
+  const maxUsage = Math.max(...chartData.map((item) => item.usage), 0);
+  const hasWeeklyUsage = chartData.some((item) => item.usage > 0);
 
   useEffect(() => {
     const loadDashboardData = async () => {
@@ -47,8 +79,10 @@ const Dashboard = ({ user }) => {
           cacheFiles: statsResponse.data?.cacheFiles || 0,
         });
         setRecentAudios(history.slice(0, 5));
+        setChartData(buildWeeklyUsage(history));
       } catch (error) {
         setRecentAudios([]);
+        setChartData(buildWeeklyUsage([]));
       }
     };
 
@@ -148,14 +182,18 @@ const Dashboard = ({ user }) => {
           className="lg:col-span-2 glass p-6 rounded-2xl border border-white/10"
         >
           <h3 className="text-xl font-bold text-white mb-6">Weekly Usage</h3>
-          <div className="h-[300px] flex items-end gap-3 border-l border-b border-white/10 px-4 pb-8 pt-4">
+          <div className="relative h-[300px] flex items-end gap-3 border-l border-b border-white/10 px-4 pb-8 pt-4">
             {chartData.map((item) => {
-              const height = Math.max((item.usage / maxUsage) * 100, 8);
+              const height = maxUsage > 0 ? Math.max((item.usage / maxUsage) * 100, 8) : 0;
               return (
                 <div key={item.day} className="flex-1 h-full flex flex-col justify-end items-center gap-3">
                   <div className="relative w-full flex justify-center group">
                     <div
-                      className="w-full max-w-12 rounded-t-lg bg-gradient-to-t from-blue-500 to-cyan-400 shadow-lg shadow-blue-500/20 transition-all group-hover:from-purple-500 group-hover:to-blue-400"
+                      className={`w-full max-w-12 rounded-t-lg transition-all ${
+                        item.usage > 0
+                          ? 'bg-gradient-to-t from-blue-500 to-cyan-400 shadow-lg shadow-blue-500/20 group-hover:from-purple-500 group-hover:to-blue-400'
+                          : 'bg-white/10'
+                      }`}
                       style={{ height: `${height}%` }}
                     />
                     <div className="absolute -top-9 px-2 py-1 rounded bg-dark-800 border border-white/10 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity">
@@ -166,6 +204,11 @@ const Dashboard = ({ user }) => {
                 </div>
               );
             })}
+            {!hasWeeklyUsage && (
+              <div className="absolute inset-x-6 top-1/2 -translate-y-1/2 text-center text-sm text-gray-400 pointer-events-none">
+                No audio generated in the last 7 days.
+              </div>
+            )}
           </div>
         </motion.div>
 

@@ -11,14 +11,22 @@ import VoiceLibrary from './pages/VoiceLibrary';
 import History from './pages/History';
 import APIKeys from './pages/APIKeys';
 import Settings from './pages/Settings';
+import AdminAccess from './pages/AdminAccess';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import { getCurrentUser, logout as authLogout } from './utils/auth';
+import { getCurrentUser, isAdmin, logout as authLogout, refreshCurrentUser } from './utils/auth';
 
 const RequireAuth = ({ user, children }) => {
   const location = useLocation();
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+  return children;
+};
+
+const RequireAdmin = ({ user, children }) => {
+  if (!isAdmin(user)) {
+    return <Navigate to="/" replace />;
   }
   return children;
 };
@@ -36,6 +44,7 @@ const ProtectedLayout = ({ user, onLogout, onUpdateUser, theme, onThemeChange })
             <Route path="/voices" element={<VoiceLibrary />} />
             <Route path="/history" element={<History />} />
             <Route path="/api-keys" element={<APIKeys />} />
+            <Route path="/admin" element={<RequireAdmin user={user}><AdminAccess currentUser={user} onUpdateUser={onUpdateUser} /></RequireAdmin>} />
             <Route path="/settings" element={<Settings user={user} onUpdateUser={onUpdateUser} theme={theme} onThemeChange={onThemeChange} onLogout={onLogout} />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
@@ -50,10 +59,16 @@ function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem('terra_tern_theme') || 'dark');
 
   useEffect(() => {
-    const currentUser = getCurrentUser();
-    if (currentUser) {
-      setUser(currentUser);
-    }
+    refreshCurrentUser()
+      .then((currentUser) => {
+        if (currentUser) {
+          setUser(currentUser);
+        }
+      })
+      .catch(() => {
+        authLogout();
+        setUser(null);
+      });
   }, []);
 
   useEffect(() => {
@@ -62,8 +77,8 @@ function App() {
     localStorage.setItem('terra_tern_theme', theme);
   }, [theme]);
 
-  const handleLogout = () => {
-    authLogout();
+  const handleLogout = async () => {
+    await authLogout();
     setUser(null);
   };
 

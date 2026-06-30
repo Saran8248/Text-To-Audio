@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from '../utils/motion';
-import { Menu, X, Home, Mic2, Music, History, Settings, LogOut } from 'lucide-react';
+import { Menu, X, Home, Mic2, Music, History, Settings, LogOut, ShieldCheck } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { isAdmin } from '../utils/auth';
 
 const Sidebar = ({ user, onLogout }) => {
   const [isOpen, setIsOpen] = useState(true);
@@ -13,6 +14,7 @@ const Sidebar = ({ user, onLogout }) => {
     { name: 'Text to Speech', icon: Mic2, path: '/tts' },
     { name: 'Voice Library', icon: Music, path: '/voices' },
     { name: 'History', icon: History, path: '/history' },
+    ...(isAdmin(user) ? [{ name: 'Admin Access', icon: ShieldCheck, path: '/admin' }] : []),
     { name: 'Settings', icon: Settings, path: '/settings' },
   ];
 
@@ -116,6 +118,7 @@ const Sidebar = ({ user, onLogout }) => {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-white truncate">{user?.name || 'User'}</p>
                 <p className="text-xs text-gray-400 truncate">{user?.email || 'user@example.com'}</p>
+                {isAdmin(user) && <p className="text-xs text-emerald-300">Admin access</p>}
               </div>
             </div>
             <button

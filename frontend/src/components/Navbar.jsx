@@ -1,13 +1,40 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from '../utils/motion';
-import { Bell, ChevronDown, Sun, Moon } from 'lucide-react';
+import { Bell, ChevronDown, Sun, Moon, Search, ShieldCheck } from 'lucide-react';
+import { isAdmin } from '../utils/auth';
 
 const Navbar = ({ user, onLogout, theme, onToggleTheme }) => {
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const isDark = theme === 'dark';
+
+  const searchItems = [
+    { label: 'Dashboard', keywords: 'dashboard home stats', path: '/' },
+    { label: 'Text to Speech', keywords: 'text speech generate audio tts', path: '/tts' },
+    { label: 'Voice Library', keywords: 'voices library language', path: '/voices' },
+    { label: 'History', keywords: 'history generated audio', path: '/history' },
+    { label: 'API Keys', keywords: 'api keys access token', path: '/api-keys' },
+    { label: 'Settings', keywords: 'settings profile theme password', path: '/settings' },
+    ...(isAdmin(user) ? [{ label: 'Admin Access', keywords: 'admin access users approve search', path: '/admin' }] : []),
+  ];
+
+  const handleSearchSubmit = (event) => {
+    event.preventDefault();
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return;
+
+    const match = searchItems.find((item) => (
+      `${item.label} ${item.keywords}`.toLowerCase().includes(query)
+    ));
+
+    if (match) {
+      navigate(match.path);
+      setSearchQuery('');
+    }
+  };
 
   const notifications = [
     { id: 1, title: 'Audio generated', message: 'Your text-to-speech is ready', time: '2m ago' },
@@ -20,10 +47,33 @@ const Navbar = ({ user, onLogout, theme, onToggleTheme }) => {
       <div className="max-w-full px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between">
           {/* Left side */}
-          <div className="flex items-center gap-4 flex-1" />
+          <div className="flex items-center gap-4 flex-1">
+            <form onSubmit={handleSearchSubmit} className="relative w-full max-w-md hidden md:block">
+              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Search pages"
+                className="w-full pl-11 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-400"
+              />
+            </form>
+          </div>
 
           {/* Right side */}
           <div className="flex items-center gap-4">
+            {isAdmin(user) && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate('/admin')}
+                className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
+              >
+                <ShieldCheck size={18} />
+                <span className="text-sm font-medium">Admin</span>
+              </motion.button>
+            )}
+
             {/* Theme Toggle */}
             <motion.button
               whileHover={{ scale: 1.1 }}

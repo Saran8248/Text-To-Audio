@@ -11,9 +11,9 @@ const Login = ({ onLogin }) => {
   const location = useLocation();
   const from = location.state?.from?.pathname || '/';
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const result = loginUser({ email, password });
+    const result = await loginUser({ email, password });
     if (!result.success) {
       toast.error(result.message);
       return;

@@ -11,22 +11,28 @@ const Register = ({ onRegister }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (password !== confirmPassword) {
       toast.error('Passwords do not match');
       return;
     }
 
-    const result = registerUser({ name, email, password });
+    const result = await registerUser({ name, email, password });
     if (!result.success) {
       toast.error(result.message);
       return;
     }
 
-    onRegister(result.user);
-    toast.success('Account created successfully');
-    navigate('/', { replace: true });
+    if (result.user.accessStatus === 'approved') {
+      onRegister(result.user);
+      toast.success('Admin account created successfully');
+      navigate('/', { replace: true });
+      return;
+    }
+
+    toast.info('Account request sent. An admin must approve access before login.');
+    navigate('/login', { replace: true });
   };
 
   return (
@@ -37,8 +43,8 @@ const Register = ({ onRegister }) => {
         className="w-full max-w-md glass p-8 rounded-3xl border border-white/10"
       >
         <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-white">Create your account</h1>
-          <p className="mt-3 text-gray-400">Register to save your profile and access the app.</p>
+          <h1 className="text-4xl font-bold text-white">Request access</h1>
+          <p className="mt-3 text-gray-400">Create an account request. An admin approves new users before login.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -92,7 +98,7 @@ const Register = ({ onRegister }) => {
             type="submit"
             className="w-full py-3 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold"
           >
-            Create Account
+            Request Access
           </motion.button>
         </form>
 

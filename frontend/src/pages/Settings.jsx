@@ -45,13 +45,13 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
     toast.success(`${themeValue === 'dark' ? 'Dark' : 'Light'} theme enabled`);
   };
 
-  const handlePasswordChange = () => {
+  const handlePasswordChange = async () => {
     const newPassword = window.prompt('Enter a new password');
     if (!newPassword) {
       return;
     }
 
-    const result = updateUserProfile({ name: profile.name, email: profile.email, password: newPassword });
+    const result = await updateUserProfile({ name: profile.name, email: profile.email, password: newPassword });
     if (result.success) {
       toast.success('Password updated successfully');
       if (onUpdateUser) {
@@ -62,12 +62,12 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
     }
   };
 
-  const handleDeleteAccount = () => {
+  const handleDeleteAccount = async () => {
     if (!window.confirm('This will permanently delete your account. Continue?')) {
       return;
     }
 
-    const result = deleteUserAccount();
+    const result = await deleteUserAccount();
     if (result.success) {
       toast.success('Account deleted successfully');
       if (onLogout) {
@@ -79,8 +79,8 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
     }
   };
 
-  const handleProfileSave = () => {
-    const result = updateUserProfile({
+  const handleProfileSave = async () => {
+    const result = await updateUserProfile({
       name: profile.name,
       email: profile.email,
     });

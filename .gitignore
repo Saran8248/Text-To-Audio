@@ -16,6 +16,7 @@ dist/
 
 # Cache
 cache/
+Backend/users.json
 
 # Environment
 .env

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from '../utils/motion';
-import { Copy, Eye, EyeOff, Trash2, Plus } from 'lucide-react';
+import { Trash2, Plus } from 'lucide-react';
 import { toast } from 'react-toastify';
-
 const APIKeys = () => {
   const [keys, setKeys] = useState([
     {

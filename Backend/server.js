@@ -51,6 +51,7 @@ let edgeVoiceSet = null;
 // Configuration
 const CACHE_DIR = path.join(__dirname, "cache");
 const HISTORY_FILE = path.join(__dirname, "history.json");
+const USERS_FILE = path.join(__dirname, "users.json");
 const MAX_TEXT_LENGTH = 5000;
 const REQUEST_TIMEOUT = 120000; // 2 minutes
 
@@ -210,6 +211,130 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+
+function normalizeUser(user) {
+  return {
+    ...user,
+    role: user.role || "user",
+    accessStatus: user.accessStatus || "approved",
+    sessions: Array.isArray(user.sessions) ? user.sessions : [],
+  };
+}
+
+function publicUser(user) {
+  const { password, passwordHash, passwordSalt, sessions, ...safeUser } = normalizeUser(user);
+  return safeUser;
+}
+
+function loadUsers() {
+  try {
+    if (fs.existsSync(USERS_FILE)) {
+      const parsed = JSON.parse(fs.readFileSync(USERS_FILE, "utf8"));
+      return Array.isArray(parsed) ? parsed.map(normalizeUser) : [];
+    }
+  } catch (error) {
+    console.error("Failed to load users:", error);
+  }
+  return [];
+}
+
+function saveUsers(users) {
+  fs.writeFileSync(USERS_FILE, JSON.stringify(users.map(normalizeUser), null, 2));
+}
+
+function hashPassword(password, salt = crypto.randomBytes(16).toString("hex")) {
+  const passwordHash = crypto.pbkdf2Sync(password, salt, 100000, 64, "sha512").toString("hex");
+  return { passwordSalt: salt, passwordHash };
+}
+
+function verifyPassword(password, user) {
+  if (user.passwordHash && user.passwordSalt) {
+    const { passwordHash } = hashPassword(password, user.passwordSalt);
+    return crypto.timingSafeEqual(Buffer.from(passwordHash, "hex"), Buffer.from(user.passwordHash, "hex"));
+  }
+
+  return user.password === password;
+}
+
+function createUser({ name, email, password, role = "user", accessStatus = "pending" }) {
+  const normalizedEmail = email.trim().toLowerCase();
+  const { passwordHash, passwordSalt } = hashPassword(password);
+
+  return normalizeUser({
+    id: Date.now() + Math.floor(Math.random() * 1000),
+    name: name.trim(),
+    email: normalizedEmail,
+    passwordHash,
+    passwordSalt,
+    role,
+    accessStatus,
+    joined: new Date().toISOString(),
+    profile: {
+      displayName: name.trim(),
+      email: normalizedEmail,
+    },
+    sessions: [],
+  });
+}
+
+function issueSession(user) {
+  return {
+    token: crypto.randomBytes(32).toString("hex"),
+    createdAt: new Date().toISOString(),
+  };
+}
+
+function readBearerToken(req) {
+  const header = req.headers.authorization || "";
+  const [scheme, token] = header.split(" ");
+  return scheme === "Bearer" && token ? token : null;
+}
+
+function findUserByToken(token) {
+  if (!token) return null;
+  return loadUsers().find((user) => user.sessions.some((session) => session.token === token)) || null;
+}
+
+function requireAuth(req, res, next) {
+  const user = findUserByToken(readBearerToken(req));
+  if (!user || user.accessStatus !== "approved") {
+    res.status(401).json({
+      error: "UNAUTHORIZED",
+      message: "Login is required",
+    });
+    return;
+  }
+
+  req.user = user;
+  next();
+}
+
+function requireAdmin(req, res, next) {
+  requireAuth(req, res, () => {
+    if (req.user.role !== "admin") {
+      res.status(403).json({
+        error: "FORBIDDEN",
+        message: "Admin access is required",
+      });
+      return;
+    }
+
+    next();
+  });
+}
+
+function validateAccountFields({ name, email, password }, { requirePassword = true } = {}) {
+  if (!name || typeof name !== "string" || !name.trim()) {
+    return "Name is required.";
+  }
+  if (!email || typeof email !== "string" || !email.trim().includes("@")) {
+    return "A valid email is required.";
+  }
+  if (requirePassword && (!password || typeof password !== "string" || password.length < 6)) {
+    return "Password must be at least 6 characters.";
+  }
+  return null;
+}
 
 // Error handling middleware
 const asyncHandler = (fn) => (req, res, next) => {
@@ -409,6 +534,194 @@ function addToHistory(text, voice) {
 // Health check
 app.get("/health", (req, res) => {
   res.json({ status: "ok", message: "Server is running" });
+});
+
+app.post("/api/auth/register", (req, res) => {
+  const validationError = validateAccountFields(req.body);
+  if (validationError) {
+    res.status(400).json({ error: "INVALID_ACCOUNT", message: validationError });
+    return;
+  }
+
+  const users = loadUsers();
+  const normalizedEmail = req.body.email.trim().toLowerCase();
+  if (users.some((user) => user.email === normalizedEmail)) {
+    res.status(409).json({ error: "EMAIL_EXISTS", message: "This email is already registered." });
+    return;
+  }
+
+  const isFirstUser = users.length === 0;
+  const newUser = createUser({
+    name: req.body.name,
+    email: normalizedEmail,
+    password: req.body.password,
+    role: isFirstUser ? "admin" : "user",
+    accessStatus: isFirstUser ? "approved" : "pending",
+  });
+
+  let token = null;
+  if (newUser.accessStatus === "approved") {
+    const session = issueSession(newUser);
+    newUser.sessions.push(session);
+    token = session.token;
+  }
+
+  saveUsers([...users, newUser]);
+  res.status(201).json({ user: publicUser(newUser), token });
+});
+
+app.post("/api/auth/login", (req, res) => {
+  const email = String(req.body.email || "").trim().toLowerCase();
+  const password = String(req.body.password || "");
+  const users = loadUsers();
+  const user = users.find((item) => item.email === email);
+
+  if (!user || !verifyPassword(password, user)) {
+    res.status(401).json({ error: "INVALID_LOGIN", message: "Invalid email or password." });
+    return;
+  }
+
+  if (user.accessStatus !== "approved") {
+    res.status(403).json({ error: "ACCESS_PENDING", message: "Your account is waiting for admin access." });
+    return;
+  }
+
+  const session = issueSession(user);
+  const updatedUser = { ...user, sessions: [...user.sessions, session] };
+  saveUsers(users.map((item) => (item.id === updatedUser.id ? updatedUser : item)));
+
+  res.json({ user: publicUser(updatedUser), token: session.token });
+});
+
+app.post("/api/auth/logout", requireAuth, (req, res) => {
+  const token = readBearerToken(req);
+  const users = loadUsers().map((user) => (
+    user.id === req.user.id
+      ? { ...user, sessions: user.sessions.filter((session) => session.token !== token) }
+      : user
+  ));
+  saveUsers(users);
+  res.json({ message: "Logged out" });
+});
+
+app.get("/api/auth/me", requireAuth, (req, res) => {
+  res.json({ user: publicUser(req.user) });
+});
+
+app.put("/api/auth/profile", requireAuth, (req, res) => {
+  const validationError = validateAccountFields({
+    name: req.body.name,
+    email: req.body.email,
+    password: req.body.password,
+  }, { requirePassword: false });
+
+  if (validationError) {
+    res.status(400).json({ error: "INVALID_PROFILE", message: validationError });
+    return;
+  }
+
+  const normalizedEmail = req.body.email.trim().toLowerCase();
+  const users = loadUsers();
+  const emailTaken = users.some((user) => user.email === normalizedEmail && user.id !== req.user.id);
+  if (emailTaken) {
+    res.status(409).json({ error: "EMAIL_EXISTS", message: "That email is already in use." });
+    return;
+  }
+
+  const updatedUsers = users.map((user) => {
+    if (user.id !== req.user.id) return user;
+
+    const passwordFields = req.body.password ? hashPassword(req.body.password) : {};
+    return normalizeUser({
+      ...user,
+      ...passwordFields,
+      name: req.body.name.trim(),
+      email: normalizedEmail,
+      profile: {
+        displayName: req.body.name.trim(),
+        email: normalizedEmail,
+      },
+    });
+  });
+
+  saveUsers(updatedUsers);
+  res.json({ user: publicUser(updatedUsers.find((user) => user.id === req.user.id)) });
+});
+
+app.delete("/api/auth/account", requireAuth, (req, res) => {
+  const users = loadUsers().filter((user) => user.id !== req.user.id);
+  saveUsers(users);
+  res.json({ message: "Account deleted" });
+});
+
+app.get("/api/admin/users", requireAdmin, (req, res) => {
+  res.json({ users: loadUsers().map(publicUser) });
+});
+
+app.post("/api/admin/users", requireAdmin, (req, res) => {
+  const validationError = validateAccountFields(req.body);
+  if (validationError) {
+    res.status(400).json({ error: "INVALID_ACCOUNT", message: validationError });
+    return;
+  }
+
+  const users = loadUsers();
+  const normalizedEmail = req.body.email.trim().toLowerCase();
+  if (users.some((user) => user.email === normalizedEmail)) {
+    res.status(409).json({ error: "EMAIL_EXISTS", message: "This email is already registered." });
+    return;
+  }
+
+  const role = req.body.role === "admin" ? "admin" : "user";
+  const newUser = createUser({
+    name: req.body.name,
+    email: normalizedEmail,
+    password: req.body.password,
+    role,
+    accessStatus: "approved",
+  });
+
+  saveUsers([...users, newUser]);
+  res.status(201).json({ user: publicUser(newUser), users: [...users, newUser].map(publicUser) });
+});
+
+app.patch("/api/admin/users/:id", requireAdmin, (req, res) => {
+  const userId = Number(req.params.id);
+  const users = loadUsers();
+  const target = users.find((user) => user.id === userId);
+
+  if (!target) {
+    res.status(404).json({ error: "USER_NOT_FOUND", message: "User not found." });
+    return;
+  }
+
+  const accessStatus = ["approved", "pending"].includes(req.body.accessStatus) ? req.body.accessStatus : target.accessStatus;
+  const role = ["admin", "user"].includes(req.body.role) ? req.body.role : target.role;
+
+  const updatedUsers = users.map((user) => (
+    user.id === userId ? { ...user, accessStatus, role } : user
+  ));
+
+  saveUsers(updatedUsers);
+  res.json({ users: updatedUsers.map(publicUser) });
+});
+
+app.delete("/api/admin/users/:id", requireAdmin, (req, res) => {
+  const userId = Number(req.params.id);
+  if (req.user.id === userId) {
+    res.status(400).json({ error: "SELF_DELETE", message: "You cannot delete your own admin account." });
+    return;
+  }
+
+  const users = loadUsers();
+  const updatedUsers = users.filter((user) => user.id !== userId);
+  if (updatedUsers.length === users.length) {
+    res.status(404).json({ error: "USER_NOT_FOUND", message: "User not found." });
+    return;
+  }
+
+  saveUsers(updatedUsers);
+  res.json({ users: updatedUsers.map(publicUser) });
 });
 
 // Legacy endpoint - kept for backward compatibility

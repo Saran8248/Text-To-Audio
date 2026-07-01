@@ -1,5 +1,6 @@
 const express = require("express");
 const fs = require("node:fs");
+const fsPromises = require("node:fs/promises");
 const path = require("node:path");
 const { spawn, spawnSync } = require("node:child_process");
 const crypto = require("node:crypto");
@@ -10,19 +11,14 @@ const edgeTtsScript = path.join(__dirname, "edge_tts_generator.py");
 const xttsScript = path.join(__dirname, "xtts_generator.py");
 
 function getPythonCandidates() {
-  const candidates = [
+  return [...new Set([
     process.env.PYTHON_EXECUTABLE,
-    path.join(__dirname, ".venv", "Scripts", "python.exe"),
-    path.join(__dirname, "..", ".venv", "Scripts", "python.exe"),
-    path.join(__dirname, "..", ".venv-1", "Scripts", "python.exe"),
-    "C:\\Program Files\\Python310\\python.exe",
-    "C:\\Users\\sksar\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "python3.12",
+    "python3.11",
+    "python3.10",
+    "python3",
     "python",
-  ].filter(Boolean);
-
-  return [...new Set(candidates)].filter((candidate) => (
-    candidate === "python" || fs.existsSync(candidate)
-  ));
+  ].filter(Boolean))];
 }
 
 function canImportModule(executable, moduleName) {
@@ -31,17 +27,14 @@ function canImportModule(executable, moduleName) {
     timeout: 5000,
     stdio: "ignore",
   });
-
   return result.status === 0;
 }
 
 function resolvePythonExecutable(requiredModule) {
   const candidates = getPythonCandidates();
-
   if (!requiredModule) {
     return candidates[0] || null;
   }
-
   return candidates.find((candidate) => canImportModule(candidate, requiredModule)) || null;
 }
 
@@ -511,8 +504,8 @@ function generateAudio(text, voice, cacheKey, options = {}) {
 
     if (!pythonExecutable) {
       reject(new Error(
-        `${engine === 'coqui' ? 'Coqui TTS' : 'Edge TTS'} is not installed in a compatible Python environment. ` +
-        `Install ${requiredPythonModule} with Python 3.10-3.12, or set PYTHON_EXECUTABLE to that python.exe.`
+        `${engine === 'coqui' ? 'Coqui TTS' : 'Edge TTS'} is not installed in the server Python environment. ` +
+        `Ensure Python 3.10-3.12 and ${requiredPythonModule} are installed on the hosting server.`
       ));
       return;
     }
@@ -999,7 +992,7 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🎵 Server running on http://localhost:${PORT}`);
+  console.log(`🎵 Server running on port ${PORT}`);
   console.log(`Cache directory: ${CACHE_DIR}`);
   console.log(`History file: ${HISTORY_FILE}`);
   console.log(`Python executable: ${defaultPythonExecutable || "not found"}`);

@@ -9,12 +9,14 @@ const normalizeApiUrl = (url) => {
 };
 
 const configuredApiUrl = normalizeApiUrl(process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_API_URL);
-const defaultRenderApiUrl = 'https://text-to-audio-backend-9o8b.onrender.com';
+const defaultApiUrl = process.env.NODE_ENV === 'production'
+  ? window.location.origin
+  : 'http://localhost:5000';
 
 if (process.env.NODE_ENV === 'production' && !configuredApiUrl) {
   console.warn(
-    'REACT_APP_API_URL is not set. Falling back to the Render backend URL. Set REACT_APP_API_URL to your backend URL to avoid this warning.'
+    'REACT_APP_API_BASE_URL is not set. Using same-origin requests in production. Set REACT_APP_API_BASE_URL to your backend URL if frontend and backend are hosted separately.'
   );
 }
 
-export const API_BASE_URL = configuredApiUrl || defaultRenderApiUrl;
+export const API_BASE_URL = configuredApiUrl || defaultApiUrl;

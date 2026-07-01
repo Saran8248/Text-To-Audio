@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: text-to-audio-backend
+    env: docker
+    plan: starter
+    branch: main
+    dockerfilePath: Backend/Dockerfile
+    envVars:
+      - key: PORT
+        value: "5000"
+      - key: NODE_ENV
+        value: "production"
+      - key: PYTHON_EXECUTABLE
+        value: "/usr/bin/python3"

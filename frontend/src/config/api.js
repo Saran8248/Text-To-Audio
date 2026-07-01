@@ -1,3 +1,15 @@
 const configuredApiUrl = process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_API_URL;
 
-export const API_BASE_URL = (configuredApiUrl || 'http://localhost:5000').replace(/\/+$/, '');
+const normalizeApiUrl = (url) => {
+  if (!url) return null;
+  const trimmed = String(url).trim().replace(/\/+$/, '');
+  if (!trimmed) return null;
+  if (/^[a-zA-Z][a-zA-Z\d+-.]*:/.test(trimmed)) {
+    return trimmed;
+  }
+  return `http://${trimmed}`;
+};
+
+export const API_BASE_URL =
+  normalizeApiUrl(configuredApiUrl) ||
+  (process.env.NODE_ENV === 'development' ? '' : 'http://localhost:5000');

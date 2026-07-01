@@ -18,6 +18,8 @@ const authHeaders = () => {
 
 const requestJson = async (path, options = {}) => {
   const response = await fetch(`${API_BASE_URL}${path}`, {
+    mode: 'cors',
+    cache: 'no-store',
     ...options,
     headers: {
       'Content-Type': 'application/json',

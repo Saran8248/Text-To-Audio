@@ -191,7 +191,19 @@ function isSupportedVoice(requestedVoice, requestedEngine) {
   return Boolean(voiceMap[requestedVoice]) || getEdgeVoiceSet().has(resolvedVoice);
 }
 
-const defaultAllowedOrigins = ['http://localhost:3000', 'http://localhost:5000'];
+const allowAllOrigins = process.env.NODE_ENV !== 'production';
+const defaultAllowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5000',
+  'https://localhost:3000',
+  'https://localhost:5000',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5000',
+  'https://127.0.0.1:3000',
+  'https://127.0.0.1:5000',
+  'http://[::1]:3000',
+  'http://[::1]:5000',
+];
 const configuredAllowedOrigins = (process.env.CORS_ORIGINS || process.env.FRONTEND_URL || '')
   .split(',')
   .map((origin) => origin.trim().replace(/\/+$/, ''))
@@ -200,15 +212,19 @@ const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...configuredAllow
 
 // Middleware
 app.use(cors({
-  origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin.replace(/\/+$/, ''))) {
-      callback(null, true);
-      return;
-    }
+  origin: allowAllOrigins
+    ? true
+    : (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin.replace(/\/+$/, ''))) {
+          callback(null, true);
+          return;
+        }
 
-    callback(new Error(`CORS blocked origin: ${origin}`));
-  },
+        callback(new Error(`CORS blocked origin: ${origin}`));
+      },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
 }));
 app.use(express.json());
 

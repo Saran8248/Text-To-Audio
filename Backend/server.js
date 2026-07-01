@@ -326,6 +326,45 @@ function hashPassword(password, salt = crypto.randomBytes(16).toString("hex")) {
   return { passwordSalt: salt, passwordHash };
 }
 
+function ensureDefaultAdminUser() {
+  const adminEmail = (process.env.DEFAULT_ADMIN_EMAIL || "sksaran987@gmail.com").trim().toLowerCase();
+  const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD || "Sarankd@987";
+  const users = loadUsers();
+  const existingAdmin = users.find((user) => user.email === adminEmail);
+
+  if (existingAdmin) {
+    const { passwordHash, passwordSalt } = hashPassword(adminPassword);
+    const updatedAdmin = normalizeUser({
+      ...existingAdmin,
+      role: "admin",
+      accessStatus: "approved",
+      passwordHash,
+      passwordSalt,
+      profile: {
+        displayName: existingAdmin.profile?.displayName || existingAdmin.name || "Admin",
+        email: adminEmail,
+      },
+    });
+    saveUsers(users.map((user) => (user.id === existingAdmin.id ? updatedAdmin : user)));
+    return;
+  }
+
+  const hasAnyAdmin = users.some((user) => user.role === "admin");
+  if (hasAnyAdmin) {
+    return;
+  }
+
+  const adminUser = createUser({
+    name: "Admin",
+    email: adminEmail,
+    password: adminPassword,
+    role: "admin",
+    accessStatus: "approved",
+  });
+
+  saveUsers([...users, adminUser]);
+}
+
 function verifyPassword(password, user) {
   if (user.passwordHash && user.passwordSalt) {
     const { passwordHash } = hashPassword(password, user.passwordSalt);
@@ -633,13 +672,12 @@ app.post("/api/auth/register", (req, res) => {
     return;
   }
 
-  const isFirstUser = users.length === 0;
   const newUser = createUser({
     name: req.body.name,
     email: normalizedEmail,
     password: req.body.password,
-    role: isFirstUser ? "admin" : "user",
-    accessStatus: isFirstUser ? "approved" : "pending",
+    role: "user",
+    accessStatus: "pending",
   });
 
   let token = null;
@@ -989,6 +1027,8 @@ app.use((err, req, res, next) => {
     message: process.env.NODE_ENV === "production" ? "An error occurred" : err.message,
   });
 });
+
+ensureDefaultAdminUser();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

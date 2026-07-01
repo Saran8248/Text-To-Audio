@@ -283,29 +283,24 @@ const defaultAllowedOrigins = [
   'http://[::1]:3000',
   'http://[::1]:5000',
 ];
-const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...configuredAllowedOrigins])];
-const allowAllOrigins = process.env.NODE_ENV !== 'production' || allowedOrigins.length === 0;
+const allowAllOrigins = process.env.NODE_ENV !== 'production' || configuredAllowedOrigins.length === 0;
 
-if (process.env.NODE_ENV === 'production' && allowAllOrigins) {
-  console.warn('CORS: no FRONTEND_URL or CORS_ORIGINS configured; allowing all origins in production.');
+if (process.env.NODE_ENV === 'production' && configuredAllowedOrigins.length === 0) {
+  console.warn('CORS: no FRONTEND_URL or CORS_ORIGINS configured in production; allowing all origins in production.');
 }
 
-// Middleware
-app.use(cors({
-  origin: allowAllOrigins
-    ? true
-    : (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin.replace(/\/+$/, ''))) {
-          callback(null, true);
-          return;
-        }
-
-        callback(new Error(`CORS blocked origin: ${origin}`));
-      },
+const corsOptions = {
+  origin: allowAllOrigins ? true : configuredAllowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-}));
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+};
+
+// Middleware
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json());
 
 function normalizeUser(user) {

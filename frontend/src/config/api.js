@@ -10,5 +10,6 @@ const normalizeApiUrl = (url) => {
   return `http://${trimmed}`;
 };
 
-const developmentBaseUrl = process.env.NODE_ENV === 'development' ? '' : 'http://localhost:5000';
+const defaultProductionBaseUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:5000';
+const developmentBaseUrl = process.env.NODE_ENV === 'development' ? '' : defaultProductionBaseUrl;
 export const API_BASE_URL = normalizeApiUrl(configuredApiUrl) || developmentBaseUrl;

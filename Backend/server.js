@@ -267,7 +267,10 @@ function isSupportedVoice(requestedVoice, requestedEngine) {
   return Boolean(voiceMap[requestedVoice]) || getEdgeVoiceSet().has(resolvedVoice);
 }
 
-const allowAllOrigins = process.env.NODE_ENV !== 'production';
+const configuredAllowedOrigins = (process.env.CORS_ORIGINS || process.env.FRONTEND_URL || '')
+  .split(',')
+  .map((origin) => origin.trim().replace(/\/+$/, ''))
+  .filter(Boolean);
 const defaultAllowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5000',
@@ -280,11 +283,12 @@ const defaultAllowedOrigins = [
   'http://[::1]:3000',
   'http://[::1]:5000',
 ];
-const configuredAllowedOrigins = (process.env.CORS_ORIGINS || process.env.FRONTEND_URL || '')
-  .split(',')
-  .map((origin) => origin.trim().replace(/\/+$/, ''))
-  .filter(Boolean);
 const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...configuredAllowedOrigins])];
+const allowAllOrigins = process.env.NODE_ENV !== 'production' || allowedOrigins.length === 0;
+
+if (process.env.NODE_ENV === 'production' && allowAllOrigins) {
+  console.warn('CORS: no FRONTEND_URL or CORS_ORIGINS configured; allowing all origins in production.');
+}
 
 // Middleware
 app.use(cors({

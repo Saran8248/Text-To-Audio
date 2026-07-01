@@ -296,7 +296,6 @@ if (process.env.NODE_ENV === 'production' && configuredAllowedOrigins.length ===
 
 // Middleware
 app.use(cors(corsOptions));
-app.options('/*', cors(corsOptions));
 app.use(express.json());
 
 function normalizeUser(user) {

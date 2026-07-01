@@ -29,7 +29,6 @@ const TextToSpeech = () => {
   const [selectedVoice, setSelectedVoice] = useState('en-US-JennyNeural');
   const [selectedLanguage, setSelectedLanguage] = useState('en-US');
   const [languageCode, setLanguageCode] = useState('en');
-  const [engine, setEngine] = useState('edge-tts');
   const [speed, setSpeed] = useState(1);
   const [pitch, setPitch] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -50,10 +49,13 @@ const TextToSpeech = () => {
     ],
     'en-GB': [
       { id: 'en-GB-SoniaNeural', name: 'Sonia (Soft)', type: 'Female' },
-      { id: 'en-GB-RyanNeural', name: 'Ryan (Clear)', type: 'Male' },
       { id: 'en-GB-LibbyNeural', name: 'Libby (Warm)', type: 'Female' },
       { id: 'en-GB-MaisieNeural', name: 'Maisie (Bright)', type: 'Female' },
+      { id: 'en-GB-PoppyNeural', name: 'Poppy (Clear)', type: 'Female' },
+      { id: 'en-GB-RyanNeural', name: 'Ryan (Bold)', type: 'Male' },
       { id: 'en-GB-ThomasNeural', name: 'Thomas (Deep)', type: 'Male' },
+      { id: 'en-GB-OliverNeural', name: 'Oliver (Smooth)', type: 'Male' },
+      { id: 'en-GB-JamesNeural', name: 'James (Warm)', type: 'Male' },
     ],
     'en-AU': [
       { id: 'en-AU-NatashaNeural', name: 'Natasha (Soft)', type: 'Female' },
@@ -81,10 +83,6 @@ const TextToSpeech = () => {
     'uk-UA': [
       { id: 'uk-UA-PolinaNeural', name: 'Polina (Soft)', type: 'Female' },
       { id: 'uk-UA-OstapNeural', name: 'Ostap (Clear)', type: 'Male' },
-    ],
-    'hi-IN': [
-      { id: 'hi-IN-SwaraNeural', name: 'Swara (Soft)', type: 'Female' },
-      { id: 'hi-IN-MadhurNeural', name: 'Madhur (Clear)', type: 'Male' },
     ],
   };
 
@@ -127,16 +125,6 @@ const TextToSpeech = () => {
     clearGeneratedAudio('Voice changed. Generate again for the new voice.');
   };
 
-  const handleEngineChange = (engineId) => {
-    setEngine(engineId);
-    if (engineId === 'coqui') {
-      setSelectedVoice('xtts-v2');
-    } else {
-      setSelectedVoice(voices[selectedLanguage]?.[0]?.id || 'en-US-JennyNeural');
-    }
-    clearGeneratedAudio('Engine changed. Generate again for the selected engine.');
-  };
-
   useEffect(() => {
     return () => {
       if (audioUrl) {
@@ -166,7 +154,6 @@ const TextToSpeech = () => {
       const response = await axios.post(`${API_BASE_URL}/api/tts/generate`, {
         text: text.trim(),
         voice: selectedVoice,
-        engine,
         language: languageCode,
       }, {
         responseType: 'blob',
@@ -257,24 +244,6 @@ const TextToSpeech = () => {
             </div>
           </div>
 
-          <div className="glass p-6 rounded-2xl border border-white/10">
-            <label className="block text-sm font-semibold text-white mb-4">Engine</label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {[
-                { id: 'edge-tts', label: 'Edge TTS' },
-                { id: 'coqui', label: 'XTTS-v2 (Coqui)' },
-              ].map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  onClick={() => handleEngineChange(option.id)}
-                  className={`rounded-xl border px-4 py-3 text-left transition-all ${engine === option.id ? 'border-blue-400 bg-blue-500/10 text-white' : 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10'}`}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="glass p-6 rounded-2xl border border-white/10">

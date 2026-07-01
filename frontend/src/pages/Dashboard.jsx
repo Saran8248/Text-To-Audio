@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { motion } from '../utils/motion';
 import { ArrowUpRight, Zap, Volume2, TrendingUp } from 'lucide-react';
@@ -44,6 +45,35 @@ const buildWeeklyUsage = (history) => {
   return days;
 };
 
+const StatCard = ({ icon: Icon, label, value, change, gradient }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    whileHover={{ y: -5 }}
+    className="glass p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all"
+  >
+    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} p-3 mb-4`}>
+      <Icon size={24} className="text-white" />
+    </div>
+    <p className="text-gray-400 text-sm font-medium mb-2">{label}</p>
+    <p className="text-3xl font-bold text-white mb-2">{value}</p>
+    {typeof change === 'number' && (
+      <div className="flex items-center gap-1 text-green-400 text-sm">
+        <ArrowUpRight size={16} />
+        <span>{change}% vs last month</span>
+      </div>
+    )}
+  </motion.div>
+);
+
+StatCard.propTypes = {
+  icon: PropTypes.elementType.isRequired,
+  label: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  change: PropTypes.number,
+  gradient: PropTypes.string.isRequired,
+};
+
 const Dashboard = ({ user }) => {
   const navigate = useNavigate();
   const [stats, setStats] = useState({
@@ -51,12 +81,24 @@ const Dashboard = ({ user }) => {
     thisMonth: 0,
     averageTime: 0,
     cacheFiles: 0,
+    successCount: 0,
+    failureCount: 0,
+    genderCounts: { male: 0, female: 0, other: 0 },
+    languageCounts: {},
   });
+  const [historyCount, setHistoryCount] = useState(0);
   const [recentAudios, setRecentAudios] = useState([]);
   const [chartData, setChartData] = useState([]);
 
   const maxUsage = Math.max(...chartData.map((item) => item.usage), 0);
   const hasWeeklyUsage = chartData.some((item) => item.usage > 0);
+  const totalAttempts = stats.successCount + stats.failureCount;
+  const successRate = totalAttempts ? Math.round((stats.successCount / totalAttempts) * 100) : 0;
+  const failureRate = totalAttempts ? Math.round((stats.failureCount / totalAttempts) * 100) : 0;
+  const genderTotal = stats.genderCounts.male + stats.genderCounts.female + stats.genderCounts.other;
+  const languageEntries = Object.entries(stats.languageCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
 
   useEffect(() => {
     const loadDashboardData = async () => {
@@ -68,19 +110,26 @@ const Dashboard = ({ user }) => {
         const history = historyResponse.data?.data || [];
         const currentMonth = new Date().getMonth();
         const currentYear = new Date().getFullYear();
+        const statsData = statsResponse.data || {};
 
         setStats({
-          totalGenerated: statsResponse.data?.historyEntries || history.length,
+          totalGenerated: statsData.historyEntries || history.length,
           thisMonth: history.filter((item) => {
             const date = new Date(item.timestamp);
             return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
           }).length,
-          averageTime: 0,
-          cacheFiles: statsResponse.data?.cacheFiles || 0,
+          averageTime: statsData.averageTime || 0,
+          cacheFiles: statsData.cacheFiles || 0,
+          successCount: statsData.successCount || 0,
+          failureCount: statsData.failureCount || 0,
+          genderCounts: statsData.genderCounts || { male: 0, female: 0, other: 0 },
+          languageCounts: statsData.languageCounts || {},
         });
+        setHistoryCount(history.length);
         setRecentAudios(history.slice(0, 5));
         setChartData(buildWeeklyUsage(history));
       } catch (error) {
+        console.error("Failed to load dashboard data:", error);
         setRecentAudios([]);
         setChartData(buildWeeklyUsage([]));
       }
@@ -88,25 +137,6 @@ const Dashboard = ({ user }) => {
 
     loadDashboardData();
   }, []);
-
-  const StatCard = ({ icon: Icon, label, value, change, gradient }) => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -5 }}
-      className="glass p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all"
-    >
-      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} p-3 mb-4`}>
-        <Icon size={24} className="text-white" />
-      </div>
-      <p className="text-gray-400 text-sm font-medium mb-2">{label}</p>
-      <p className="text-3xl font-bold text-white mb-2">{value}</p>
-      <div className="flex items-center gap-1 text-green-400 text-sm">
-        <ArrowUpRight size={16} />
-        <span>{change}% vs last month</span>
-      </div>
-    </motion.div>
-  );
 
   return (
     <div className="space-y-8">
@@ -182,30 +212,37 @@ const Dashboard = ({ user }) => {
           className="lg:col-span-2 glass p-6 rounded-2xl border border-white/10"
         >
           <h3 className="text-xl font-bold text-white mb-6">Weekly Usage</h3>
-          <div className="relative h-[300px] flex items-end gap-3 border-l border-b border-white/10 px-4 pb-8 pt-4">
-            {chartData.map((item) => {
-              const height = maxUsage > 0 ? Math.max((item.usage / maxUsage) * 100, 8) : 0;
-              return (
-                <div key={item.day} className="flex-1 h-full flex flex-col justify-end items-center gap-3">
-                  <div className="relative w-full flex justify-center group">
+          <div className="relative h-[320px] border-l border-b border-white/10 px-4 pb-8 pt-6">
+            <div className="absolute inset-x-0 top-0 h-full pointer-events-none">
+              {[0, 1, 2, 3, 4].map((index) => (
+                <div
+                  key={index}
+                  className="absolute left-0 right-0 h-px bg-white/10"
+                  style={{ top: `${index * 25}%` }}
+                />
+              ))}
+            </div>
+            <div className="relative h-full flex items-end gap-3">
+              {chartData.map((item) => {
+                const height = maxUsage > 0 ? Math.max((item.usage / maxUsage) * 100, 8) : 0;
+                return (
+                  <div key={item.day} className="flex-1 h-full flex flex-col justify-end items-center gap-2">
+                    <div className="text-xs text-gray-400">{item.usage}</div>
                     <div
-                      className={`w-full max-w-12 rounded-t-lg transition-all ${
+                      className={`w-full max-w-12 rounded-t-full transition-all ${
                         item.usage > 0
-                          ? 'bg-gradient-to-t from-blue-500 to-cyan-400 shadow-lg shadow-blue-500/20 group-hover:from-purple-500 group-hover:to-blue-400'
+                          ? 'bg-gradient-to-t from-blue-500 to-cyan-400 shadow-lg shadow-blue-500/20'
                           : 'bg-white/10'
                       }`}
                       style={{ height: `${height}%` }}
                     />
-                    <div className="absolute -top-9 px-2 py-1 rounded bg-dark-800 border border-white/10 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                      {item.usage}
-                    </div>
+                    <span className="text-xs text-gray-400">{item.day}</span>
                   </div>
-                  <span className="text-xs text-gray-400">{item.day}</span>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
             {!hasWeeklyUsage && (
-              <div className="absolute inset-x-6 top-1/2 -translate-y-1/2 text-center text-sm text-gray-400 pointer-events-none">
+              <div className="absolute inset-x-0 top-0 h-full flex items-center justify-center text-center text-sm text-gray-400 pointer-events-none">
                 No audio generated in the last 7 days.
               </div>
             )}
@@ -236,6 +273,110 @@ const Dashboard = ({ user }) => {
               <span className="text-gray-400">Uptime</span>
               <span className="text-green-400 font-medium">99.9%</span>
             </div>
+          </div>
+        </motion.div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass p-6 rounded-2xl border border-white/10"
+        >
+          <h3 className="text-xl font-bold text-white mb-6">Generation Health</h3>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-400">Success</span>
+              <span className="text-white font-semibold">{stats.successCount}</span>
+            </div>
+            <div className="h-3 w-full rounded-full bg-white/10 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-emerald-400"
+                style={{ width: `${successRate}%` }}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-400">Failure</span>
+              <span className="text-white font-semibold">{stats.failureCount}</span>
+            </div>
+            <div className="h-3 w-full rounded-full bg-white/10 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-red-500"
+                style={{ width: `${failureRate}%` }}
+              />
+            </div>
+            <div className="flex items-center justify-between text-sm text-gray-400">
+              <span>Success rate</span>
+              <span>{successRate}%</span>
+            </div>
+            <div className="flex items-center justify-between text-sm text-gray-400">
+              <span>Failure rate</span>
+              <span>{failureRate}%</span>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass p-6 rounded-2xl border border-white/10"
+        >
+          <h3 className="text-xl font-bold text-white mb-6">Gender Breakdown</h3>
+          <div className="space-y-4">
+            {['male', 'female', 'other'].map((key) => {
+              const count = stats.genderCounts[key] || 0;
+              const width = genderTotal ? Math.round((count / genderTotal) * 100) : 0;
+              let barColor = 'bg-violet-500';
+              if (key === 'male') barColor = 'bg-blue-500';
+              else if (key === 'female') barColor = 'bg-pink-500';
+              return (
+                <div key={key}>
+                  <div className="flex items-center justify-between text-gray-400 text-sm mb-2">
+                    <span>{key.charAt(0).toUpperCase() + key.slice(1)}</span>
+                    <span>{count}</span>
+                  </div>
+                  <div className="h-3 w-full rounded-full bg-white/10 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${barColor}`}
+                      style={{ width: `${width}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass p-6 rounded-2xl border border-white/10"
+        >
+          <h3 className="text-xl font-bold text-white mb-6">Top Languages</h3>
+          <div className="space-y-4">
+            {languageEntries.length > 0 ? (
+              languageEntries.map(([language, count]) => (
+                <div key={language} className="space-y-2">
+                  <div className="flex items-center justify-between text-gray-400 text-sm">
+                    <span>{language}</span>
+                    <span>{count}</span>
+                  </div>
+                  <div className="h-3 w-full rounded-full bg-white/10 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-cyan-500"
+                      style={{ width: `${Math.min(100, Math.round((count / Math.max(historyCount, 1)) * 100))}%` }}
+                    />
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-gray-400">No language data available.</p>
+            )}
+            {languageEntries.length > 0 && historyCount > 0 && (
+              <p className="text-xs text-gray-500 mt-3">
+                Showing top {languageEntries.length} of {Object.keys(stats.languageCounts).length} detected languages.
+              </p>
+            )}
           </div>
         </motion.div>
       </div>
@@ -272,6 +413,12 @@ const Dashboard = ({ user }) => {
       </motion.div>
     </div>
   );
+};
+
+Dashboard.propTypes = {
+  user: PropTypes.shape({
+    name: PropTypes.string,
+  }),
 };
 
 export default Dashboard;

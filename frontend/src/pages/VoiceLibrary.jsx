@@ -21,7 +21,10 @@ const VoiceLibrary = () => {
     { id: 6, name: 'Ryan', language: 'English (UK)', type: 'Male', accent: 'British', url: 'https://example.com/ryan.wav' },
     { id: 7, name: 'Libby', language: 'English (UK)', type: 'Female', accent: 'British', url: 'https://example.com/libby.wav' },
     { id: 8, name: 'Maisie', language: 'English (UK)', type: 'Female', accent: 'British', style: 'Bright', url: 'https://example.com/maisie.wav' },
+    { id: 9, name: 'Poppy', language: 'English (UK)', type: 'Female', accent: 'British', style: 'Clear', url: 'https://example.com/poppy.wav' },
     { id: 29, name: 'Thomas', language: 'English (UK)', type: 'Male', accent: 'British', style: 'Deep', url: 'https://example.com/thomas.wav' },
+    { id: 30, name: 'Oliver', language: 'English (UK)', type: 'Male', accent: 'British', style: 'Smooth', url: 'https://example.com/oliver.wav' },
+    { id: 31, name: 'James', language: 'English (UK)', type: 'Male', accent: 'British', style: 'Warm', url: 'https://example.com/james.wav' },
     { id: 33, name: 'Natasha', language: 'English (AU)', type: 'Female', accent: 'Australian', style: 'Soft', url: 'https://example.com/natasha.wav' },
     { id: 34, name: 'William', language: 'English (AU)', type: 'Male', accent: 'Australian', style: 'Clear', url: 'https://example.com/william.wav' },
     { id: 9, name: 'Katja', language: 'German', type: 'Female', accent: 'German', url: 'https://example.com/katja.wav' },
@@ -39,8 +42,6 @@ const VoiceLibrary = () => {
     { id: 18, name: 'Keita', language: 'Japanese', type: 'Male', accent: 'Japanese', style: 'Clear', url: 'https://example.com/keita.wav' },
     { id: 19, name: 'Polina', language: 'Ukrainian', type: 'Female', accent: 'Ukrainian', style: 'Soft', url: 'https://example.com/polina.wav' },
     { id: 20, name: 'Ostap', language: 'Ukrainian', type: 'Male', accent: 'Ukrainian', style: 'Clear', url: 'https://example.com/ostap.wav' },
-    { id: 35, name: 'Swara', language: 'Hindi', type: 'Female', accent: 'Indian', style: 'Soft', url: 'https://example.com/swara.wav' },
-    { id: 36, name: 'Madhur', language: 'Hindi', type: 'Male', accent: 'Indian', style: 'Clear', url: 'https://example.com/madhur.wav' },
   ];
 
   const toggleFavorite = (id) => {
@@ -82,13 +83,12 @@ const VoiceLibrary = () => {
           const utter = new SpeechSynthesisUtterance(`Sample voice ${voice.name}`);
           // optional: map some basic language hints
           if (voice.language && voice.language.toLowerCase().includes('german')) utter.lang = 'de-DE';
-          if (voice.language && voice.language.toLowerCase().includes('french')) utter.lang = 'fr-FR';
-          if (voice.language && voice.language.toLowerCase().includes('japanese')) utter.lang = 'ja-JP';
-          if (voice.language && voice.language.toLowerCase().includes('ukrainian')) utter.lang = 'uk-UA';
-          if (voice.language && voice.language.toLowerCase().includes('hindi')) utter.lang = 'hi-IN';
-          if (voice.language && voice.language.toLowerCase().includes('english (au)')) utter.lang = 'en-AU';
-          if (voice.language && voice.language.toLowerCase().includes('english (uk)')) utter.lang = 'en-GB';
-          if (voice.language && voice.language.toLowerCase().includes('english (us)')) utter.lang = 'en-US';
+          if (voice.language?.toLowerCase().includes('french')) utter.lang = 'fr-FR';
+          if (voice.language?.toLowerCase().includes('japanese')) utter.lang = 'ja-JP';
+          if (voice.language?.toLowerCase().includes('ukrainian')) utter.lang = 'uk-UA';
+          if (voice.language?.toLowerCase().includes('english (au)')) utter.lang = 'en-AU';
+          if (voice.language?.toLowerCase().includes('english (uk)')) utter.lang = 'en-GB';
+          if (voice.language?.toLowerCase().includes('english (us)')) utter.lang = 'en-US';
 
           setPlayingId(voice.id);
           audioRef.current = { synth: true };
@@ -237,7 +237,7 @@ const VoiceLibrary = () => {
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-3">Language</label>
             <div className="flex gap-2 flex-wrap">
-              {['all', 'English (US)', 'English (UK)', 'English (AU)', 'German', 'French', 'Japanese', 'Ukrainian', 'Hindi'].map((lang) => (
+              {['all', 'English (US)', 'English (UK)', 'English (AU)', 'German', 'French', 'Japanese', 'Ukrainian'].map((lang) => (
                 <motion.button
                   key={lang}
                   onClick={() => setSelectedLanguage(lang === 'all' ? 'all' : lang)}

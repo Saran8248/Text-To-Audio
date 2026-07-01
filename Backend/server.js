@@ -74,7 +74,10 @@ const voiceMap = {
   "en-GB-RyanNeural": "en-GB-RyanNeural",
   "en-GB-LibbyNeural": "en-GB-LibbyNeural",
   "en-GB-MaisieNeural": "en-GB-MaisieNeural",
+  "en-GB-PoppyNeural": "en-GB-PoppyNeural",
   "en-GB-ThomasNeural": "en-GB-ThomasNeural",
+  "en-GB-OliverNeural": "en-GB-OliverNeural",
+  "en-GB-JamesNeural": "en-GB-JamesNeural",
   "de-DE-KatjaNeural": "de-DE-KatjaNeural",
   "de-DE-ConradNeural": "de-DE-ConradNeural",
   "de-DE-AmalaNeural": "de-DE-AmalaNeural",
@@ -90,8 +93,6 @@ const voiceMap = {
   "ja-JP-KeitaNeural": "ja-JP-KeitaNeural",
   "uk-UA-PolinaNeural": "uk-UA-PolinaNeural",
   "uk-UA-OstapNeural": "uk-UA-OstapNeural",
-  "hi-IN-SwaraNeural": "hi-IN-SwaraNeural",
-  "hi-IN-MadhurNeural": "hi-IN-MadhurNeural",
   "en-AU-NatashaNeural": "en-AU-NatashaNeural",
   "en-AU-WilliamMultilingualNeural": "en-AU-WilliamMultilingualNeural",
   "xtts-v2": "xtts-v2",
@@ -176,6 +177,81 @@ function getEdgeVoiceSet() {
 
 function resolveVoice(requestedVoice) {
   return voiceMap[requestedVoice] || requestedVoice;
+}
+
+function getAvailableVoices() {
+  return {
+    "en-US": [
+      { id: "en-US-JennyNeural", name: "Jenny", type: "Female", style: "Soft" },
+      { id: "en-US-GuyNeural", name: "Guy", type: "Male", style: "Bold" },
+      { id: "en-US-AriaNeural", name: "Aria", type: "Female", style: "Warm" },
+      { id: "en-US-EricNeural", name: "Eric", type: "Male", style: "Clear" },
+      { id: "en-US-AvaNeural", name: "Ava", type: "Female", style: "Soft" },
+      { id: "en-US-EmmaNeural", name: "Emma", type: "Female", style: "Public Speaker" },
+      { id: "en-US-BrianNeural", name: "Brian", type: "Male", style: "Warm" },
+      { id: "en-US-ChristopherNeural", name: "Christopher", type: "Male", style: "Deep" },
+    ],
+    "en-GB": [
+      { id: "en-GB-SoniaNeural", name: "Sonia", type: "Female", style: "Soft" },
+      { id: "en-GB-LibbyNeural", name: "Libby", type: "Female", style: "Warm" },
+      { id: "en-GB-MaisieNeural", name: "Maisie", type: "Female", style: "Bright" },
+      { id: "en-GB-PoppyNeural", name: "Poppy", type: "Female", style: "Clear" },
+      { id: "en-GB-RyanNeural", name: "Ryan", type: "Male", style: "Bold" },
+      { id: "en-GB-ThomasNeural", name: "Thomas", type: "Male", style: "Deep" },
+      { id: "en-GB-OliverNeural", name: "Oliver", type: "Male", style: "Smooth" },
+      { id: "en-GB-JamesNeural", name: "James", type: "Male", style: "Warm" },
+    ],
+    "de-DE": [
+      { id: "de-DE-KatjaNeural", name: "Katja", type: "Female", style: "Soft" },
+      { id: "de-DE-ConradNeural", name: "Conrad", type: "Male", style: "Clear" },
+      { id: "de-DE-AmalaNeural", name: "Amala", type: "Female", style: "Warm" },
+      { id: "de-DE-FlorianMultilingualNeural", name: "Florian", type: "Male", style: "Bold" },
+      { id: "de-DE-KillianNeural", name: "Killian", type: "Male", style: "Bright" },
+      { id: "de-DE-SeraphinaMultilingualNeural", name: "Seraphina", type: "Female", style: "Clear" },
+    ],
+    "fr-FR": [
+      { id: "fr-FR-DeniseNeural", name: "Denise", type: "Female", style: "Soft" },
+      { id: "fr-FR-HenriNeural", name: "Henri", type: "Male", style: "Clear" },
+      { id: "fr-FR-EloiseNeural", name: "Eloise", type: "Female", style: "Warm" },
+      { id: "fr-FR-RemyMultilingualNeural", name: "Remy", type: "Male", style: "Bold" },
+      { id: "fr-FR-VivienneMultilingualNeural", name: "Vivienne", type: "Female", style: "Bright" },
+    ],
+    "ja-JP": [
+      { id: "ja-JP-NanamiNeural", name: "Nanami", type: "Female", style: "Soft" },
+      { id: "ja-JP-KeitaNeural", name: "Keita", type: "Male", style: "Clear" },
+    ],
+    "uk-UA": [
+      { id: "uk-UA-PolinaNeural", name: "Polina", type: "Female", style: "Soft" },
+      { id: "uk-UA-OstapNeural", name: "Ostap", type: "Male", style: "Clear" },
+    ],
+    "en-AU": [
+      { id: "en-AU-NatashaNeural", name: "Natasha", type: "Female", style: "Soft" },
+      { id: "en-AU-WilliamMultilingualNeural", name: "William", type: "Male", style: "Clear" },
+    ],
+    "XTTS-v2": [
+      { id: "xtts-v2", name: "XTTS v2", type: "Multilingual", style: "Coqui" },
+    ],
+  };
+}
+
+function getVoiceMeta(voiceId) {
+  const voices = getAvailableVoices();
+  for (const voiceGroup of Object.values(voices)) {
+    const match = voiceGroup.find((voice) => voice.id === voiceId);
+    if (match) {
+      return {
+        ...match,
+        language: voiceId.split('-').slice(0, 2).join('-'),
+      };
+    }
+  }
+  return {
+    id: voiceId,
+    name: voiceId,
+    type: 'Unknown',
+    style: 'Unknown',
+    language: voiceId.split('-').slice(0, 2).join('-'),
+  };
 }
 
 function isSupportedVoice(requestedVoice, requestedEngine) {
@@ -530,12 +606,16 @@ function saveHistory(history) {
 }
 
 // Add to history
-function addToHistory(text, voice) {
+function addToHistory(text, voice, status = 'success') {
+  const voiceMeta = getVoiceMeta(voice);
   const history = loadHistory();
   history.unshift({
     id: Date.now(),
     text: text.substring(0, 100),
     voice,
+    language: voiceMeta.language,
+    gender: voiceMeta.type,
+    status,
     timestamp: new Date().toISOString(),
   });
   // Keep only last 100 entries
@@ -780,7 +860,7 @@ app.post("/api/tts/generate", validateTTSRequest, asyncHandler(async (req, res) 
     const cacheKey = generateCacheKey(text, selectedVoice, engine, req.body.language || 'en');
     const { filePath, fromCache } = await generateAudio(text, selectedVoice, cacheKey, { engine, language: req.body.language });
 
-    addToHistory(text, selectedVoice);
+    addToHistory(text, selectedVoice, 'success');
 
     res.setHeader("Content-Type", "audio/mpeg");
     res.setHeader("X-From-Cache", fromCache ? "true" : "false");
@@ -793,6 +873,7 @@ app.post("/api/tts/generate", validateTTSRequest, asyncHandler(async (req, res) 
     });
   } catch (error) {
     console.error("Error generating audio:", error);
+    addToHistory(text, requestedVoice, 'failure');
     res.status(500).json({
       error: "GENERATION_FAILED",
       message: error.message || "Failed to generate audio",
@@ -813,61 +894,24 @@ app.get("/api/tts/history", (req, res) => {
   }
 });
 
+// Clear generation history permanently
+app.delete("/api/tts/history", (req, res) => {
+  try {
+    if (fs.existsSync(HISTORY_FILE)) {
+      fs.unlinkSync(HISTORY_FILE);
+    }
+    res.json({ message: "Generation history cleared", data: [] });
+  } catch (error) {
+    res.status(500).json({
+      error: "HISTORY_CLEAR_FAILED",
+      message: error.message,
+    });
+  }
+});
+
 // Get available voices
 app.get("/api/tts/voices", (req, res) => {
-  const voices = {
-    "en-US": [
-      { id: "en-US-JennyNeural", name: "Jenny", type: "Female", style: "Soft" },
-      { id: "en-US-GuyNeural", name: "Guy", type: "Male", style: "Bold" },
-      { id: "en-US-AriaNeural", name: "Aria", type: "Female", style: "Warm" },
-      { id: "en-US-EricNeural", name: "Eric", type: "Male", style: "Clear" },
-      { id: "en-US-AvaNeural", name: "Ava", type: "Female", style: "Soft" },
-      { id: "en-US-EmmaNeural", name: "Emma", type: "Female", style: "Public Speaker" },
-      { id: "en-US-BrianNeural", name: "Brian", type: "Male", style: "Warm" },
-      { id: "en-US-ChristopherNeural", name: "Christopher", type: "Male", style: "Deep" },
-    ],
-    "en-GB": [
-      { id: "en-GB-SoniaNeural", name: "Sonia", type: "Female", style: "Soft" },
-      { id: "en-GB-RyanNeural", name: "Ryan", type: "Male", style: "Clear" },
-      { id: "en-GB-LibbyNeural", name: "Libby", type: "Female", style: "Warm" },
-      { id: "en-GB-MaisieNeural", name: "Maisie", type: "Female", style: "Bright" },
-      { id: "en-GB-ThomasNeural", name: "Thomas", type: "Male", style: "Deep" },
-    ],
-    "de-DE": [
-      { id: "de-DE-KatjaNeural", name: "Katja", type: "Female", style: "Soft" },
-      { id: "de-DE-ConradNeural", name: "Conrad", type: "Male", style: "Clear" },
-      { id: "de-DE-AmalaNeural", name: "Amala", type: "Female", style: "Warm" },
-      { id: "de-DE-FlorianMultilingualNeural", name: "Florian", type: "Male", style: "Bold" },
-      { id: "de-DE-KillianNeural", name: "Killian", type: "Male", style: "Bright" },
-      { id: "de-DE-SeraphinaMultilingualNeural", name: "Seraphina", type: "Female", style: "Clear" },
-    ],
-    "fr-FR": [
-      { id: "fr-FR-DeniseNeural", name: "Denise", type: "Female", style: "Soft" },
-      { id: "fr-FR-HenriNeural", name: "Henri", type: "Male", style: "Clear" },
-      { id: "fr-FR-EloiseNeural", name: "Eloise", type: "Female", style: "Warm" },
-      { id: "fr-FR-RemyMultilingualNeural", name: "Remy", type: "Male", style: "Bold" },
-      { id: "fr-FR-VivienneMultilingualNeural", name: "Vivienne", type: "Female", style: "Bright" },
-    ],
-    "ja-JP": [
-      { id: "ja-JP-NanamiNeural", name: "Nanami", type: "Female", style: "Soft" },
-      { id: "ja-JP-KeitaNeural", name: "Keita", type: "Male", style: "Clear" },
-    ],
-    "uk-UA": [
-      { id: "uk-UA-PolinaNeural", name: "Polina", type: "Female", style: "Soft" },
-      { id: "uk-UA-OstapNeural", name: "Ostap", type: "Male", style: "Clear" },
-    ],
-    "hi-IN": [
-      { id: "hi-IN-SwaraNeural", name: "Swara", type: "Female", style: "Soft" },
-      { id: "hi-IN-MadhurNeural", name: "Madhur", type: "Male", style: "Clear" },
-    ],
-    "en-AU": [
-      { id: "en-AU-NatashaNeural", name: "Natasha", type: "Female", style: "Soft" },
-      { id: "en-AU-WilliamMultilingualNeural", name: "William", type: "Male", style: "Clear" },
-    ],
-    "XTTS-v2": [
-      { id: "xtts-v2", name: "XTTS v2", type: "Multilingual", style: "Coqui" },
-    ],
-  };
+  const voices = getAvailableVoices();
 
   res.json({ data: voices });
 });
@@ -905,10 +949,33 @@ app.get("/api/stats", (req, res) => {
       cacheSize += stats.size;
     }
 
+    const successCount = history.filter((item) => item.status !== 'failure').length;
+    const failureCount = history.filter((item) => item.status === 'failure').length;
+    const genderCounts = history.reduce(
+      (counts, item) => {
+        const type = String(item.gender || 'Unknown').toLowerCase();
+        if (type === 'male') counts.male += 1;
+        else if (type === 'female') counts.female += 1;
+        else counts.other += 1;
+        return counts;
+      },
+      { male: 0, female: 0, other: 0 }
+    );
+
+    const languageCounts = history.reduce((counts, item) => {
+      const language = String(item.language || item.voice || '').split('-').slice(0, 2).join('-') || 'unknown';
+      counts[language] = (counts[language] || 0) + 1;
+      return counts;
+    }, {});
+
     res.json({
       cacheSize: Math.round(cacheSize / 1024 / 1024 * 100) / 100 + " MB",
       cacheFiles: cacheFiles.length,
       historyEntries: history.length,
+      successCount,
+      failureCount,
+      genderCounts,
+      languageCounts,
       uptime: process.uptime(),
     });
   } catch (error) {

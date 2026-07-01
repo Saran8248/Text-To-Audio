@@ -17,23 +17,31 @@ const authHeaders = () => {
 };
 
 const requestJson = async (path, options = {}) => {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    mode: 'cors',
-    cache: 'no-store',
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeaders(),
-      ...(options.headers || {}),
-    },
-  });
+  const url = API_BASE_URL ? `${API_BASE_URL}${path}` : path;
+  const requestUrl = url.replace(/([^:]\/\/)+/g, '$1/');
 
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(payload.message || 'Request failed');
+  try {
+    const response = await fetch(requestUrl, {
+      mode: 'cors',
+      cache: 'no-store',
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders(),
+        ...(options.headers || {}),
+      },
+    });
+
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const message = payload.message || payload.error || 'Request failed';
+      throw new Error(message);
+    }
+
+    return payload;
+  } catch (error) {
+    throw new Error(`Network request failed for ${requestUrl}: ${error.message}`);
   }
-
-  return payload;
 };
 
 export const getCurrentUser = () => {

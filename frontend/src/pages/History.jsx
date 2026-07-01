@@ -31,9 +31,14 @@ const History = () => {
     loadHistory();
   };
 
-  const handleClearHistory = () => {
-    setHistory([]);
-    toast.success('Generation history cleared');
+  const handleClearHistory = async () => {
+    try {
+      await axios.delete(`${API_BASE_URL}/api/tts/history`);
+      setHistory([]);
+      toast.success('Generation history cleared');
+    } catch (error) {
+      toast.error('Failed to clear history');
+    }
   };
 
   const filteredHistory = history.filter((item) => {
@@ -104,7 +109,7 @@ const History = () => {
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-3">Language filter</label>
             <div className="flex flex-wrap gap-2">
-              {['all', 'en-US', 'en-GB', 'en-AU', 'de-DE', 'fr-FR', 'ja-JP', 'uk-UA', 'hi-IN'].map((filter) => (
+              {['all', 'en-US', 'en-GB', 'en-AU', 'de-DE', 'fr-FR', 'ja-JP', 'uk-UA'].map((filter) => (
                 <motion.button
                   key={filter}
                   onClick={() => setSelectedFilter(filter)}

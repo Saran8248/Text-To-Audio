@@ -10,6 +10,5 @@ const normalizeApiUrl = (url) => {
   return `http://${trimmed}`;
 };
 
-export const API_BASE_URL =
-  normalizeApiUrl(configuredApiUrl) ||
-  (process.env.NODE_ENV === 'development' ? '' : 'http://localhost:5000');
+const developmentBaseUrl = process.env.NODE_ENV === 'development' ? '' : 'http://localhost:5000';
+export const API_BASE_URL = normalizeApiUrl(configuredApiUrl) || developmentBaseUrl;

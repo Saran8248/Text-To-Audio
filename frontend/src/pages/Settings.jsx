@@ -203,10 +203,13 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
               <option value="en-US-BrianNeural">Brian (English US Male)</option>
               <option value="en-US-ChristopherNeural">Christopher (English US Male)</option>
               <option value="en-GB-SoniaNeural">Sonia (English UK Female)</option>
-              <option value="en-GB-RyanNeural">Ryan (English UK Male)</option>
               <option value="en-GB-LibbyNeural">Libby (English UK Female)</option>
               <option value="en-GB-MaisieNeural">Maisie (English UK Female)</option>
+              <option value="en-GB-PoppyNeural">Poppy (English UK Female)</option>
+              <option value="en-GB-RyanNeural">Ryan (English UK Male)</option>
               <option value="en-GB-ThomasNeural">Thomas (English UK Male)</option>
+              <option value="en-GB-OliverNeural">Oliver (English UK Male)</option>
+              <option value="en-GB-JamesNeural">James (English UK Male)</option>
               <option value="en-AU-NatashaNeural">Natasha (English AU Female)</option>
               <option value="en-AU-WilliamMultilingualNeural">William (English AU Male)</option>
               <option value="de-DE-KatjaNeural">Katja (German Female)</option>
@@ -224,8 +227,6 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
               <option value="ja-JP-KeitaNeural">Keita (Japanese Male)</option>
               <option value="uk-UA-PolinaNeural">Polina (Ukrainian Female)</option>
               <option value="uk-UA-OstapNeural">Ostap (Ukrainian Male)</option>
-              <option value="hi-IN-SwaraNeural">Swara (Hindi Female)</option>
-              <option value="hi-IN-MadhurNeural">Madhur (Hindi Male)</option>
             </select>
           </div>
 

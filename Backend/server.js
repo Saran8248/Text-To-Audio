@@ -271,36 +271,32 @@ const configuredAllowedOrigins = (process.env.CORS_ORIGINS || process.env.FRONTE
   .split(',')
   .map((origin) => origin.trim().replace(/\/+$/, ''))
   .filter(Boolean);
-const defaultAllowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:5000',
-  'https://localhost:3000',
-  'https://localhost:5000',
-  'http://127.0.0.1:3000',
-  'http://127.0.0.1:5000',
-  'https://127.0.0.1:3000',
-  'https://127.0.0.1:5000',
-  'http://[::1]:3000',
-  'http://[::1]:5000',
-];
-const allowAllOrigins = process.env.NODE_ENV !== 'production' || configuredAllowedOrigins.length === 0;
+
+const corsOptions = configuredAllowedOrigins.length > 0
+  ? {
+      origin: configuredAllowedOrigins,
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+      preflightContinue: false,
+      optionsSuccessStatus: 204,
+    }
+  : {
+      origin: true,
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+      preflightContinue: false,
+      optionsSuccessStatus: 204,
+    };
 
 if (process.env.NODE_ENV === 'production' && configuredAllowedOrigins.length === 0) {
   console.warn('CORS: no FRONTEND_URL or CORS_ORIGINS configured in production; allowing all origins in production.');
 }
 
-const corsOptions = {
-  origin: allowAllOrigins ? true : configuredAllowedOrigins,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-  preflightContinue: false,
-  optionsSuccessStatus: 204,
-};
-
 // Middleware
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+app.options('/*', cors(corsOptions));
 app.use(express.json());
 
 function normalizeUser(user) {

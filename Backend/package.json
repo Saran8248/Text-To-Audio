@@ -4,6 +4,7 @@
   "description": "Node.js backend for Text-to-Audio with hosted Python TTS generation",
   "main": "server.js",
   "scripts": {
+    "check": "node --check server.js",
     "start": "node server.js",
     "start:dev": "nodemon server.js"
   },

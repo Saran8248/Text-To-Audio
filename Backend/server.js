@@ -840,9 +840,9 @@ app.post("/api/admin/users", requireAdmin, (req, res) => {
 });
 
 app.patch("/api/admin/users/:id", requireAdmin, (req, res) => {
-  const userId = Number(req.params.id);
+  const userId = String(req.params.id);
   const users = loadUsers();
-  const target = users.find((user) => user.id === userId);
+  const target = users.find((user) => String(user.id) === userId);
 
   if (!target) {
     res.status(404).json({ error: "USER_NOT_FOUND", message: "User not found." });
@@ -853,7 +853,7 @@ app.patch("/api/admin/users/:id", requireAdmin, (req, res) => {
   const role = ["admin", "user"].includes(req.body.role) ? req.body.role : target.role;
 
   const updatedUsers = users.map((user) => (
-    user.id === userId ? { ...user, accessStatus, role } : user
+    String(user.id) === userId ? { ...user, accessStatus, role } : user
   ));
 
   saveUsers(updatedUsers);
@@ -861,14 +861,14 @@ app.patch("/api/admin/users/:id", requireAdmin, (req, res) => {
 });
 
 app.delete("/api/admin/users/:id", requireAdmin, (req, res) => {
-  const userId = Number(req.params.id);
-  if (req.user.id === userId) {
+  const userId = String(req.params.id);
+  if (String(req.user.id) === userId) {
     res.status(400).json({ error: "SELF_DELETE", message: "You cannot delete your own admin account." });
     return;
   }
 
   const users = loadUsers();
-  const updatedUsers = users.filter((user) => user.id !== userId);
+  const updatedUsers = users.filter((user) => String(user.id) !== userId);
   if (updatedUsers.length === users.length) {
     res.status(404).json({ error: "USER_NOT_FOUND", message: "User not found." });
     return;

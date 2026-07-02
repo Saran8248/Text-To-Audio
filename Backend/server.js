@@ -1,6 +1,5 @@
 const express = require("express");
 const fs = require("node:fs");
-const fsPromises = require("node:fs/promises");
 const path = require("node:path");
 const { spawn, spawnSync } = require("node:child_process");
 const crypto = require("node:crypto");
@@ -48,6 +47,8 @@ const USERS_FILE = path.join(__dirname, "users.json");
 const MAX_TEXT_LENGTH = 5000;
 const REQUEST_TIMEOUT = 120000; // 2 minutes
 const REQUIRE_ADMIN_APPROVAL = String(process.env.REQUIRE_ADMIN_APPROVAL || "false").toLowerCase() === "true";
+const SESSION_TTL_DAYS = Number(process.env.SESSION_TTL_DAYS || 30);
+const isProduction = process.env.NODE_ENV === "production";
 
 // Ensure cache directory exists
 if (!fs.existsSync(CACHE_DIR)) {
@@ -268,7 +269,13 @@ const configuredAllowedOrigins = (process.env.CORS_ORIGINS || process.env.FRONTE
 
 const corsOptions = configuredAllowedOrigins.length > 0
   ? {
-      origin: configuredAllowedOrigins,
+      origin(origin, callback) {
+        if (!origin || configuredAllowedOrigins.includes(origin.replace(/\/+$/, ''))) {
+          callback(null, true);
+          return;
+        }
+        callback(new Error(`Origin not allowed by CORS: ${origin}`));
+      },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
@@ -276,7 +283,7 @@ const corsOptions = configuredAllowedOrigins.length > 0
       optionsSuccessStatus: 204,
     }
   : {
-      origin: true,
+      origin: isProduction ? false : true,
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
@@ -284,13 +291,13 @@ const corsOptions = configuredAllowedOrigins.length > 0
       optionsSuccessStatus: 204,
     };
 
-if (process.env.NODE_ENV === 'production' && configuredAllowedOrigins.length === 0) {
-  console.warn('CORS: no FRONTEND_URL or CORS_ORIGINS configured in production; allowing all origins in production.');
+if (isProduction && configuredAllowedOrigins.length === 0) {
+  console.warn('CORS: no FRONTEND_URL or CORS_ORIGINS configured in production; browser requests may be rejected.');
 }
 
 // Middleware
 app.use(cors(corsOptions));
-app.use(express.json());
+app.use(express.json({ limit: "64kb" }));
 
 function normalizeUser(user) {
   return {
@@ -328,8 +335,16 @@ function hashPassword(password, salt = crypto.randomBytes(16).toString("hex")) {
 }
 
 function ensureDefaultAdminUser() {
-  const adminEmail = (process.env.DEFAULT_ADMIN_EMAIL || "sksaran987@gmail.com").trim().toLowerCase();
-  const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD || "Sarankd@987";
+  const adminEmail = (process.env.DEFAULT_ADMIN_EMAIL || "").trim().toLowerCase();
+  const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD || "";
+
+  if (!adminEmail || !adminPassword) {
+    if (!isProduction) {
+      console.warn("Default admin user was not created. Set DEFAULT_ADMIN_EMAIL and DEFAULT_ADMIN_PASSWORD to enable bootstrap admin creation.");
+    }
+    return;
+  }
+
   const users = loadUsers();
   const existingAdmin = users.find((user) => user.email === adminEmail);
 
@@ -369,7 +384,9 @@ function ensureDefaultAdminUser() {
 function verifyPassword(password, user) {
   if (user.passwordHash && user.passwordSalt) {
     const { passwordHash } = hashPassword(password, user.passwordSalt);
-    return crypto.timingSafeEqual(Buffer.from(passwordHash, "hex"), Buffer.from(user.passwordHash, "hex"));
+    const expected = Buffer.from(user.passwordHash, "hex");
+    const actual = Buffer.from(passwordHash, "hex");
+    return expected.length === actual.length && crypto.timingSafeEqual(actual, expected);
   }
 
   return user.password === password;
@@ -380,7 +397,7 @@ function createUser({ name, email, password, role = "user", accessStatus = "pend
   const { passwordHash, passwordSalt } = hashPassword(password);
 
   return normalizeUser({
-    id: Date.now() + Math.floor(Math.random() * 1000),
+    id: crypto.randomUUID(),
     name: name.trim(),
     email: normalizedEmail,
     passwordHash,
@@ -411,7 +428,13 @@ function readBearerToken(req) {
 
 function findUserByToken(token) {
   if (!token) return null;
-  return loadUsers().find((user) => user.sessions.some((session) => session.token === token)) || null;
+  const now = Date.now();
+  const sessionTtlMs = SESSION_TTL_DAYS * 24 * 60 * 60 * 1000;
+  return loadUsers().find((user) => user.sessions.some((session) => {
+    if (session.token !== token) return false;
+    const createdAt = new Date(session.createdAt).getTime();
+    return !Number.isNaN(createdAt) && now - createdAt <= sessionTtlMs;
+  })) || null;
 }
 
 function requireAuth(req, res, next) {
@@ -449,8 +472,8 @@ function validateAccountFields({ name, email, password }, { requirePassword = tr
   if (!email || typeof email !== "string" || !email.trim().includes("@")) {
     return "A valid email is required.";
   }
-  if (requirePassword && (!password || typeof password !== "string" || password.length < 6)) {
-    return "Password must be at least 6 characters.";
+  if (requirePassword && (!password || typeof password !== "string" || password.length < 8)) {
+    return "Password must be at least 8 characters.";
   }
   return null;
 }
@@ -656,7 +679,16 @@ function addToHistory(text, voice, status = 'success') {
 
 // Health check
 app.get("/health", (req, res) => {
-  res.json({ status: "ok", message: "Server is running" });
+  res.json({
+    status: "ok",
+    message: "Server is running",
+    service: "text-to-audio-backend",
+    uptime: process.uptime(),
+    python: {
+      executable: defaultPythonExecutable || null,
+      edgeTtsAvailable: Boolean(resolvePythonExecutable("edge_tts")),
+    },
+  });
 });
 
 app.post("/api/auth/register", (req, res) => {
@@ -949,8 +981,11 @@ app.post("/api/cache/clear", asyncHandler(async (req, res) => {
     let deletedCount = 0;
 
     for (const file of files) {
-      fs.unlinkSync(path.join(CACHE_DIR, file));
-      deletedCount++;
+      const filePath = path.join(CACHE_DIR, file);
+      if (path.extname(filePath) === ".mp3" && fs.statSync(filePath).isFile()) {
+        fs.unlinkSync(filePath);
+        deletedCount++;
+      }
     }
 
     res.json({ message: "Cache cleared", deletedCount });

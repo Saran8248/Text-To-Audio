@@ -85,7 +85,7 @@ function App() {
   const handleThemeToggle = () => setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
 
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
         <Route path="/login" element={<Login onLogin={setUser} />} />
         <Route path="/register" element={<Register onRegister={setUser} />} />

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from '../utils/motion';
-import { Menu, X, Home, Mic2, Music, History, Settings, LogOut, ShieldCheck } from 'lucide-react';
+import { Menu, X, Home, Mic2, Music, History, Settings, LogOut, ShieldCheck, KeyRound } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { isAdmin } from '../utils/auth';
 
@@ -14,6 +14,7 @@ const Sidebar = ({ user, onLogout }) => {
     { name: 'Text to Speech', icon: Mic2, path: '/tts' },
     { name: 'Voice Library', icon: Music, path: '/voices' },
     { name: 'History', icon: History, path: '/history' },
+    { name: 'API Keys', icon: KeyRound, path: '/api-keys' },
     ...(isAdmin(user) ? [{ name: 'Admin Access', icon: ShieldCheck, path: '/admin' }] : []),
     { name: 'Settings', icon: Settings, path: '/settings' },
   ];
@@ -55,18 +56,16 @@ const Sidebar = ({ user, onLogout }) => {
             animate={{ opacity: 1, y: 0 }}
             className="flex items-center gap-3 mb-12 mt-8 md:mt-0"
           >
-            <div className="relative w-10 h-30 rounded-lg overflow-hidden bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center">
+            <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-white/10 ring-1 ring-white/10 flex items-center justify-center">
               <img
-        
                 src="/terra-tern-logo.png"
                 alt="Terra Tern"
-                
-                className="w-full h-ful object-contain rounded"
+                className="w-full h-full object-contain rounded"
               />
             </div>
             <div>
               <h1 className="text-xl font-bold text-white">Terra Tern</h1>
-              <p className="text-xs text-gray-400">Team Shringika</p>
+                <p className="text-xs text-gray-400">Text to Audio</p>
             </div>
           </motion.div>
 
@@ -85,7 +84,7 @@ const Sidebar = ({ user, onLogout }) => {
                   <Link
                     to={item.path}
                     onClick={() => window.innerWidth < 768 && setIsOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
+                    className={`relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
                       active
                         ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/20'
                         : 'text-gray-400 hover:text-white hover:bg-white/5'

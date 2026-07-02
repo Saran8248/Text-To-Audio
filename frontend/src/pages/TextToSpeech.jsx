@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from '../utils/motion';
-import { Play, Download, Copy, Volume2, Zap, AlertCircle } from 'lucide-react';
+import { Play, Download, Copy, Volume2, Zap, AlertCircle, RotateCcw } from 'lucide-react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import { API_BASE_URL } from '../config/api';
@@ -30,7 +30,6 @@ const TextToSpeech = () => {
   const [selectedLanguage, setSelectedLanguage] = useState('en-US');
   const [languageCode, setLanguageCode] = useState('en');
   const [speed, setSpeed] = useState(1);
-  const [pitch, setPitch] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
   const [generationError, setGenerationError] = useState('');
   const [generationStatus, setGenerationStatus] = useState('');
@@ -197,10 +196,29 @@ const TextToSpeech = () => {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
+        className="glass p-6 sm:p-8 rounded-2xl border border-white/10"
       >
-        <h1 className="text-4xl font-bold text-white mb-2">Text to Speech</h1>
-        <p className="text-gray-400">Convert your text into natural-sounding audio in seconds</p>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-wide text-blue-300">AI audio studio</p>
+            <h1 className="text-3xl sm:text-4xl font-bold text-white mt-2">Text to Speech</h1>
+            <p className="text-gray-400 mt-2 max-w-2xl">Create clean MP3 voiceovers with production-ready Edge voices.</p>
+          </div>
+          <div className="grid grid-cols-3 gap-3 text-center">
+            <div className="glass-sm px-4 py-3 rounded-xl">
+              <p className="text-xs text-gray-400">Limit</p>
+              <p className="text-sm font-semibold text-white">5000 chars</p>
+            </div>
+            <div className="glass-sm px-4 py-3 rounded-xl">
+              <p className="text-xs text-gray-400">Format</p>
+              <p className="text-sm font-semibold text-white">MP3</p>
+            </div>
+            <div className="glass-sm px-4 py-3 rounded-xl">
+              <p className="text-xs text-gray-400">Voice</p>
+              <p className="text-sm font-semibold text-white">{selectedVoice.split('-').slice(-1)[0].replace('Neural', '')}</p>
+            </div>
+          </div>
+        </div>
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -239,6 +257,7 @@ const TextToSpeech = () => {
                 }}
                 className="flex items-center gap-2 px-4 py-2 glass border border-white/10 rounded-lg text-gray-400 hover:text-white hover:border-white/20"
               >
+                <RotateCcw size={18} />
                 Clear
               </motion.button>
             </div>
@@ -308,26 +327,6 @@ const TextToSpeech = () => {
               <div className="flex justify-between text-xs text-gray-500 mt-2">
                 <span>0.5x</span>
                 <span>2x</span>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <label className="text-sm font-semibold text-white">Pitch</label>
-                <span className="text-sm text-purple-400 font-medium">{pitch.toFixed(2)}</span>
-              </div>
-              <input
-                type="range"
-                min="0.5"
-                max="2"
-                step="0.1"
-                value={pitch}
-                onChange={(e) => setPitch(parseFloat(e.target.value))}
-                className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-purple-500"
-              />
-              <div className="flex justify-between text-xs text-gray-500 mt-2">
-                <span>Low</span>
-                <span>High</span>
               </div>
             </div>
           </div>
@@ -477,11 +476,11 @@ const TextToSpeech = () => {
               <div className="flex gap-2">
                 <AlertCircle size={18} className="text-blue-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-xs font-medium text-blue-300 mb-1">💡 Tips</p>
+                  <p className="text-xs font-medium text-blue-300 mb-1">Tips</p>
                   <ul className="text-xs text-blue-200/80 space-y-1">
-                    <li>• Max 5000 characters per request</li>
-                    <li>• Adjust speed for better comprehension</li>
-                    <li>• Try different voices and languages</li>
+                    <li>Max 5000 characters per request</li>
+                    <li>Playback speed changes preview and download review only</li>
+                    <li>Try different voices and languages for narration style</li>
                   </ul>
                 </div>
               </div>

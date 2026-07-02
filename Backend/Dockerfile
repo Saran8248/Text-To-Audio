@@ -1,4 +1,4 @@
-FROM node:24-bullseye-slim
+FROM node:20-bullseye-slim
 
 # Install Python 3 and pip on the server container.
 RUN apt-get update \
@@ -8,7 +8,7 @@ RUN apt-get update \
 WORKDIR /usr/src/app
 
 COPY package.json package-lock.json ./
-RUN npm install --production
+RUN npm ci --omit=dev
 
 COPY requirements.txt ./
 RUN python3 -m pip install --no-cache-dir --upgrade pip \

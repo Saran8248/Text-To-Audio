@@ -1,4 +1,5 @@
 import asyncio
+import argparse
 import sys
 
 import edge_tts

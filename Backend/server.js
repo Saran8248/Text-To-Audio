@@ -47,6 +47,7 @@ const HISTORY_FILE = path.join(__dirname, "history.json");
 const USERS_FILE = path.join(__dirname, "users.json");
 const MAX_TEXT_LENGTH = 5000;
 const REQUEST_TIMEOUT = 120000; // 2 minutes
+const REQUIRE_ADMIN_APPROVAL = String(process.env.REQUIRE_ADMIN_APPROVAL || "false").toLowerCase() === "true";
 
 // Ensure cache directory exists
 if (!fs.existsSync(CACHE_DIR)) {
@@ -677,7 +678,7 @@ app.post("/api/auth/register", (req, res) => {
     email: normalizedEmail,
     password: req.body.password,
     role: "user",
-    accessStatus: "pending",
+    accessStatus: REQUIRE_ADMIN_APPROVAL ? "pending" : "approved",
   });
 
   let token = null;

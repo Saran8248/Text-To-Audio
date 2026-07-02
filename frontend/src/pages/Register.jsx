@@ -24,15 +24,15 @@ const Register = ({ onRegister }) => {
       return;
     }
 
-    if (result.user.accessStatus === 'approved') {
-      onRegister(result.user);
-      toast.success('Admin account created successfully');
-      navigate('/', { replace: true });
+    if (result.user.accessStatus !== 'approved') {
+      toast.info('Account request sent. An admin must approve access before login.');
+      navigate('/login', { replace: true });
       return;
     }
 
-    toast.info('Account request sent. An admin must approve access before login.');
-    navigate('/login', { replace: true });
+    onRegister(result.user);
+    toast.success('Account created successfully');
+    navigate('/', { replace: true });
   };
 
   return (
@@ -43,8 +43,8 @@ const Register = ({ onRegister }) => {
         className="w-full max-w-md glass p-8 rounded-3xl border border-white/10"
       >
         <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-white">Request access</h1>
-          <p className="mt-3 text-gray-400">Create an account request. An admin approves new users before login.</p>
+          <h1 className="text-4xl font-bold text-white">Create account</h1>
+          <p className="mt-3 text-gray-400">Create an account to access your sound generation dashboard.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -98,7 +98,7 @@ const Register = ({ onRegister }) => {
             type="submit"
             className="w-full py-3 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold"
           >
-            Request Access
+            Create Account
           </motion.button>
         </form>
 

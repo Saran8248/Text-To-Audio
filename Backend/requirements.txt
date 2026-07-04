@@ -1,1 +1,8 @@
-edge-tts==7.2.3
+fastapi
+uvicorn
+edge-tts
+python-multipart
+pydub
+pandas
+openpyxl
+...

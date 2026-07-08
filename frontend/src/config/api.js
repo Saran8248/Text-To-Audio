@@ -8,15 +8,15 @@ const normalizeApiUrl = (url) => {
   return `http://${trimmed}`;
 };
 
+const isProduction = process.env.NODE_ENV === 'production';
+const isVercelHost = typeof window !== 'undefined' && /\.vercel\.app$/.test(window.location.hostname);
 const configuredApiUrl = normalizeApiUrl(process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_API_URL);
-const defaultApiUrl = process.env.NODE_ENV === 'production'
-  ? window.location.origin
-  : 'http://localhost:5000';
+const defaultApiUrl = isProduction ? '' : 'http://localhost:5000';
 
-if (process.env.NODE_ENV === 'production' && !configuredApiUrl) {
+if (isProduction && !configuredApiUrl) {
   console.warn(
-    'REACT_APP_API_BASE_URL is not set. Using same-origin requests in production. Set REACT_APP_API_BASE_URL to your backend URL if frontend and backend are hosted separately.'
+    'REACT_APP_API_BASE_URL is not set. Using same-origin API requests in production.'
   );
 }
 
-export const API_BASE_URL = configuredApiUrl || defaultApiUrl;
+export const API_BASE_URL = isProduction && isVercelHost ? defaultApiUrl : (configuredApiUrl || defaultApiUrl);

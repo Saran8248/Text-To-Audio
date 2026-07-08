@@ -564,7 +564,7 @@ const corsOptions = configuredAllowedOrigins.length > 0
       optionsSuccessStatus: 204,
     }
   : {
-      origin: isProduction ? false : true,
+      origin: true,
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
@@ -573,7 +573,7 @@ const corsOptions = configuredAllowedOrigins.length > 0
     };
 
 if (isProduction && configuredAllowedOrigins.length === 0) {
-  console.warn('CORS: no FRONTEND_URL or CORS_ORIGINS configured in production; browser requests may be rejected.');
+  console.warn('CORS: no FRONTEND_URL or CORS_ORIGINS configured in production; allowing browser requests from any origin.');
 }
 
 // Middleware

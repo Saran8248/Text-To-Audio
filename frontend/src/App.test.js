@@ -6,9 +6,9 @@ jest.mock('axios');
 
 const mockUser = {
   id: 1,
-  name: 'Test User',
-  email: 'test@example.com',
-  password: 'password123',
+  name: 'Saran',
+  email: 'sksaran987@gmail.com',
+  password: 'Sarankd@987',
 };
 
 beforeEach(() => {
@@ -47,7 +47,6 @@ test.each([
   ['/tts', /Text to Speech/i],
   ['/voices', /Voice Library/i],
   ['/history', /Generation History/i],
-  ['/api-keys', /API Keys/i],
   ['/settings', /Settings/i],
 ])('renders route %s', async (path, heading) => {
   window.history.pushState({}, '', path);

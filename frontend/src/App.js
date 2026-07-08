@@ -9,7 +9,6 @@ import Dashboard from './pages/Dashboard';
 import TextToSpeech from './pages/TextToSpeech';
 import VoiceLibrary from './pages/VoiceLibrary';
 import History from './pages/History';
-import APIKeys from './pages/APIKeys';
 import Settings from './pages/Settings';
 import AdminAccess from './pages/AdminAccess';
 import Login from './pages/Login';
@@ -43,7 +42,7 @@ const ProtectedLayout = ({ user, onLogout, onUpdateUser, theme, onThemeChange })
             <Route path="/tts" element={<TextToSpeech />} />
             <Route path="/voices" element={<VoiceLibrary />} />
             <Route path="/history" element={<History />} />
-            <Route path="/api-keys" element={<APIKeys />} />
+            <Route path="/api-keys" element={<Navigate to="/" replace />} />
             <Route path="/admin" element={<RequireAdmin user={user}><AdminAccess currentUser={user} onUpdateUser={onUpdateUser} /></RequireAdmin>} />
             <Route path="/settings" element={<Settings user={user} onUpdateUser={onUpdateUser} theme={theme} onThemeChange={onThemeChange} onLogout={onLogout} />} />
             <Route path="*" element={<Navigate to="/" replace />} />

@@ -16,7 +16,6 @@ const Navbar = ({ user, onLogout, theme, onToggleTheme }) => {
     { label: 'Text to Speech', keywords: 'text speech generate audio tts', path: '/tts' },
     { label: 'Voice Library', keywords: 'voices library language', path: '/voices' },
     { label: 'History', keywords: 'history generated audio', path: '/history' },
-    { label: 'API Keys', keywords: 'api keys access token', path: '/api-keys' },
     { label: 'Settings', keywords: 'settings profile theme password', path: '/settings' },
     ...(isAdmin(user) ? [{ label: 'Admin Access', keywords: 'admin access users approve search', path: '/admin' }] : []),
   ];

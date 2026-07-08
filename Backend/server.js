@@ -8,6 +8,7 @@ const cors = require("cors");
 const app = express();
 const edgeTtsScript = path.join(__dirname, "edge_tts_generator.py");
 const xttsScript = path.join(__dirname, "xtts_generator.py");
+const frontendBuildDir = path.join(__dirname, "..", "frontend", "build");
 
 function getPythonCandidates() {
   return [...new Set([
@@ -1325,6 +1326,19 @@ app.get("/api/stats", (req, res) => {
     });
   }
 });
+
+if (fs.existsSync(frontendBuildDir)) {
+  app.use(express.static(frontendBuildDir));
+
+  app.get(/.*/, (req, res, next) => {
+    if (req.path.startsWith("/api/") || req.path === "/health" || req.path === "/convert") {
+      next();
+      return;
+    }
+
+    res.sendFile(path.join(frontendBuildDir, "index.html"));
+  });
+}
 
 // 404 handler
 app.use((req, res) => {

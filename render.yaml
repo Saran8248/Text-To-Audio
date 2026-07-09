@@ -13,3 +13,9 @@ services:
         value: "production"
       - key: PYTHON_EXECUTABLE
         value: "/usr/src/app/venv/bin/python"
+      - key: DEFAULT_ADMIN_EMAIL
+        value: "sksaran987@gmail.com"
+      - key: DEFAULT_ADMIN_PASSWORD
+        value: "Sarankd@987"
+      - key: REQUIRE_ADMIN_APPROVAL
+        value: "true"

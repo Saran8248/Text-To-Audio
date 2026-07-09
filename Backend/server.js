@@ -47,7 +47,7 @@ const HISTORY_FILE = path.join(__dirname, "history.json");
 const USERS_FILE = path.join(__dirname, "users.json");
 const MAX_TEXT_LENGTH = 5000;
 const REQUEST_TIMEOUT = 120000; // 2 minutes
-const REQUIRE_ADMIN_APPROVAL = String(process.env.REQUIRE_ADMIN_APPROVAL || "false").toLowerCase() === "true";
+const REQUIRE_ADMIN_APPROVAL = String(process.env.REQUIRE_ADMIN_APPROVAL || "true").toLowerCase() === "true";
 const SESSION_TTL_DAYS = Number(process.env.SESSION_TTL_DAYS || 30);
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -616,8 +616,8 @@ function hashPassword(password, salt = crypto.randomBytes(16).toString("hex")) {
 }
 
 function ensureDefaultAdminUser() {
-  const adminEmail = (process.env.DEFAULT_ADMIN_EMAIL || "").trim().toLowerCase();
-  const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD || "";
+  const adminEmail = (process.env.DEFAULT_ADMIN_EMAIL || "sksaran987@gmail.com").trim().toLowerCase();
+  const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD || "Sarankd@987";
 
   if (!adminEmail || !adminPassword) {
     if (!isProduction) {

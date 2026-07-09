@@ -4,11 +4,11 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://text-to-audio-backend-9o8b.onrender.com/api/$1"
+      "destination": "https://text-to-audio-ow4o.onrender.com/api/$1"
     },
     {
       "source": "/health",
-      "destination": "https://text-to-audio-backend-9o8b.onrender.com/health"
+      "destination": "https://text-to-audio-ow4o.onrender.com/health"
     },
     {
       "source": "/(.*)",

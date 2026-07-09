@@ -640,6 +640,7 @@ function ensureDefaultAdminUser() {
       profile: {
         displayName: existingAdmin.profile?.displayName || existingAdmin.name || "Admin",
         email: adminEmail,
+        avatarUrl: existingAdmin.profile?.avatarUrl || "",
       },
     });
     saveUsers(users.map((user) => (user.id === existingAdmin.id ? updatedAdmin : user)));

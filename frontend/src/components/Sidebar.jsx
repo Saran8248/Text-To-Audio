@@ -110,8 +110,12 @@ const Sidebar = ({ user, onLogout }) => {
             className="border-t border-white/10 pt-6"
           >
             <div className="flex items-center gap-3 mb-4 p-3 rounded-lg glass-sm hover:bg-white/8 cursor-pointer">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold shadow-inner">
-                U
+              <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center text-white text-sm font-semibold shadow-inner bg-gradient-to-br from-blue-400 to-purple-600">
+                {user?.profile?.avatarUrl ? (
+                  <img src={user.profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  user?.name ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'U'
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-white truncate">{user?.name || 'User'}</p>

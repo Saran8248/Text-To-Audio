@@ -1074,6 +1074,7 @@ app.put("/api/auth/profile", requireAuth, (req, res) => {
       profile: {
         displayName: req.body.name.trim(),
         email: normalizedEmail,
+        avatarUrl: req.body.avatarUrl || (user.profile && user.profile.avatarUrl) || "",
       },
     });
   });

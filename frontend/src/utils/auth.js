@@ -132,11 +132,11 @@ export const deleteUserAccount = async () => {
   }
 };
 
-export const updateUserProfile = async ({ name, email, password }) => {
+export const updateUserProfile = async ({ name, email, password, avatarUrl }) => {
   try {
     const result = await requestJson('/api/auth/profile', {
       method: 'PUT',
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, email, password, avatarUrl }),
     });
 
     setCurrentUser(result.user);

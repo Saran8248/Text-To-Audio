@@ -136,7 +136,13 @@ const Navbar = ({ user, onLogout, theme, onToggleTheme }) => {
                 onClick={() => setShowProfile(!showProfile)}
                 className="flex items-center gap-2 px-3 py-2 rounded-lg glass-sm hover:bg-white/10"
               >
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full" />
+                <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center text-white text-xs font-semibold bg-gradient-to-br from-blue-400 to-purple-600 shadow-inner">
+                  {user?.profile?.avatarUrl ? (
+                    <img src={user.profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    user?.name ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'U'
+                  )}
+                </div>
                 <span className="text-sm font-medium text-white hidden sm:inline">{user?.name || user?.email || 'User'}</span>
                 <ChevronDown size={16} className={`text-gray-400 transition-transform ${showProfile ? 'rotate-180' : ''}`} />
               </motion.button>

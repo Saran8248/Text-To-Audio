@@ -162,6 +162,14 @@ const Dashboard = ({ user }) => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => navigate('/merge')}
+              className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg font-medium text-white hover:shadow-lg hover:shadow-purple-500/30"
+            >
+              Merge Audio
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/voices')}
               className="px-6 py-3 glass border border-white/20 rounded-lg font-medium text-white hover:bg-white/10"
             >

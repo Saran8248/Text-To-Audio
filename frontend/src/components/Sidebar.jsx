@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from '../utils/motion';
-import { Menu, X, Home, Mic2, Music, History, Settings, LogOut, ShieldCheck } from 'lucide-react';
+import { Menu, X, Home, Mic2, Music, History, Settings, LogOut, ShieldCheck, GitMerge } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { isAdmin } from '../utils/auth';
 
@@ -14,6 +14,7 @@ const Sidebar = ({ user, onLogout }) => {
     { name: 'Text to Speech', icon: Mic2, path: '/tts' },
     { name: 'Voice Library', icon: Music, path: '/voices' },
     { name: 'History', icon: History, path: '/history' },
+    { name: 'Merge Audio', icon: GitMerge, path: '/merge' },
     ...(isAdmin(user) ? [{ name: 'Admin Access', icon: ShieldCheck, path: '/admin' }] : []),
     { name: 'Settings', icon: Settings, path: '/settings' },
   ];

@@ -1,0 +1,40 @@
+# Dependency directories
+node_modules/
+**/node_modules/
+
+# Local virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Build outputs
+build/
+dist/
+frontend/build/
+frontend/dist/
+
+# Local databases and cache
+Backend/cache/
+Backend/history.json
+Backend/users.json
+*.db
+*.sqlite
+
+# Logs
+*.log
+**/logs/
+
+# Audio outputs
+*.mp3
+Backend/*.mp3
+
+# IDE / System files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Git files
+.git/
+.github/

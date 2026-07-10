@@ -521,7 +521,7 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
             <p>Have questions or running into issues? Send a direct message to our support team.</p>
             <div className="pt-2">
               <span className="font-medium text-white block">Email Support</span>
-              <a href="mailto:support@terratern.com" className="text-blue-400 hover:text-blue-300">support@terratern.com</a>
+              <a href="mailto:support@terratern.com" className="text-blue-400 hover:text-blue-300">sksaran987@gmail.com</a>
             </div>
             <div>
               <span className="font-medium text-white block">Availability</span>

@@ -5,8 +5,10 @@ const { spawn, spawnSync } = require("node:child_process");
 const crypto = require("node:crypto");
 const cors = require("cors");
 const { MongoClient } = require("mongodb");
+const { Pool } = require("pg");
 
 let cachedUsers = null;
+let pgPool = null;
 
 const app = express();
 const edgeTtsScript = path.join(__dirname, "edge_tts_generator.py");
@@ -531,6 +533,41 @@ function saveUsers(users) {
         console.error("Failed to sync users to MongoDB:", err);
       });
   }
+
+  if (pgPool) {
+    (async () => {
+      const client = await pgPool.connect();
+      try {
+        await client.query("BEGIN");
+        await client.query("DELETE FROM users");
+        for (const user of cachedUsers) {
+          await client.query(
+            `INSERT INTO users (id, name, email, role, access_status, password_hash, password_salt, profile, sessions, created_at)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+            [
+              String(user.id),
+              user.name,
+              user.email,
+              user.role,
+              user.accessStatus,
+              user.passwordHash || "",
+              user.passwordSalt || "",
+              JSON.stringify(user.profile || {}),
+              JSON.stringify(user.sessions || []),
+              user.joined ? new Date(user.joined) : new Date()
+            ]
+          );
+        }
+        await client.query("COMMIT");
+        console.log(`Successfully backed up ${cachedUsers.length} users to PostgreSQL in background.`);
+      } catch (err) {
+        await client.query("ROLLBACK");
+        console.error("Failed to sync users to PostgreSQL:", err);
+      } finally {
+        client.release();
+      }
+    })().catch(err => console.error("Unhandled error in PG saveUsers:", err));
+  }
 }
 
 function hashPassword(password, salt = crypto.randomBytes(16).toString("hex")) {
@@ -860,10 +897,10 @@ function saveHistory(history) {
 }
 
 // Add to history
-function addToHistory(text, voice, status = 'success') {
+function addToHistory(text, voice, status = 'success', userId = null) {
   const voiceMeta = getVoiceMeta(voice);
   const history = loadHistory();
-  history.unshift({
+  const newRecord = {
     id: Date.now(),
     text: text.substring(0, 100),
     voice,
@@ -871,12 +908,34 @@ function addToHistory(text, voice, status = 'success') {
     gender: voiceMeta.type,
     status,
     timestamp: new Date().toISOString(),
-  });
+    user_id: userId
+  };
+
+  history.unshift(newRecord);
   // Keep only last 100 entries
   if (history.length > 100) {
     history.pop();
   }
   saveHistory(history);
+
+  if (pgPool) {
+    pgPool.query(
+      `INSERT INTO audio_history (user_id, text, voice, language, gender, status, timestamp, audio_file)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      [
+        userId,
+        newRecord.text,
+        newRecord.voice,
+        newRecord.language,
+        newRecord.gender,
+        newRecord.status,
+        newRecord.timestamp,
+        `cache/${voice}-${Date.now()}.mp3`
+      ]
+    ).catch(err => {
+      console.error("Failed to insert history to PostgreSQL:", err);
+    });
+  }
 }
 
 // Routes
@@ -1378,8 +1437,121 @@ app.use((err, req, res, next) => {
 
 let db = null;
 const MONGODB_URI = process.env.MONGODB_URI;
+const DATABASE_URL = process.env.DATABASE_URL || process.env.POSTGRES_URL;
 
-if (MONGODB_URI) {
+if (DATABASE_URL) {
+  console.log("Attempting to connect to PostgreSQL database...");
+  pgPool = new Pool({
+    connectionString: DATABASE_URL,
+    ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false
+  });
+
+  (async () => {
+    let client;
+    try {
+      client = await pgPool.connect();
+      console.log("Connected to PostgreSQL successfully! Adjusting schema...");
+      
+      // Drop foreign key constraint first to prevent conflict during alter
+      await client.query(`
+        ALTER TABLE audio_history DROP CONSTRAINT IF EXISTS audio_history_user_id_fkey;
+      `);
+
+      // Alter users table columns dynamically to support UUIDs and custom metadata
+      await client.query(`
+        ALTER TABLE users ALTER COLUMN id TYPE VARCHAR(100);
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(50) DEFAULT 'user';
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS access_status VARCHAR(50) DEFAULT 'approved';
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash VARCHAR(255);
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS password_salt VARCHAR(255);
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS profile JSONB;
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS sessions JSONB DEFAULT '[]'::jsonb;
+      `);
+
+      // Alter audio_history table columns dynamically
+      await client.query(`
+        ALTER TABLE audio_history ALTER COLUMN user_id TYPE VARCHAR(100);
+        ALTER TABLE audio_history ADD COLUMN IF NOT EXISTS gender VARCHAR(50);
+        ALTER TABLE audio_history ADD COLUMN IF NOT EXISTS status VARCHAR(50);
+        ALTER TABLE audio_history ADD COLUMN IF NOT EXISTS timestamp VARCHAR(100);
+      `);
+
+      // Re-add foreign key constraint with cascade on delete
+      await client.query(`
+        ALTER TABLE audio_history ADD CONSTRAINT audio_history_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+      `);
+
+      console.log("PostgreSQL schema adjusted and verified.");
+
+      // Fetch users from PostgreSQL into local cache
+      const { rows: pgUsers } = await client.query("SELECT * FROM users");
+      if (pgUsers && pgUsers.length > 0) {
+        cachedUsers = pgUsers.map(row => normalizeUser({
+          id: row.id,
+          name: row.name,
+          email: row.email,
+          role: row.role,
+          accessStatus: row.access_status,
+          passwordHash: row.password_hash,
+          passwordSalt: row.password_salt,
+          profile: typeof row.profile === "string" ? JSON.parse(row.profile) : row.profile,
+          sessions: typeof row.sessions === "string" ? JSON.parse(row.sessions) : row.sessions,
+          joined: row.created_at ? new Date(row.created_at).toISOString() : new Date().toISOString()
+        }));
+        console.log(`Loaded ${cachedUsers.length} users from PostgreSQL into memory cache.`);
+      } else {
+        console.log("PostgreSQL users table is empty. Syncing local users to PostgreSQL...");
+        const currentUsers = loadUsers();
+        if (currentUsers.length > 0) {
+          for (const user of currentUsers) {
+            await client.query(
+              `INSERT INTO users (id, name, email, role, access_status, password_hash, password_salt, profile, sessions, created_at)
+               VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+              [
+                String(user.id),
+                user.name,
+                user.email,
+                user.role,
+                user.accessStatus,
+                user.passwordHash || "",
+                user.passwordSalt || "",
+                JSON.stringify(user.profile || {}),
+                JSON.stringify(user.sessions || []),
+                user.joined ? new Date(user.joined) : new Date()
+              ]
+            );
+          }
+        }
+      }
+
+      // Fetch history records from PostgreSQL
+      const { rows: pgHistory } = await client.query("SELECT * FROM audio_history ORDER BY created_at DESC LIMIT 100");
+      if (pgHistory && pgHistory.length > 0) {
+        const historyList = pgHistory.map(row => ({
+          id: row.id,
+          user_id: row.user_id,
+          text: row.text,
+          voice: row.voice,
+          language: row.language,
+          gender: row.gender,
+          status: row.status,
+          timestamp: row.timestamp || (row.created_at ? new Date(row.created_at).toISOString() : new Date().toISOString())
+        }));
+        fs.writeFileSync(HISTORY_FILE, JSON.stringify(historyList, null, 2));
+        console.log(`Loaded ${historyList.length} history records from PostgreSQL.`);
+      }
+    } catch (err) {
+      console.error("PostgreSQL initialization error:", err);
+    } finally {
+      if (client) client.release();
+    }
+    
+    ensureDefaultAdminUser();
+  })().catch(err => {
+    console.error("Unhandled async PG error:", err);
+    ensureDefaultAdminUser();
+  });
+} else if (MONGODB_URI) {
   console.log("Attempting to connect to MongoDB Atlas...");
   MongoClient.connect(MONGODB_URI)
     .then(client => {

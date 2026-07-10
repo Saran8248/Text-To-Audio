@@ -17,6 +17,7 @@
   "dependencies": {
     "cors": "^2.8.6",
     "express": "^5.2.1",
-    "mongodb": "^6.3.0"
+    "mongodb": "^6.3.0",
+    "pg": "^8.11.3"
   }
 }

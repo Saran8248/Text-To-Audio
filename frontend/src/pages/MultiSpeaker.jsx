@@ -20,7 +20,23 @@ const MultiSpeaker = () => {
       try {
         const response = await fetch('/api/tts/voices');
         const data = await response.json();
-        setVoices(data.data || []);
+        const groupedVoices = data.data || {};
+        const flatVoices = [];
+        
+        Object.entries(groupedVoices).forEach(([locale, list]) => {
+          if (Array.isArray(list)) {
+            list.forEach((v) => {
+              flatVoices.push({
+                shortName: v.id,
+                displayName: v.name,
+                gender: v.type,
+                locale: locale,
+              });
+            });
+          }
+        });
+        
+        setVoices(flatVoices);
       } catch (err) {
         console.error('Failed to load voices:', err);
         toast.error('Unable to retrieve voice library list.');

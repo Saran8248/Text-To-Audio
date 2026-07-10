@@ -1263,14 +1263,28 @@ app.post("/api/tts/multi-speaker", requireAuth, asyncHandler(async (req, res) =>
       const turn = turns[i];
       const selectedVoice = resolveVoice(turn.voice);
       const engine = resolveEngine(selectedVoice);
-      const cacheKey = generateCacheKey(turn.text, selectedVoice, engine, "en");
+      
+      // Clean/transliterate German umlauts for non-German voices to prevent Microsoft socket crashes
+      let ttsText = turn.text;
+      if (!selectedVoice.startsWith("de-")) {
+        ttsText = ttsText
+          .replace(/ä/g, 'ae')
+          .replace(/ö/g, 'oe')
+          .replace(/ü/g, 'ue')
+          .replace(/ß/g, 'ss')
+          .replace(/Ä/g, 'Ae')
+          .replace(/Ö/g, 'Oe')
+          .replace(/Ü/g, 'Ue');
+      }
+
+      const cacheKey = generateCacheKey(ttsText, selectedVoice, engine, "en");
       
       if (i > 0) {
         // Sleep for 500ms to prevent rate limiting Edge TTS connections
         await new Promise((resolve) => setTimeout(resolve, 500));
       }
       
-      const { filePath } = await generateAudio(turn.text, selectedVoice, cacheKey, { engine });
+      const { filePath } = await generateAudio(ttsText, selectedVoice, cacheKey, { engine });
       
       const buffer = fs.readFileSync(filePath);
       buffers.push(buffer);

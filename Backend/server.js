@@ -1392,23 +1392,32 @@ app.get("/api/tts/test-german", asyncHandler(async (req, res) => {
     "de-CH-LeniNeural"
   ];
 
-  const results = {};
-
-  for (const voice of germanVoices) {
+  const promises = germanVoices.map(async (voice) => {
     try {
       const cacheKey = path.join(CACHE_DIR, `test-german-${voice}-${Date.now()}.mp3`);
-      const { filePath } = await generateAudio("Hallo", voice, cacheKey);
       
-      // Clean up test file
+      const resultPromise = generateAudio("Hallo", voice, cacheKey);
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("Timeout")), 5000)
+      );
+
+      const { filePath } = await Promise.race([resultPromise, timeoutPromise]);
+      
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
       }
       
-      results[voice] = { status: "success" };
+      return { voice, status: "success" };
     } catch (err) {
-      results[voice] = { status: "failed", error: err.message };
+      return { voice, status: "failed", error: err.message };
     }
-  }
+  });
+
+  const resultsList = await Promise.all(promises);
+  const results = {};
+  resultsList.forEach(r => {
+    results[r.voice] = { status: r.status, error: r.error };
+  });
 
   res.json({ results });
 }));

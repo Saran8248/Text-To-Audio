@@ -4,6 +4,9 @@ const path = require("node:path");
 const { spawn, spawnSync } = require("node:child_process");
 const crypto = require("node:crypto");
 const cors = require("cors");
+const { MongoClient } = require("mongodb");
+
+let cachedUsers = null;
 
 const app = express();
 const edgeTtsScript = path.join(__dirname, "edge_tts_generator.py");
@@ -592,19 +595,46 @@ function publicUser(user) {
 }
 
 function loadUsers() {
+  if (cachedUsers !== null) {
+    return cachedUsers;
+  }
+
+  let fileUsers = [];
   try {
     if (fs.existsSync(USERS_FILE)) {
       const parsed = JSON.parse(fs.readFileSync(USERS_FILE, "utf8"));
-      return Array.isArray(parsed) ? parsed.map(normalizeUser) : [];
+      fileUsers = Array.isArray(parsed) ? parsed.map(normalizeUser) : [];
     }
   } catch (error) {
-    console.error("Failed to load users:", error);
+    console.error("Failed to load users from file:", error);
   }
-  return [];
+  cachedUsers = fileUsers;
+  return cachedUsers;
 }
 
 function saveUsers(users) {
-  fs.writeFileSync(USERS_FILE, JSON.stringify(users.map(normalizeUser), null, 2));
+  cachedUsers = users.map(normalizeUser);
+  
+  try {
+    fs.writeFileSync(USERS_FILE, JSON.stringify(cachedUsers, null, 2));
+  } catch (error) {
+    console.error("Failed to save users locally:", error);
+  }
+
+  if (db) {
+    db.collection("users").deleteMany({})
+      .then(() => {
+        if (cachedUsers.length > 0) {
+          return db.collection("users").insertMany(cachedUsers);
+        }
+      })
+      .then(() => {
+        console.log(`Successfully backed up ${cachedUsers.length} users to MongoDB in background.`);
+      })
+      .catch(err => {
+        console.error("Failed to sync users to MongoDB:", err);
+      });
+  }
 }
 
 function hashPassword(password, salt = crypto.randomBytes(16).toString("hex")) {
@@ -1451,7 +1481,39 @@ app.use((err, req, res, next) => {
   });
 });
 
-ensureDefaultAdminUser();
+let db = null;
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (MONGODB_URI) {
+  console.log("Attempting to connect to MongoDB Atlas...");
+  MongoClient.connect(MONGODB_URI)
+    .then(client => {
+      db = client.db();
+      console.log("Connected to MongoDB successfully!");
+      return db.collection("users").find({}).toArray();
+    })
+    .then(dbUsers => {
+      if (dbUsers && dbUsers.length > 0) {
+        cachedUsers = dbUsers.map(({ _id, ...user }) => normalizeUser(user));
+        console.log(`Loaded ${cachedUsers.length} users from MongoDB into memory cache.`);
+      } else {
+        console.log("MongoDB users collection is empty. Backing up local users to MongoDB...");
+        const currentUsers = loadUsers();
+        if (currentUsers.length > 0) {
+          return db.collection("users").insertMany(currentUsers);
+        }
+      }
+    })
+    .then(() => {
+      ensureDefaultAdminUser();
+    })
+    .catch(err => {
+      console.error("MongoDB initialization failed:", err);
+      ensureDefaultAdminUser();
+    });
+} else {
+  ensureDefaultAdminUser();
+}
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

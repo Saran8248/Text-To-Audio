@@ -3,12 +3,31 @@ import { motion } from '../utils/motion';
 import { Users, Play, Pause, Download, Cpu, CheckCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 
+const localeNames = {
+  'en-US': 'English (US)',
+  'en-GB': 'English (UK)',
+  'en-AU': 'English (Australia)',
+  'de-DE': 'German (Germany)',
+  'de-AT': 'German (Austria)',
+  'de-CH': 'German (Switzerland)',
+  'fr-FR': 'French',
+  'es-ES': 'Spanish',
+  'hi-IN': 'Hindi',
+  'it-IT': 'Italian',
+  'pt-BR': 'Portuguese (Brazil)',
+  'zh-CN': 'Chinese',
+  'ja-JP': 'Japanese',
+  'uk-UA': 'Ukrainian',
+  'XTTS-v2': 'XTTS Multilingual'
+};
+
 const MultiSpeaker = () => {
   const [conversationText, setConversationText] = useState(
     "Tom: Hallo Anna.\nAnna: Hallo Tom.\nNarrator: Beide gehen ins Restaurant.\nTom: Ich möchte Pizza.\nAnna: Ich nehme Pasta."
   );
   const [voices, setVoices] = useState([]);
   const [voiceMapping, setVoiceMapping] = useState({});
+  const [speakerLanguages, setSpeakerLanguages] = useState({});
   const [isGenerating, setIsGenerating] = useState(false);
   const [mergedUrl, setMergedUrl] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -53,6 +72,7 @@ const MultiSpeaker = () => {
   useEffect(() => {
     if (!conversationText.trim()) {
       setVoiceMapping({});
+      setSpeakerLanguages({});
       return;
     }
 
@@ -70,12 +90,12 @@ const MultiSpeaker = () => {
 
     setVoiceMapping((prevMapping) => {
       const newMapping = {};
+      const newLanguages = {};
+
       speakerList.forEach((speaker) => {
-        // Preserve user voice selections if they already exist
         if (prevMapping[speaker]) {
           newMapping[speaker] = prevMapping[speaker];
         } else {
-          // Otherwise auto-assign default matching voices
           const lower = speaker.toLowerCase();
           if (lower.includes('anna') || lower.includes('female') || lower.includes('girl')) {
             newMapping[speaker] = 'de-DE-KatjaNeural';
@@ -87,10 +107,48 @@ const MultiSpeaker = () => {
             newMapping[speaker] = 'de-DE-ChristophNeural';
           }
         }
+
+        const voiceId = newMapping[speaker];
+        const voiceObj = voices.find((v) => v.shortName === voiceId);
+        newLanguages[speaker] = voiceObj ? voiceObj.locale : voiceId.split('-').slice(0, 2).join('-');
       });
+
+      setSpeakerLanguages(newLanguages);
       return newMapping;
     });
-  }, [conversationText]);
+  }, [conversationText, voices]);
+
+  // Sync languages state when voices list updates
+  useEffect(() => {
+    if (voices.length === 0 || Object.keys(voiceMapping).length === 0) return;
+    setSpeakerLanguages((prev) => {
+      const updated = { ...prev };
+      Object.entries(voiceMapping).forEach(([speaker, voiceId]) => {
+        if (!updated[speaker]) {
+          const found = voices.find((v) => v.shortName === voiceId);
+          if (found) {
+            updated[speaker] = found.locale;
+          }
+        }
+      });
+      return updated;
+    });
+  }, [voices, voiceMapping]);
+
+  const handleLanguageChange = (speaker, newLocale) => {
+    setSpeakerLanguages((prev) => ({
+      ...prev,
+      [speaker]: newLocale,
+    }));
+
+    const localeVoices = voices.filter((v) => v.locale === newLocale);
+    if (localeVoices.length > 0) {
+      setVoiceMapping((prev) => ({
+        ...prev,
+        [speaker]: localeVoices[0].shortName,
+      }));
+    }
+  };
 
   const handleVoiceChange = (speaker, voiceId) => {
     setVoiceMapping((prev) => ({
@@ -206,22 +264,47 @@ const MultiSpeaker = () => {
                     <span className="font-semibold text-white truncate">{speaker}</span>
                   </div>
 
-                  <div className="flex-1 w-full max-w-md relative">
-                    <select
-                      value={voiceMapping[speaker]}
-                      onChange={(e) => handleVoiceChange(speaker, e.target.value)}
-                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:border-blue-400 focus:outline-none appearance-none cursor-pointer text-sm"
-                    >
-                      {voices.map((voice) => (
-                        <option key={voice.shortName} value={voice.shortName} className="bg-dark-900 text-white">
-                          {voice.displayName} ({voice.locale.split('-')[1]} - {voice.gender})
-                        </option>
-                      ))}
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-gray-400">
-                      <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-                      </svg>
+                  <div className="flex-1 w-full max-w-lg flex flex-col sm:flex-row gap-3">
+                    {/* Language Dropdown */}
+                    <div className="flex-1 relative">
+                      <select
+                        value={speakerLanguages[speaker] || 'de-DE'}
+                        onChange={(e) => handleLanguageChange(speaker, e.target.value)}
+                        className="w-full pl-4 pr-10 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:border-blue-400 focus:outline-none appearance-none cursor-pointer text-sm"
+                      >
+                        {Object.entries(localeNames).map(([locale, name]) => (
+                          <option key={locale} value={locale} className="bg-dark-900 text-white">
+                            {name}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-gray-400">
+                        <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                          <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                        </svg>
+                      </div>
+                    </div>
+
+                    {/* Voice Dropdown */}
+                    <div className="flex-1 relative">
+                      <select
+                        value={voiceMapping[speaker] || ''}
+                        onChange={(e) => handleVoiceChange(speaker, e.target.value)}
+                        className="w-full pl-4 pr-10 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:border-blue-400 focus:outline-none appearance-none cursor-pointer text-sm"
+                      >
+                        {voices
+                          .filter((v) => v.locale === (speakerLanguages[speaker] || 'de-DE'))
+                          .map((voice) => (
+                            <option key={voice.shortName} value={voice.shortName} className="bg-dark-900 text-white">
+                              {voice.displayName} ({voice.gender})
+                            </option>
+                          ))}
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-gray-400">
+                        <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                          <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                        </svg>
+                      </div>
                     </div>
                   </div>
                 </div>

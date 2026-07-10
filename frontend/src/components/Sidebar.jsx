@@ -9,21 +9,15 @@ const Sidebar = ({ user, onLogout }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const mainItems = [
+  const menuItems = [
     { name: 'Dashboard', icon: Home, path: '/' },
-  ];
-
-  const textToAudioItems = [
-    { name: 'Single Speaker', icon: Mic2, path: '/tts', prefix: '├── ' },
-    { name: 'Multi Speaker', icon: Users, path: '/multi-speaker', prefix: '├── ', isNew: true },
-    { name: 'History', icon: History, path: '/history', prefix: '├── ' },
-    { name: 'Settings', icon: Settings, path: '/settings', prefix: '└── ' },
-  ];
-
-  const toolItems = [
+    { name: 'Single Speaker', icon: Mic2, path: '/tts' },
+    { name: 'Multi Speaker', icon: Users, path: '/multi-speaker', isNew: true },
     { name: 'Voice Library', icon: Music, path: '/voices' },
     { name: 'Merge Audio', icon: GitMerge, path: '/merge' },
+    { name: 'History', icon: History, path: '/history' },
     ...(isAdmin(user) ? [{ name: 'Admin Access', icon: ShieldCheck, path: '/admin' }] : []),
+    { name: 'Settings', icon: Settings, path: '/settings' },
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -61,7 +55,7 @@ const Sidebar = ({ user, onLogout }) => {
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-3 mb-10 mt-8 md:mt-0"
+            className="flex items-center gap-3 mb-12 mt-8 md:mt-0"
           >
             <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-white/10 ring-1 ring-white/10 flex items-center justify-center">
               <img
@@ -77,118 +71,45 @@ const Sidebar = ({ user, onLogout }) => {
           </motion.div>
 
           {/* Navigation */}
-          <nav className="flex-1 space-y-4 overflow-y-auto pr-1">
-            {/* Main Section */}
-            <div className="space-y-1">
-              {mainItems.map((item, idx) => {
-                const Icon = item.icon;
-                const active = isActive(item.path);
-                return (
-                  <motion.div
-                    key={item.name}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.05 }}
+          <nav className="flex-1 space-y-2 overflow-y-auto pr-1">
+            {menuItems.map((item, idx) => {
+              const Icon = item.icon;
+              const active = isActive(item.path);
+              return (
+                <motion.div
+                  key={item.name}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.05 }}
+                >
+                  <Link
+                    to={item.path}
+                    onClick={() => window.innerWidth < 768 && setIsOpen(false)}
+                    className={`relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
+                      active
+                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/20'
+                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    }`}
                   >
-                    <Link
-                      to={item.path}
-                      onClick={() => window.innerWidth < 768 && setIsOpen(false)}
-                      className={`relative flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group ${
-                        active
-                          ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/20'
-                          : 'text-gray-400 hover:text-white hover:bg-white/5'
-                      }`}
-                    >
-                      <Icon size={18} className={active ? 'text-white' : 'group-hover:text-blue-400'} />
-                      <span className="font-medium text-sm">{item.name}</span>
-                      {active && (
-                        <div className="absolute right-0 w-1 h-6 bg-white rounded-l-full" />
+                    <Icon size={20} className={active ? 'text-white' : 'group-hover:text-blue-400'} />
+                    <span className="font-medium flex items-center gap-2 flex-1 min-w-0 truncate">
+                      {item.name}
+                      {item.isNew && (
+                        <span className="px-1.5 py-0.5 rounded text-[8px] font-extrabold bg-blue-500/20 text-blue-400 border border-blue-500/25 tracking-widest uppercase scale-90">
+                          New
+                        </span>
                       )}
-                    </Link>
-                  </motion.div>
-                );
-              })}
-            </div>
-
-            {/* Text to Audio Section */}
-            <div className="space-y-1">
-              <div className="text-[10px] font-bold text-gray-500 tracking-wider uppercase px-4 mb-2">
-                Text to Audio
-              </div>
-              {textToAudioItems.map((item, idx) => {
-                const Icon = item.icon;
-                const active = isActive(item.path);
-                return (
-                  <motion.div
-                    key={item.name}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: (idx + mainItems.length) * 0.05 }}
-                  >
-                    <Link
-                      to={item.path}
-                      onClick={() => window.innerWidth < 768 && setIsOpen(false)}
-                      className={`relative flex items-center px-4 py-2 rounded-xl transition-all duration-200 group ${
-                        active
-                          ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/20'
-                          : 'text-gray-400 hover:text-white hover:bg-white/5'
-                      }`}
-                    >
-                      <span className="font-mono text-gray-600 text-sm mr-1 group-hover:text-gray-400 select-none">
-                        {item.prefix}
-                      </span>
-                      <Icon size={16} className={`${active ? 'text-white' : 'group-hover:text-blue-400'} mr-2`} />
-                      <span className="font-medium text-xs flex items-center gap-1.5 flex-1 min-w-0 truncate">
-                        {item.name}
-                        {item.isNew && (
-                          <span className="px-1.5 py-0.5 rounded text-[8px] font-extrabold bg-blue-500/20 text-blue-400 border border-blue-500/25 tracking-widest uppercase">
-                            New
-                          </span>
-                        )}
-                      </span>
-                      {active && (
-                        <div className="absolute right-0 w-1 h-5 bg-white rounded-l-full" />
-                      )}
-                    </Link>
-                  </motion.div>
-                );
-              })}
-            </div>
-
-            {/* Other Tools Section */}
-            <div className="space-y-1">
-              <div className="text-[10px] font-bold text-gray-500 tracking-wider uppercase px-4 mb-2">
-                Audio Tools
-              </div>
-              {toolItems.map((item, idx) => {
-                const Icon = item.icon;
-                const active = isActive(item.path);
-                return (
-                  <motion.div
-                    key={item.name}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: (idx + mainItems.length + textToAudioItems.length) * 0.05 }}
-                  >
-                    <Link
-                      to={item.path}
-                      onClick={() => window.innerWidth < 768 && setIsOpen(false)}
-                      className={`relative flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group ${
-                        active
-                          ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/20'
-                          : 'text-gray-400 hover:text-white hover:bg-white/5'
-                      }`}
-                    >
-                      <Icon size={18} className={active ? 'text-white' : 'group-hover:text-blue-400'} />
-                      <span className="font-medium text-sm">{item.name}</span>
-                      {active && (
-                        <div className="absolute right-0 w-1 h-6 bg-white rounded-l-full" />
-                      )}
-                    </Link>
-                  </motion.div>
-                );
-              })}
-            </div>
+                    </span>
+                    {active && (
+                      <motion.div
+                        layoutId="activeIndicator"
+                        className="absolute right-0 w-1 h-6 bg-white rounded-l-full"
+                      />
+                    )}
+                  </Link>
+                </motion.div>
+              );
+            })}
           </nav>
 
           {/* User Section */}

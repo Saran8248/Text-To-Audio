@@ -1221,6 +1221,81 @@ app.post("/api/tts/generate", validateTTSRequest, asyncHandler(async (req, res) 
   }
 }));
 
+app.post("/api/tts/multi-speaker", requireAuth, asyncHandler(async (req, res) => {
+  const { text, voiceMapping } = req.body;
+  if (!text || typeof text !== "string" || !text.trim()) {
+    res.status(400).json({ error: "INVALID_REQUEST", message: "Conversation text is required." });
+    return;
+  }
+  if (!voiceMapping || typeof voiceMapping !== "object") {
+    res.status(400).json({ error: "INVALID_REQUEST", message: "Voice mapping is required." });
+    return;
+  }
+
+  const lines = text.split("\n");
+  const turns = [];
+  for (let line of lines) {
+    line = line.trim();
+    if (!line) continue;
+
+    const match = line.match(/^([a-zA-Z0-9\s_-]+):(.*)$/);
+    if (match) {
+      const speaker = match[1].trim();
+      const speech = match[2].trim();
+      const voice = voiceMapping[speaker] || "en-US-JennyNeural";
+      turns.push({ speaker, text: speech, voice });
+    } else {
+      if (turns.length > 0) {
+        turns[turns.length - 1].text += " " + line;
+      } else {
+        const voice = voiceMapping["Narrator"] || Object.values(voiceMapping)[0] || "en-US-JennyNeural";
+        turns.push({ speaker: "Narrator", text: line, voice });
+      }
+    }
+  }
+
+  if (turns.length === 0) {
+    res.status(400).json({ error: "INVALID_REQUEST", message: "No conversation turns detected." });
+    return;
+  }
+
+  try {
+    const buffers = [];
+
+    for (const turn of turns) {
+      const selectedVoice = resolveVoice(turn.voice);
+      const engine = resolveEngine(selectedVoice);
+      const cacheKey = generateCacheKey(turn.text, selectedVoice, engine, "en");
+      
+      const { filePath } = await generateAudio(turn.text, selectedVoice, cacheKey, { engine });
+      
+      const buffer = fs.readFileSync(filePath);
+      buffers.push(buffer);
+    }
+
+    const mergedBuffer = Buffer.concat(buffers);
+    const mergedFileName = `multi-speaker-${Date.now()}-${Math.random().toString(36).slice(2)}.mp3`;
+    const mergedFilePath = path.join(CACHE_DIR, mergedFileName);
+    fs.writeFileSync(mergedFilePath, mergedBuffer);
+
+    addToHistory(`Multi-Speaker Conversation (${turns.length} turns)`, "Multi-Speaker", "success");
+
+    res.setHeader("Content-Type", "audio/mpeg");
+    res.download(mergedFilePath, "merged_conversation.mp3", (downloadErr) => {
+      if (downloadErr && !res.headersSent) {
+        console.error("Error sending merged audio:", downloadErr);
+      }
+    });
+  } catch (error) {
+    console.error("Multi-speaker generation failed:", error);
+    addToHistory("Multi-Speaker Conversation (Failed)", "Multi-Speaker", "failure");
+    res.status(500).json({
+      error: "GENERATION_FAILED",
+      message: error.message || "Failed to generate multi-speaker audio",
+    });
+  }
+}));
+
 // Get generation history
 app.get("/api/tts/history", (req, res) => {
   try {

@@ -12,6 +12,7 @@ import History from './pages/History';
 import Settings from './pages/Settings';
 import AdminAccess from './pages/AdminAccess';
 import MergeAudio from './pages/MergeAudio';
+import MultiSpeaker from './pages/MultiSpeaker';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import { getCurrentUser, isAdmin, logout as authLogout, refreshCurrentUser } from './utils/auth';
@@ -41,6 +42,7 @@ const ProtectedLayout = ({ user, onLogout, onUpdateUser, theme, onThemeChange })
           <Routes>
             <Route path="/" element={<Dashboard user={user} />} />
             <Route path="/tts" element={<TextToSpeech />} />
+            <Route path="/multi-speaker" element={<MultiSpeaker />} />
             <Route path="/voices" element={<VoiceLibrary />} />
             <Route path="/history" element={<History />} />
             <Route path="/merge" element={<MergeAudio user={user} />} />

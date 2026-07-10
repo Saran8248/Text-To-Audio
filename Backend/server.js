@@ -1378,6 +1378,41 @@ app.get("/api/tts/voices", (req, res) => {
   res.json({ data: voices });
 });
 
+app.get("/api/tts/test-german", asyncHandler(async (req, res) => {
+  const germanVoices = [
+    "de-DE-KatjaNeural",
+    "de-DE-ConradNeural",
+    "de-DE-AmalaNeural",
+    "de-DE-FlorianMultilingualNeural",
+    "de-DE-KillianNeural",
+    "de-DE-SeraphinaMultilingualNeural",
+    "de-AT-IngridNeural",
+    "de-AT-JonasNeural",
+    "de-CH-JanNeural",
+    "de-CH-LeniNeural"
+  ];
+
+  const results = {};
+
+  for (const voice of germanVoices) {
+    try {
+      const cacheKey = path.join(CACHE_DIR, `test-german-${voice}-${Date.now()}.mp3`);
+      const { filePath } = await generateAudio("Hallo", voice, cacheKey);
+      
+      // Clean up test file
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      
+      results[voice] = { status: "success" };
+    } catch (err) {
+      results[voice] = { status: "failed", error: err.message };
+    }
+  }
+
+  res.json({ results });
+}));
+
 // Clear cache
 app.post("/api/cache/clear", asyncHandler(async (req, res) => {
   try {

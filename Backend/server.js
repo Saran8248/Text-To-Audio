@@ -1259,10 +1259,16 @@ app.post("/api/tts/multi-speaker", requireAuth, asyncHandler(async (req, res) =>
   try {
     const buffers = [];
 
-    for (const turn of turns) {
+    for (let i = 0; i < turns.length; i++) {
+      const turn = turns[i];
       const selectedVoice = resolveVoice(turn.voice);
       const engine = resolveEngine(selectedVoice);
       const cacheKey = generateCacheKey(turn.text, selectedVoice, engine, "en");
+      
+      if (i > 0) {
+        // Sleep for 500ms to prevent rate limiting Edge TTS connections
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
       
       const { filePath } = await generateAudio(turn.text, selectedVoice, cacheKey, { engine });
       

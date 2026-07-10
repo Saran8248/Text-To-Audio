@@ -1377,51 +1377,6 @@ app.get("/api/tts/voices", (req, res) => {
 
   res.json({ data: voices });
 });
-
-app.get("/api/tts/test-german", asyncHandler(async (req, res) => {
-  const germanVoices = [
-    "de-DE-KatjaNeural",
-    "de-DE-ConradNeural",
-    "de-DE-AmalaNeural",
-    "de-DE-FlorianMultilingualNeural",
-    "de-DE-KillianNeural",
-    "de-DE-SeraphinaMultilingualNeural",
-    "de-AT-IngridNeural",
-    "de-AT-JonasNeural",
-    "de-CH-JanNeural",
-    "de-CH-LeniNeural"
-  ];
-
-  const promises = germanVoices.map(async (voice) => {
-    try {
-      const cacheKey = path.join(CACHE_DIR, `test-german-${voice}-${Date.now()}.mp3`);
-      
-      const resultPromise = generateAudio("Hallo", voice, cacheKey);
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("Timeout")), 5000)
-      );
-
-      const { filePath } = await Promise.race([resultPromise, timeoutPromise]);
-      
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
-      
-      return { voice, status: "success" };
-    } catch (err) {
-      return { voice, status: "failed", error: err.message };
-    }
-  });
-
-  const resultsList = await Promise.all(promises);
-  const results = {};
-  resultsList.forEach(r => {
-    results[r.voice] = { status: r.status, error: r.error };
-  });
-
-  res.json({ results });
-}));
-
 // Clear cache
 app.post("/api/cache/clear", asyncHandler(async (req, res) => {
   try {

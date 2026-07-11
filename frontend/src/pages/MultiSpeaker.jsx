@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from '../utils/motion';
-import { Users, Play, Pause, Download, Cpu, CheckCircle } from 'lucide-react';
+import { Users, Cpu, CheckCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 const localeNames = {
@@ -23,7 +23,7 @@ const MultiSpeaker = () => {
   const [speakerLanguages, setSpeakerLanguages] = useState({});
   const [isGenerating, setIsGenerating] = useState(false);
   const [mergedUrl, setMergedUrl] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+
   const audioRef = useRef(null);
 
   useEffect(() => {
@@ -182,7 +182,6 @@ const MultiSpeaker = () => {
       const url = URL.createObjectURL(audioBlob);
 
       setMergedUrl(url);
-      setIsPlaying(false);
       toast.dismiss(generateToast);
       toast.success('Conversation audio successfully generated!');
     } catch (err) {
@@ -194,15 +193,7 @@ const MultiSpeaker = () => {
     }
   };
 
-  const handlePlayToggle = () => {
-    if (!audioRef.current) return;
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-    setIsPlaying(!isPlaying);
-  };
+
 
   return (
     <div className="space-y-8 max-w-4xl">
@@ -350,32 +341,20 @@ const MultiSpeaker = () => {
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 gap-4">
             <audio
               ref={audioRef}
               src={mergedUrl}
-              onEnded={() => setIsPlaying(false)}
-              className="hidden"
+              controls
+              className="w-full flex-1 rounded-lg text-white"
             />
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              onClick={handlePlayToggle}
-              className="w-12 h-12 rounded-full bg-blue-500 hover:bg-blue-600 flex items-center justify-center text-white"
-            >
-              {isPlaying ? <Pause size={20} /> : <Play className="ml-0.5" size={20} />}
-            </motion.button>
-
-            <div className="flex-1 text-sm font-medium text-white truncate">
-              merged_conversation.mp3
-            </div>
 
             <a
               href={mergedUrl}
               download="merged_conversation.mp3"
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium hover:shadow-lg transition-all"
+              className="text-blue-500 hover:text-blue-400 text-sm font-semibold underline underline-offset-4 shrink-0 transition-all hover:scale-105"
             >
-              <Download size={16} />
-              Download
+              Download MP3
             </a>
           </div>
         </motion.div>

@@ -11,6 +11,18 @@ let cachedUsers = null;
 let pgPool = null;
 let lastPgError = null;
 
+function formatPgError(err) {
+  if (!err) return "";
+  let msg = err.message || err.detail || String(err);
+  if (err.errors && Array.isArray(err.errors)) {
+    msg +=
+      " [Nested: " +
+      err.errors.map((e) => e.message || String(e)).join(", ") +
+      "]";
+  }
+  return msg;
+}
+
 const app = express();
 const edgeTtsScript = path.join(__dirname, "edge_tts_generator.py");
 const xttsScript = path.join(__dirname, "xtts_generator.py");
@@ -741,7 +753,7 @@ function saveUsers(users) {
         console.error("Failed to sync users to PostgreSQL:", err);
         lastPgError = {
           operation: "saveUsers",
-          message: err.message || err.detail || String(err),
+          message: formatPgError(err),
           timestamp: new Date().toISOString(),
         };
       } finally {
@@ -1189,7 +1201,7 @@ function addToHistory(text, voice, status = "success", userId = null) {
         console.error("Failed to insert history to PostgreSQL:", err);
         lastPgError = {
           operation: "addToHistory",
-          message: err.message || err.detail || String(err),
+          message: formatPgError(err),
           timestamp: new Date().toISOString(),
         };
       });
@@ -1983,7 +1995,7 @@ if (DATABASE_URL) {
       console.error("PostgreSQL initialization error:", err);
       lastPgError = {
         operation: "startup",
-        message: err.message || err.detail || String(err),
+        message: formatPgError(err),
         timestamp: new Date().toISOString(),
       };
     } finally {
@@ -1995,7 +2007,7 @@ if (DATABASE_URL) {
     console.error("Unhandled async PG error:", err);
     lastPgError = {
       operation: "unhandledStartup",
-      message: err.message || err.detail || String(err),
+      message: formatPgError(err),
       timestamp: new Date().toISOString(),
     };
     ensureDefaultAdminUser();

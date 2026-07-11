@@ -337,6 +337,9 @@ function getAvailableVoices() {
       { id: "de-DE-ConradNeural", name: "Conrad", type: "Male", style: "Clear / Professional" },
       { id: "de-DE-KatjaNeural", name: "Katja", type: "Female", style: "Soft / Natural" },
       { id: "de-DE-KillianNeural", name: "Killian", type: "Male", style: "Bright / Conversational" },
+      { id: "de-DE-LaraNeural", name: "Lara", type: "Female", style: "Soft / Conversational" },
+      { id: "de-DE-FelixNeural", name: "Felix", type: "Male", style: "Clear / Conversational" },
+      { id: "de-DE-GretaNeural", name: "Greta", type: "Female", style: "Natural / Versatile" },
     ],
     "en-AU": [
       { id: "en-AU-NatashaNeural", name: "Natasha", type: "Female", style: "Natural" },

@@ -415,6 +415,9 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
               <option value="de-DE-FlorianMultilingualNeural">Florian (German Male - Bold)</option>
               <option value="de-DE-KillianNeural">Killian (German Male - Bright)</option>
               <option value="de-DE-SeraphinaMultilingualNeural">Seraphina (German Female - Clear)</option>
+              <option value="de-DE-LaraNeural">Lara (German Female - Soft)</option>
+              <option value="de-DE-FelixNeural">Felix (German Male - Clear)</option>
+              <option value="de-DE-GretaNeural">Greta (German Female - Natural)</option>
               <option value="de-AT-IngridNeural">Ingrid (German Austria Female - Friendly)</option>
               <option value="de-AT-JonasNeural">Jonas (German Austria Male - Friendly)</option>
               <option value="de-CH-LeniNeural">Leni (German Switzerland Female - Soft)</option>

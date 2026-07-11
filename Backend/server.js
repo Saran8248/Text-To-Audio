@@ -9,6 +9,7 @@ const { Pool } = require("pg");
 
 let cachedUsers = null;
 let pgPool = null;
+let lastPgError = null;
 
 const app = express();
 const edgeTtsScript = path.join(__dirname, "edge_tts_generator.py");
@@ -738,6 +739,11 @@ function saveUsers(users) {
       } catch (err) {
         await client.query("ROLLBACK");
         console.error("Failed to sync users to PostgreSQL:", err);
+        lastPgError = {
+          operation: "saveUsers",
+          message: err.message,
+          timestamp: new Date().toISOString(),
+        };
       } finally {
         client.release();
       }
@@ -1181,6 +1187,11 @@ function addToHistory(text, voice, status = "success", userId = null) {
       )
       .catch((err) => {
         console.error("Failed to insert history to PostgreSQL:", err);
+        lastPgError = {
+          operation: "addToHistory",
+          message: err.message,
+          timestamp: new Date().toISOString(),
+        };
       });
   }
 }
@@ -1197,6 +1208,10 @@ app.get("/health", (req, res) => {
     python: {
       executable: defaultPythonExecutable || null,
       edgeTtsAvailable: Boolean(resolvePythonExecutable("edge_tts")),
+    },
+    postgres: {
+      connected: Boolean(pgPool),
+      lastError: lastPgError,
     },
   });
 });
@@ -1945,6 +1960,11 @@ if (DATABASE_URL) {
       }
     } catch (err) {
       console.error("PostgreSQL initialization error:", err);
+      lastPgError = {
+        operation: "startup",
+        message: err.message,
+        timestamp: new Date().toISOString(),
+      };
     } finally {
       if (client) client.release();
     }
@@ -1952,6 +1972,11 @@ if (DATABASE_URL) {
     ensureDefaultAdminUser();
   })().catch((err) => {
     console.error("Unhandled async PG error:", err);
+    lastPgError = {
+      operation: "unhandledStartup",
+      message: err.message,
+      timestamp: new Date().toISOString(),
+    };
     ensureDefaultAdminUser();
   });
 } else if (MONGODB_URI) {

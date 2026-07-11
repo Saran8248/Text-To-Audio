@@ -8,17 +8,10 @@ const localeNames = {
   'en-GB': 'English (UK)',
   'en-AU': 'English (Australia)',
   'de-DE': 'German (Germany)',
-  'de-AT': 'German (Austria)',
-  'de-CH': 'German (Switzerland)',
   'fr-FR': 'French',
   'es-ES': 'Spanish',
-  'hi-IN': 'Hindi',
-  'it-IT': 'Italian',
-  'pt-BR': 'Portuguese (Brazil)',
-  'zh-CN': 'Chinese',
-  'ja-JP': 'Japanese',
-  'uk-UA': 'Ukrainian',
-  'XTTS-v2': 'XTTS Multilingual'
+  'ta-IN': 'Tamil (India)',
+  'ar-AE': 'Arabic (UAE)'
 };
 
 const MultiSpeaker = () => {

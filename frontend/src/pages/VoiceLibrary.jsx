@@ -36,19 +36,15 @@ const VoiceLibrary = () => {
     { id: 'de-DE-LaraNeural', name: 'Lara', language: 'German', type: 'Female', accent: 'Germany', style: 'Soft', url: 'https://example.com/lara.wav' },
     { id: 'de-DE-FelixNeural', name: 'Felix', language: 'German', type: 'Male', accent: 'Germany', style: 'Clear', url: 'https://example.com/felix.wav' },
     { id: 'de-DE-GretaNeural', name: 'Greta', language: 'German', type: 'Female', accent: 'Germany', style: 'Natural', url: 'https://example.com/greta.wav' },
-    { id: 'de-AT-IngridNeural', name: 'Ingrid', language: 'German', type: 'Female', accent: 'Austria', style: 'Friendly', url: 'https://example.com/ingrid.wav' },
-    { id: 'de-AT-JonasNeural', name: 'Jonas', language: 'German', type: 'Male', accent: 'Austria', style: 'Friendly', url: 'https://example.com/jonas.wav' },
-    { id: 'de-CH-LeniNeural', name: 'Leni', language: 'German', type: 'Female', accent: 'Switzerland', style: 'Soft', url: 'https://example.com/leni.wav' },
-    { id: 'de-CH-JanNeural', name: 'Jan', language: 'German', type: 'Male', accent: 'Switzerland', style: 'Clear', url: 'https://example.com/jan.wav' },
+    { id: 'ta-IN-PallaviNeural', name: 'Pallavi', language: 'Tamil', type: 'Female', accent: 'India', style: 'Natural', url: 'https://example.com/pallavi.wav' },
+    { id: 'ta-IN-ValluvarNeural', name: 'Valluvar', language: 'Tamil', type: 'Male', accent: 'India', style: 'Natural', url: 'https://example.com/valluvar.wav' },
+    { id: 'ar-AE-FatimaNeural', name: 'Fatima', language: 'Arabic (UAE)', type: 'Female', accent: 'UAE', style: 'Natural', url: 'https://example.com/fatima.wav' },
+    { id: 'ar-AE-HamdanNeural', name: 'Hamdan', language: 'Arabic (UAE)', type: 'Male', accent: 'UAE', style: 'Natural', url: 'https://example.com/hamdan.wav' },
     { id: 'fr-FR-DeniseNeural', name: 'Denise', language: 'French', type: 'Female', accent: 'French', style: 'Soft', url: 'https://example.com/denise.wav' },
     { id: 'fr-FR-HenriNeural', name: 'Henri', language: 'French', type: 'Male', accent: 'French', style: 'Clear', url: 'https://example.com/henri.wav' },
     { id: 'fr-FR-EloiseNeural', name: 'Eloise', language: 'French', type: 'Female', accent: 'French', style: 'Warm', url: 'https://example.com/eloise.wav' },
     { id: 'fr-FR-RemyMultilingualNeural', name: 'Remy', language: 'French', type: 'Male', accent: 'French', style: 'Bold', url: 'https://example.com/remy.wav' },
     { id: 'fr-FR-VivienneMultilingualNeural', name: 'Vivienne', language: 'French', type: 'Female', accent: 'French', style: 'Bright', url: 'https://example.com/vivienne.wav' },
-    { id: 'ja-JP-NanamiNeural', name: 'Nanami', language: 'Japanese', type: 'Female', accent: 'Japanese', style: 'Soft', url: 'https://example.com/nanami.wav' },
-    { id: 'ja-JP-KeitaNeural', name: 'Keita', language: 'Japanese', type: 'Male', accent: 'Japanese', style: 'Clear', url: 'https://example.com/keita.wav' },
-    { id: 'uk-UA-PolinaNeural', name: 'Polina', language: 'Ukrainian', type: 'Female', accent: 'Ukrainian', style: 'Soft', url: 'https://example.com/polina.wav' },
-    { id: 'uk-UA-OstapNeural', name: 'Ostap', language: 'Ukrainian', type: 'Male', accent: 'Ukrainian', style: 'Clear', url: 'https://example.com/ostap.wav' },
   ];
 
   const toggleFavorite = (id) => {
@@ -243,7 +239,7 @@ const VoiceLibrary = () => {
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-3">Language</label>
             <div className="flex gap-2 flex-wrap">
-              {['all', 'English (US)', 'English (UK)', 'English (AU)', 'German', 'French', 'Japanese', 'Ukrainian'].map((lang) => (
+              {['all', 'English (US)', 'English (UK)', 'English (AU)', 'German', 'French', 'Tamil', 'Arabic (UAE)'].map((lang) => (
                 <motion.button
                   key={lang}
                   onClick={() => setSelectedLanguage(lang === 'all' ? 'all' : lang)}

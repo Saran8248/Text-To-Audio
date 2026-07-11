@@ -322,14 +322,6 @@ function resolveVoice(requestedVoice) {
 
 function getAvailableVoices() {
   return {
-    "de-AT": [
-      { id: "de-AT-IngridNeural", name: "Ingrid", type: "Female", style: "Natural" },
-      { id: "de-AT-JonasNeural", name: "Jonas", type: "Male", style: "Natural" },
-    ],
-    "de-CH": [
-      { id: "de-CH-LeniNeural", name: "Leni", type: "Female", style: "Natural" },
-      { id: "de-CH-JanNeural", name: "Jan", type: "Male", style: "Natural" },
-    ],
     "de-DE": [
       { id: "de-DE-SeraphinaMultilingualNeural", name: "Seraphina Multilingual", type: "Female", style: "Clear / Versatile" },
       { id: "de-DE-FlorianMultilingualNeural", name: "Florian Multilingual", type: "Male", style: "Bold / Versatile" },
@@ -374,39 +366,13 @@ function getAvailableVoices() {
       { id: "fr-FR-HenriNeural", name: "Henri", type: "Male", style: "Natural" },
       { id: "fr-FR-EloiseNeural", name: "Eloise", type: "Female", style: "Natural" },
     ],
-    "hi-IN": [
-      { id: "hi-IN-SwaraNeural", name: "Swara", type: "Female", style: "Natural" },
-      { id: "hi-IN-MadhurNeural", name: "Madhur", type: "Male", style: "Natural" },
+    "ta-IN": [
+      { id: "ta-IN-PallaviNeural", name: "Pallavi", type: "Female", style: "Natural" },
+      { id: "ta-IN-ValluvarNeural", name: "Valluvar", type: "Male", style: "Natural" },
     ],
-    "it-IT": [
-      { id: "it-IT-ElsaNeural", name: "Elsa", type: "Female", style: "Natural" },
-      { id: "it-IT-GiuseppeMultilingualNeural", name: "Giuseppe Multilingual", type: "Male", style: "Natural" },
-      { id: "it-IT-IsabellaNeural", name: "Isabella", type: "Female", style: "Natural" },
-      { id: "it-IT-DiegoNeural", name: "Diego", type: "Male", style: "Natural" },
-    ],
-    "ja-JP": [
-      { id: "ja-JP-NanamiNeural", name: "Nanami", type: "Female", style: "Natural" },
-      { id: "ja-JP-KeitaNeural", name: "Keita", type: "Male", style: "Natural" },
-    ],
-    "pt-BR": [
-      { id: "pt-BR-ThalitaMultilingualNeural", name: "Thalita Multilingual", type: "Female", style: "Natural" },
-      { id: "pt-BR-AntonioNeural", name: "Antonio", type: "Male", style: "Natural" },
-      { id: "pt-BR-FranciscaNeural", name: "Francisca", type: "Female", style: "Natural" },
-    ],
-    "uk-UA": [
-      { id: "uk-UA-PolinaNeural", name: "Polina", type: "Female", style: "Natural" },
-      { id: "uk-UA-OstapNeural", name: "Ostap", type: "Male", style: "Natural" },
-    ],
-    "zh-CN": [
-      { id: "zh-CN-XiaoxiaoNeural", name: "Xiaoxiao", type: "Female", style: "Natural" },
-      { id: "zh-CN-YunjianNeural", name: "Yunjian", type: "Male", style: "Natural" },
-      { id: "zh-CN-XiaoyiNeural", name: "Xiaoyi", type: "Female", style: "Natural" },
-      { id: "zh-CN-YunxiNeural", name: "Yunxi", type: "Male", style: "Natural" },
-      { id: "zh-CN-YunxiaNeural", name: "Yunxia", type: "Male", style: "Natural" },
-      { id: "zh-CN-YunyangNeural", name: "Yunyang", type: "Male", style: "Natural" },
-    ],
-    "XTTS-v2": [
-      { id: "xtts-v2", name: "XTTS v2", type: "Multilingual", style: "Coqui" },
+    "ar-AE": [
+      { id: "ar-AE-FatimaNeural", name: "Fatima", type: "Female", style: "Natural" },
+      { id: "ar-AE-HamdanNeural", name: "Hamdan", type: "Male", style: "Natural" },
     ],
   };
 }

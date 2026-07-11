@@ -418,19 +418,15 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
               <option value="de-DE-LaraNeural">Lara (German Female - Soft)</option>
               <option value="de-DE-FelixNeural">Felix (German Male - Clear)</option>
               <option value="de-DE-GretaNeural">Greta (German Female - Natural)</option>
-              <option value="de-AT-IngridNeural">Ingrid (German Austria Female - Friendly)</option>
-              <option value="de-AT-JonasNeural">Jonas (German Austria Male - Friendly)</option>
-              <option value="de-CH-LeniNeural">Leni (German Switzerland Female - Soft)</option>
-              <option value="de-CH-JanNeural">Jan (German Switzerland Male - Clear)</option>
+              <option value="ta-IN-PallaviNeural">Pallavi (Tamil India Female)</option>
+              <option value="ta-IN-ValluvarNeural">Valluvar (Tamil India Male)</option>
+              <option value="ar-AE-FatimaNeural">Fatima (Arabic UAE Female)</option>
+              <option value="ar-AE-HamdanNeural">Hamdan (Arabic UAE Male)</option>
               <option value="fr-FR-DeniseNeural">Denise (French Female)</option>
               <option value="fr-FR-HenriNeural">Henri (French Male)</option>
               <option value="fr-FR-EloiseNeural">Eloise (French Female)</option>
               <option value="fr-FR-RemyMultilingualNeural">Remy (French Male)</option>
               <option value="fr-FR-VivienneMultilingualNeural">Vivienne (French Female)</option>
-              <option value="ja-JP-NanamiNeural">Nanami (Japanese Female)</option>
-              <option value="ja-JP-KeitaNeural">Keita (Japanese Male)</option>
-              <option value="uk-UA-PolinaNeural">Polina (Ukrainian Female)</option>
-              <option value="uk-UA-OstapNeural">Ostap (Ukrainian Male)</option>
             </select>
           </div>
 

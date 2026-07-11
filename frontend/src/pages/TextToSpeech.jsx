@@ -65,16 +65,10 @@ const TextToSpeech = () => {
     'en-GB': 'English (United Kingdom)',
     'en-AU': 'English (Australia)',
     'de-DE': 'German (Germany)',
-    'de-AT': 'German (Austria)',
-    'de-CH': 'German (Switzerland)',
     'fr-FR': 'French (France)',
     'es-ES': 'Spanish (Spain)',
-    'hi-IN': 'Hindi (India)',
-    'it-IT': 'Italian (Italy)',
-    'pt-BR': 'Portuguese (Brazil)',
-    'zh-CN': 'Chinese (Simplified, China)',
-    'ja-JP': 'Japanese (Japan)',
-    'uk-UA': 'Ukrainian (Ukraine)',
+    'ta-IN': 'Tamil (India)',
+    'ar-AE': 'Arabic (UAE)',
   };
 
   const languages = Object.keys(voices).map((lang) => ({

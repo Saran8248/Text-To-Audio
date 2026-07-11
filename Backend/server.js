@@ -1419,6 +1419,8 @@ if (DATABASE_URL) {
     let client;
     try {
       client = await pgPool.connect();
+      const { rows: dbInfo } = await client.query("SELECT current_database(), current_user");
+      console.log(`Connected to PostgreSQL database: "${dbInfo[0].current_database}" as user: "${dbInfo[0].current_user}"`);
       console.log("Connected to PostgreSQL successfully! Adjusting schema...");
       
       // Drop foreign key constraint first to prevent conflict during alter

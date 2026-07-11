@@ -741,7 +741,7 @@ function saveUsers(users) {
         console.error("Failed to sync users to PostgreSQL:", err);
         lastPgError = {
           operation: "saveUsers",
-          message: err.message,
+          message: err.message || err.detail || String(err),
           timestamp: new Date().toISOString(),
         };
       } finally {
@@ -1189,7 +1189,7 @@ function addToHistory(text, voice, status = "success", userId = null) {
         console.error("Failed to insert history to PostgreSQL:", err);
         lastPgError = {
           operation: "addToHistory",
-          message: err.message,
+          message: err.message || err.detail || String(err),
           timestamp: new Date().toISOString(),
         };
       });
@@ -1853,9 +1853,26 @@ if (DATABASE_URL) {
         ALTER TABLE audio_history DROP CONSTRAINT IF EXISTS audio_history_user_id_fkey;
       `);
 
-      // Alter users table columns dynamically to support UUIDs and custom metadata
+      // Safely drop the default serial sequence on users.id column if it exists
+      await client
+        .query(
+          `
+        ALTER TABLE users ALTER COLUMN id DROP DEFAULT;
+      `,
+        )
+        .catch((e) =>
+          console.log(
+            "users.id sequence default already dropped or not present",
+          ),
+        );
+
+      // Alter users.id column using explicit cast to character varying
       await client.query(`
-        ALTER TABLE users ALTER COLUMN id TYPE VARCHAR(100);
+        ALTER TABLE users ALTER COLUMN id TYPE VARCHAR(100) USING id::VARCHAR(100);
+      `);
+
+      // Add missing metadata columns to users table
+      await client.query(`
         ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(50) DEFAULT 'user';
         ALTER TABLE users ADD COLUMN IF NOT EXISTS access_status VARCHAR(50) DEFAULT 'approved';
         ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash VARCHAR(255);
@@ -1864,9 +1881,13 @@ if (DATABASE_URL) {
         ALTER TABLE users ADD COLUMN IF NOT EXISTS sessions JSONB DEFAULT '[]'::jsonb;
       `);
 
-      // Alter audio_history table columns dynamically
+      // Alter audio_history.user_id using explicit cast to character varying
       await client.query(`
-        ALTER TABLE audio_history ALTER COLUMN user_id TYPE VARCHAR(100);
+        ALTER TABLE audio_history ALTER COLUMN user_id TYPE VARCHAR(100) USING user_id::VARCHAR(100);
+      `);
+
+      // Add missing metadata columns to audio_history table
+      await client.query(`
         ALTER TABLE audio_history ADD COLUMN IF NOT EXISTS gender VARCHAR(50);
         ALTER TABLE audio_history ADD COLUMN IF NOT EXISTS status VARCHAR(50);
         ALTER TABLE audio_history ADD COLUMN IF NOT EXISTS timestamp VARCHAR(100);
@@ -1962,7 +1983,7 @@ if (DATABASE_URL) {
       console.error("PostgreSQL initialization error:", err);
       lastPgError = {
         operation: "startup",
-        message: err.message,
+        message: err.message || err.detail || String(err),
         timestamp: new Date().toISOString(),
       };
     } finally {
@@ -1974,7 +1995,7 @@ if (DATABASE_URL) {
     console.error("Unhandled async PG error:", err);
     lastPgError = {
       operation: "unhandledStartup",
-      message: err.message,
+      message: err.message || err.detail || String(err),
       timestamp: new Date().toISOString(),
     };
     ensureDefaultAdminUser();

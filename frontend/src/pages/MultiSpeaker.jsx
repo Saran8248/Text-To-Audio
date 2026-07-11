@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from '../utils/motion';
-import { Users, Cpu, CheckCircle } from 'lucide-react';
+import { Users, Cpu, CheckCircle, Download } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 const localeNames = {
@@ -352,8 +352,9 @@ const MultiSpeaker = () => {
             <a
               href={mergedUrl}
               download="merged_conversation.mp3"
-              className="text-blue-500 hover:text-blue-400 text-sm font-semibold underline underline-offset-4 shrink-0 transition-all hover:scale-105"
+              className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white text-sm font-semibold rounded-xl hover:shadow-lg transition-all hover:scale-105 active:scale-95 shrink-0"
             >
+              <Download size={16} />
               Download MP3
             </a>
           </div>

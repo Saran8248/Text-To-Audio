@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { motion } from '../utils/motion';
-import { toast } from 'react-toastify';
-import { loginUser } from '../utils/auth';
-import { Eye, EyeOff } from 'lucide-react';
+import React, { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { motion } from "../utils/motion";
+import { toast } from "react-toastify";
+import { loginUser } from "../utils/auth";
+import { Eye, EyeOff } from "lucide-react";
 
 const Login = ({ onLogin }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/';
+  const from = location.state?.from?.pathname || "/";
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -22,7 +22,7 @@ const Login = ({ onLogin }) => {
     }
 
     onLogin(result.user);
-    toast.success('Logged in successfully');
+    toast.success("Logged in successfully");
     navigate(from, { replace: true });
   };
 
@@ -35,7 +35,9 @@ const Login = ({ onLogin }) => {
       >
         <div className="mb-8 text-center">
           <h1 className="text-4xl font-bold text-white">Terra Tern</h1>
-          <p className="mt-3 text-gray-400">Log in to access your sound generation dashboard.</p>
+          <p className="mt-3 text-gray-400">
+            Log in to access your sound generation dashboard.
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -54,7 +56,7 @@ const Login = ({ onLogin }) => {
             <label className="block text-sm text-gray-400 mb-2">Password</label>
             <div className="relative">
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -64,8 +66,8 @@ const Login = ({ onLogin }) => {
                 type="button"
                 onClick={() => setShowPassword((current) => !current)}
                 className="absolute inset-y-0 right-3 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400/60"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-                title={showPassword ? 'Hide password' : 'Show password'}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                title={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -83,7 +85,7 @@ const Login = ({ onLogin }) => {
         </form>
 
         <p className="mt-6 text-center text-gray-400">
-          New here?{' '}
+          New here?{" "}
           <Link to="/register" className="text-blue-400 hover:text-blue-200">
             Create an account
           </Link>

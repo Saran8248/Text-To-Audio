@@ -1,22 +1,22 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { motion } from '../utils/motion';
-import { Users, Cpu, CheckCircle, Download } from 'lucide-react';
-import { toast } from 'react-toastify';
+import React, { useState, useEffect, useRef } from "react";
+import { motion } from "../utils/motion";
+import { Users, Cpu, CheckCircle, Download } from "lucide-react";
+import { toast } from "react-toastify";
 
 const localeNames = {
-  'en-US': 'English (US)',
-  'en-GB': 'English (UK)',
-  'en-AU': 'English (Australia)',
-  'de-DE': 'German (Germany)',
-  'fr-FR': 'French',
-  'es-ES': 'Spanish',
-  'ta-IN': 'Tamil (India)',
-  'ar-AE': 'Arabic (UAE)'
+  "en-US": "English (US)",
+  "en-GB": "English (UK)",
+  "en-AU": "English (Australia)",
+  "de-DE": "German (Germany)",
+  "fr-FR": "French",
+  "es-ES": "Spanish",
+  "ta-IN": "Tamil (India)",
+  "ar-AE": "Arabic (UAE)",
 };
 
 const MultiSpeaker = () => {
   const [conversationText, setConversationText] = useState(
-    "Tom: Hallo Anna.\nAnna: Hallo Tom.\nNarrator: Beide gehen ins Restaurant.\nTom: Ich möchte Pizza.\nAnna: Ich nehme Pasta."
+    "Tom: Hallo Anna.\nAnna: Hallo Tom.\nNarrator: Beide gehen ins Restaurant.\nTom: Ich möchte Pizza.\nAnna: Ich nehme Pasta.",
   );
   const [voices, setVoices] = useState([]);
   const [voiceMapping, setVoiceMapping] = useState({});
@@ -30,11 +30,11 @@ const MultiSpeaker = () => {
     // Fetch available voices from backend
     const fetchVoices = async () => {
       try {
-        const response = await fetch('/api/tts/voices');
+        const response = await fetch("/api/tts/voices");
         const data = await response.json();
         const groupedVoices = data.data || {};
         const flatVoices = [];
-        
+
         Object.entries(groupedVoices).forEach(([locale, list]) => {
           if (Array.isArray(list)) {
             list.forEach((v) => {
@@ -47,11 +47,11 @@ const MultiSpeaker = () => {
             });
           }
         });
-        
+
         setVoices(flatVoices);
       } catch (err) {
-        console.error('Failed to load voices:', err);
-        toast.error('Unable to retrieve voice library list.');
+        console.error("Failed to load voices:", err);
+        toast.error("Unable to retrieve voice library list.");
       }
     };
     fetchVoices();
@@ -69,7 +69,7 @@ const MultiSpeaker = () => {
       return;
     }
 
-    const lines = conversationText.split('\n');
+    const lines = conversationText.split("\n");
     const uniqueSpeakers = new Set();
 
     lines.forEach((line) => {
@@ -90,20 +90,34 @@ const MultiSpeaker = () => {
           newMapping[speaker] = prevMapping[speaker];
         } else {
           const lower = speaker.toLowerCase();
-          if (lower.includes('anna') || lower.includes('female') || lower.includes('girl')) {
-            newMapping[speaker] = 'de-DE-KatjaNeural';
-          } else if (lower.includes('tom') || lower.includes('male') || lower.includes('boy')) {
-            newMapping[speaker] = 'de-DE-ConradNeural';
-          } else if (lower.includes('narrator') || lower.includes('story') || lower.includes('erzähler')) {
-            newMapping[speaker] = 'de-DE-AmalaNeural';
+          if (
+            lower.includes("anna") ||
+            lower.includes("female") ||
+            lower.includes("girl")
+          ) {
+            newMapping[speaker] = "de-DE-KatjaNeural";
+          } else if (
+            lower.includes("tom") ||
+            lower.includes("male") ||
+            lower.includes("boy")
+          ) {
+            newMapping[speaker] = "de-DE-ConradNeural";
+          } else if (
+            lower.includes("narrator") ||
+            lower.includes("story") ||
+            lower.includes("erzähler")
+          ) {
+            newMapping[speaker] = "de-DE-AmalaNeural";
           } else {
-            newMapping[speaker] = 'de-DE-ChristophNeural';
+            newMapping[speaker] = "de-DE-ChristophNeural";
           }
         }
 
         const voiceId = newMapping[speaker];
         const voiceObj = voices.find((v) => v.shortName === voiceId);
-        newLanguages[speaker] = voiceObj ? voiceObj.locale : voiceId.split('-').slice(0, 2).join('-');
+        newLanguages[speaker] = voiceObj
+          ? voiceObj.locale
+          : voiceId.split("-").slice(0, 2).join("-");
       });
 
       setSpeakerLanguages(newLanguages);
@@ -152,19 +166,24 @@ const MultiSpeaker = () => {
 
   const handleGenerateAudio = async () => {
     if (Object.keys(voiceMapping).length === 0) {
-      toast.warn('No speakers detected in the conversation. Format must contain "Speaker: Text".');
+      toast.warn(
+        'No speakers detected in the conversation. Format must contain "Speaker: Text".',
+      );
       return;
     }
 
     setIsGenerating(true);
-    const generateToast = toast.loading('Generating conversation audio tracks...', { autoClose: false });
+    const generateToast = toast.loading(
+      "Generating conversation audio tracks...",
+      { autoClose: false },
+    );
 
     try {
-      const token = localStorage.getItem('terra_tern_auth_token');
-      const response = await fetch('/api/tts/multi-speaker', {
-        method: 'POST',
+      const token = localStorage.getItem("terra_tern_auth_token");
+      const response = await fetch("/api/tts/multi-speaker", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
@@ -175,7 +194,9 @@ const MultiSpeaker = () => {
 
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.message || 'Server error occurred during generation.');
+        throw new Error(
+          errData.message || "Server error occurred during generation.",
+        );
       }
 
       const audioBlob = await response.blob();
@@ -183,17 +204,15 @@ const MultiSpeaker = () => {
 
       setMergedUrl(url);
       toast.dismiss(generateToast);
-      toast.success('Conversation audio successfully generated!');
+      toast.success("Conversation audio successfully generated!");
     } catch (err) {
       console.error(err);
       toast.dismiss(generateToast);
-      toast.error(err.message || 'Generation failed.');
+      toast.error(err.message || "Generation failed.");
     } finally {
       setIsGenerating(false);
     }
   };
-
-
 
   return (
     <div className="space-y-8 max-w-4xl">
@@ -202,8 +221,13 @@ const MultiSpeaker = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1 className="text-4xl font-bold text-white mb-2">Multi Speaker Text to Audio</h1>
-        <p className="text-gray-400">Paste your dialog conversation and map distinct voices to each speaker dynamically.</p>
+        <h1 className="text-4xl font-bold text-white mb-2">
+          Multi Speaker Text to Audio
+        </h1>
+        <p className="text-gray-400">
+          Paste your dialog conversation and map distinct voices to each speaker
+          dynamically.
+        </p>
       </motion.div>
 
       {/* Main Single Configuration Card */}
@@ -238,33 +262,51 @@ const MultiSpeaker = () => {
           </h3>
 
           {Object.keys(voiceMapping).length === 0 ? (
-            <p className="text-sm text-gray-500 italic">No speakers detected. Type conversation lines (e.g. "Tom: Hallo") to configure speaker voices below.</p>
+            <p className="text-sm text-gray-500 italic">
+              No speakers detected. Type conversation lines (e.g. "Tom: Hallo")
+              to configure speaker voices below.
+            </p>
           ) : (
             <div className="space-y-3">
               {Object.keys(voiceMapping).map((speaker) => (
-                <div key={speaker} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3.5 glass-sm rounded-xl border border-white/5 hover:border-white/10 transition-all gap-4">
+                <div
+                  key={speaker}
+                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3.5 glass-sm rounded-xl border border-white/5 hover:border-white/10 transition-all gap-4"
+                >
                   <div className="flex items-center gap-2 min-w-[140px]">
                     <span className="w-2 h-2 rounded-full bg-blue-400" />
-                    <span className="font-semibold text-white truncate">{speaker}</span>
+                    <span className="font-semibold text-white truncate">
+                      {speaker}
+                    </span>
                   </div>
 
                   <div className="flex-1 w-full max-w-lg flex flex-col sm:flex-row gap-3">
                     {/* Language Dropdown */}
                     <div className="flex-1 relative">
                       <select
-                        value={speakerLanguages[speaker] || 'de-DE'}
-                        onChange={(e) => handleLanguageChange(speaker, e.target.value)}
+                        value={speakerLanguages[speaker] || "de-DE"}
+                        onChange={(e) =>
+                          handleLanguageChange(speaker, e.target.value)
+                        }
                         className="w-full pl-4 pr-10 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:border-blue-400 focus:outline-none appearance-none cursor-pointer text-sm"
                       >
                         {Object.entries(localeNames).map(([locale, name]) => (
-                          <option key={locale} value={locale} className="bg-dark-900 text-white">
+                          <option
+                            key={locale}
+                            value={locale}
+                            className="bg-dark-900 text-white"
+                          >
                             {name}
                           </option>
                         ))}
                       </select>
                       <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-gray-400">
-                        <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                          <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                        <svg
+                          className="fill-current h-4 w-4"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                        >
+                          <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
                         </svg>
                       </div>
                     </div>
@@ -272,21 +314,35 @@ const MultiSpeaker = () => {
                     {/* Voice Dropdown */}
                     <div className="flex-1 relative">
                       <select
-                        value={voiceMapping[speaker] || ''}
-                        onChange={(e) => handleVoiceChange(speaker, e.target.value)}
+                        value={voiceMapping[speaker] || ""}
+                        onChange={(e) =>
+                          handleVoiceChange(speaker, e.target.value)
+                        }
                         className="w-full pl-4 pr-10 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:border-blue-400 focus:outline-none appearance-none cursor-pointer text-sm"
                       >
                         {voices
-                          .filter((v) => v.locale === (speakerLanguages[speaker] || 'de-DE'))
+                          .filter(
+                            (v) =>
+                              v.locale ===
+                              (speakerLanguages[speaker] || "de-DE"),
+                          )
                           .map((voice) => (
-                            <option key={voice.shortName} value={voice.shortName} className="bg-dark-900 text-white">
+                            <option
+                              key={voice.shortName}
+                              value={voice.shortName}
+                              className="bg-dark-900 text-white"
+                            >
                               {voice.displayName} ({voice.gender})
                             </option>
                           ))}
                       </select>
                       <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-gray-400">
-                        <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                          <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                        <svg
+                          className="fill-current h-4 w-4"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                        >
+                          <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
                         </svg>
                       </div>
                     </div>
@@ -300,7 +356,9 @@ const MultiSpeaker = () => {
         {/* Audio Generating Options & Trigger Button (Directly Downside of Speaker Config) */}
         <div className="pt-4 border-t border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-300 font-medium">Output Format:</span>
+            <span className="text-sm text-gray-300 font-medium">
+              Output Format:
+            </span>
             <label className="flex items-center gap-2 text-white text-sm cursor-pointer">
               <input
                 type="radio"
@@ -319,7 +377,7 @@ const MultiSpeaker = () => {
             disabled={isGenerating || Object.keys(voiceMapping).length === 0}
             className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl font-medium text-white hover:shadow-lg disabled:opacity-50"
           >
-            {isGenerating ? 'Generating Audio...' : 'Generate Audio'}
+            {isGenerating ? "Generating Audio..." : "Generate Audio"}
           </motion.button>
         </div>
       </motion.div>
@@ -336,8 +394,12 @@ const MultiSpeaker = () => {
               <CheckCircle className="text-emerald-400" size={20} />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">Generation Successful!</h3>
-              <p className="text-xs text-gray-400">All conversation segments merged together successfully.</p>
+              <h3 className="text-lg font-bold text-white">
+                Generation Successful!
+              </h3>
+              <p className="text-xs text-gray-400">
+                All conversation segments merged together successfully.
+              </p>
             </div>
           </div>
 

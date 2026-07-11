@@ -1,12 +1,21 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { motion } from '../utils/motion';
-import { Play, Download, Copy, Volume2, Zap, AlertCircle, RotateCcw } from 'lucide-react';
-import { toast } from 'react-toastify';
-import axios from 'axios';
-import { API_BASE_URL } from '../config/api';
+import React, { useEffect, useRef, useState } from "react";
+import { motion } from "../utils/motion";
+import {
+  Play,
+  Download,
+  Copy,
+  Volume2,
+  Zap,
+  AlertCircle,
+  RotateCcw,
+} from "lucide-react";
+import { toast } from "react-toastify";
+import axios from "axios";
+import { API_BASE_URL } from "../config/api";
 
 const getErrorMessage = async (error) => {
-  const fallback = 'The hosted voice service is not ready yet. Please try again shortly or contact the site owner.';
+  const fallback =
+    "The hosted voice service is not ready yet. Please try again shortly or contact the site owner.";
   const data = error.response?.data;
 
   if (data instanceof Blob) {
@@ -23,16 +32,16 @@ const getErrorMessage = async (error) => {
 };
 
 const TextToSpeech = () => {
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
   const [audioUrl, setAudioUrl] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedVoice, setSelectedVoice] = useState('en-US-JennyNeural');
-  const [selectedLanguage, setSelectedLanguage] = useState('en-US');
-  const [languageCode, setLanguageCode] = useState('en');
+  const [selectedVoice, setSelectedVoice] = useState("en-US-JennyNeural");
+  const [selectedLanguage, setSelectedLanguage] = useState("en-US");
+  const [languageCode, setLanguageCode] = useState("en");
   const [speed, setSpeed] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [generationError, setGenerationError] = useState('');
-  const [generationStatus, setGenerationStatus] = useState('');
+  const [generationError, setGenerationError] = useState("");
+  const [generationStatus, setGenerationStatus] = useState("");
   const audioRef = useRef(null);
 
   const [voices, setVoices] = useState({});
@@ -40,35 +49,37 @@ const TextToSpeech = () => {
   useEffect(() => {
     const fetchVoices = async () => {
       try {
-        const response = await fetch('/api/tts/voices');
+        const response = await fetch("/api/tts/voices");
         const data = await response.json();
         const grouped = data.data || {};
         setVoices(grouped);
 
         const locales = Object.keys(grouped);
         if (locales.length > 0) {
-          const defaultLocale = locales.includes('en-US') ? 'en-US' : locales[0];
+          const defaultLocale = locales.includes("en-US")
+            ? "en-US"
+            : locales[0];
           setSelectedLanguage(defaultLocale);
           if (grouped[defaultLocale] && grouped[defaultLocale].length > 0) {
             setSelectedVoice(grouped[defaultLocale][0].id);
           }
         }
       } catch (err) {
-        console.error('Failed to load voices:', err);
+        console.error("Failed to load voices:", err);
       }
     };
     fetchVoices();
   }, []);
 
   const languageNames = {
-    'en-US': 'English (United States)',
-    'en-GB': 'English (United Kingdom)',
-    'en-AU': 'English (Australia)',
-    'de-DE': 'German (Germany)',
-    'fr-FR': 'French (France)',
-    'es-ES': 'Spanish (Spain)',
-    'ta-IN': 'Tamil (India)',
-    'ar-AE': 'Arabic (UAE)',
+    "en-US": "English (United States)",
+    "en-GB": "English (United Kingdom)",
+    "en-AU": "English (Australia)",
+    "de-DE": "German (Germany)",
+    "fr-FR": "French (France)",
+    "es-ES": "Spanish (Spain)",
+    "ta-IN": "Tamil (India)",
+    "ar-AE": "Arabic (UAE)",
   };
 
   const languages = Object.keys(voices).map((lang) => ({
@@ -76,7 +87,7 @@ const TextToSpeech = () => {
     name: languageNames[lang] || lang,
   }));
 
-  const clearGeneratedAudio = (status = '') => {
+  const clearGeneratedAudio = (status = "") => {
     if (audioUrl) {
       window.URL.revokeObjectURL(audioUrl);
       setAudioUrl(null);
@@ -87,14 +98,16 @@ const TextToSpeech = () => {
     }
 
     setIsPlaying(false);
-    setGenerationError('');
+    setGenerationError("");
     setGenerationStatus(status);
   };
 
   const handleTextChange = (value) => {
     setText(value.slice(0, 5000));
     if (audioUrl) {
-      clearGeneratedAudio('Text changed. Generate again for the updated audio.');
+      clearGeneratedAudio(
+        "Text changed. Generate again for the updated audio.",
+      );
     }
   };
 
@@ -103,13 +116,13 @@ const TextToSpeech = () => {
     if (voices[lang] && voices[lang].length > 0) {
       setSelectedVoice(voices[lang][0].id);
     }
-    setLanguageCode(lang.split('-')[0]);
-    clearGeneratedAudio('Language changed. Generate again for the new voice.');
+    setLanguageCode(lang.split("-")[0]);
+    clearGeneratedAudio("Language changed. Generate again for the new voice.");
   };
 
   const handleVoiceChange = (voiceId) => {
     setSelectedVoice(voiceId);
-    clearGeneratedAudio('Voice changed. Generate again for the new voice.');
+    clearGeneratedAudio("Voice changed. Generate again for the new voice.");
   };
 
   useEffect(() => {
@@ -128,37 +141,41 @@ const TextToSpeech = () => {
 
   const handleGenerateAudio = async () => {
     if (!text.trim()) {
-      toast.error('Please enter some text to convert');
-      setGenerationError('Please enter some text to convert.');
-      setGenerationStatus('');
+      toast.error("Please enter some text to convert");
+      setGenerationError("Please enter some text to convert.");
+      setGenerationStatus("");
       return;
     }
 
     setIsLoading(true);
-    setGenerationError('');
-    setGenerationStatus('Generating audio...');
+    setGenerationError("");
+    setGenerationStatus("Generating audio...");
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/tts/generate`, {
-        text: text.trim(),
-        voice: selectedVoice,
-        language: languageCode,
-      }, {
-        responseType: 'blob',
-        timeout: 180000,
-      });
+      const response = await axios.post(
+        `${API_BASE_URL}/api/tts/generate`,
+        {
+          text: text.trim(),
+          voice: selectedVoice,
+          language: languageCode,
+        },
+        {
+          responseType: "blob",
+          timeout: 180000,
+        },
+      );
 
       const url = window.URL.createObjectURL(response.data);
       if (audioUrl) {
         window.URL.revokeObjectURL(audioUrl);
       }
       setAudioUrl(url);
-      setGenerationStatus('Audio is ready to preview or download.');
-      toast.success('Audio generated successfully!');
+      setGenerationStatus("Audio is ready to preview or download.");
+      toast.success("Audio generated successfully!");
       setIsPlaying(false);
     } catch (error) {
       const message = await getErrorMessage(error);
       setGenerationError(message);
-      setGenerationStatus('');
+      setGenerationStatus("");
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -167,16 +184,16 @@ const TextToSpeech = () => {
 
   const handleDownload = () => {
     if (!audioUrl) return;
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = audioUrl;
     a.download = `audio-${Date.now()}.mp3`;
     a.click();
-    toast.success('Audio downloaded!');
+    toast.success("Audio downloaded!");
   };
 
   const handleCopyText = () => {
     navigator.clipboard.writeText(text);
-    toast.success('Text copied to clipboard!');
+    toast.success("Text copied to clipboard!");
   };
 
   return (
@@ -188,9 +205,15 @@ const TextToSpeech = () => {
       >
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-wide text-blue-300">AI audio studio</p>
-            <h1 className="text-3xl sm:text-4xl font-bold text-white mt-2">Text to Speech</h1>
-            <p className="text-gray-400 mt-2 max-w-2xl">Create clean MP3 voiceovers with production-ready Edge voices.</p>
+            <p className="text-sm font-semibold uppercase tracking-wide text-blue-300">
+              AI audio studio
+            </p>
+            <h1 className="text-3xl sm:text-4xl font-bold text-white mt-2">
+              Text to Speech
+            </h1>
+            <p className="text-gray-400 mt-2 max-w-2xl">
+              Create clean MP3 voiceovers with production-ready Edge voices.
+            </p>
           </div>
           <div className="grid grid-cols-3 gap-3 text-center">
             <div className="glass-sm px-4 py-3 rounded-xl">
@@ -203,7 +226,9 @@ const TextToSpeech = () => {
             </div>
             <div className="glass-sm px-4 py-3 rounded-xl">
               <p className="text-xs text-gray-400">Voice</p>
-              <p className="text-sm font-semibold text-white">{selectedVoice.split('-').slice(-1)[0].replace('Neural', '')}</p>
+              <p className="text-sm font-semibold text-white">
+                {selectedVoice.split("-").slice(-1)[0].replace("Neural", "")}
+              </p>
             </div>
           </div>
         </div>
@@ -217,8 +242,12 @@ const TextToSpeech = () => {
         >
           <div className="glass p-6 rounded-2xl border border-white/10">
             <div className="flex items-center justify-between mb-4">
-              <label className="text-lg font-semibold text-white">Your Text</label>
-              <span className="text-sm text-gray-400">{text.length} / 5000 characters</span>
+              <label className="text-lg font-semibold text-white">
+                Your Text
+              </label>
+              <span className="text-sm text-gray-400">
+                {text.length} / 5000 characters
+              </span>
             </div>
             <textarea
               value={text}
@@ -240,8 +269,8 @@ const TextToSpeech = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => {
-                  setText('');
-                  clearGeneratedAudio('');
+                  setText("");
+                  clearGeneratedAudio("");
                 }}
                 className="flex items-center gap-2 px-4 py-2 glass border border-white/10 rounded-lg text-gray-400 hover:text-white hover:border-white/20"
               >
@@ -251,10 +280,14 @@ const TextToSpeech = () => {
             </div>
           </div>
 
-
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="glass p-6 rounded-2xl border border-white/10">
-              <label htmlFor="tts-language" className="block text-sm font-semibold text-white mb-4">Language</label>
+              <label
+                htmlFor="tts-language"
+                className="block text-sm font-semibold text-white mb-4"
+              >
+                Language
+              </label>
               <div className="space-y-2">
                 {languages.map((lang) => (
                   <motion.button
@@ -263,8 +296,8 @@ const TextToSpeech = () => {
                     whileHover={{ x: 4 }}
                     className={`w-full text-left px-4 py-3 rounded-lg transition-all ${
                       selectedLanguage === lang.id
-                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
-                        : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+                        : "bg-white/5 text-gray-300 hover:bg-white/10"
                     }`}
                   >
                     {lang.name}
@@ -274,25 +307,31 @@ const TextToSpeech = () => {
             </div>
 
             <div className="glass p-6 rounded-2xl border border-white/10">
-              <label htmlFor="tts-voice" className="block text-sm font-semibold text-white mb-4">Voice</label>
+              <label
+                htmlFor="tts-voice"
+                className="block text-sm font-semibold text-white mb-4"
+              >
+                Voice
+              </label>
               <div className="space-y-2">
-                {voices[selectedLanguage] && voices[selectedLanguage].map((voice) => (
-                  <motion.button
-                    key={voice.id}
-                    onClick={() => handleVoiceChange(voice.id)}
-                    whileHover={{ x: 4 }}
-                    className={`w-full text-left px-4 py-3 rounded-lg transition-all ${
-                      selectedVoice === voice.id
-                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
-                        : 'bg-white/5 text-gray-300 hover:bg-white/10'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium">{voice.name}</span>
-                      <span className="text-xs opacity-70">{voice.type}</span>
-                    </div>
-                  </motion.button>
-                ))}
+                {voices[selectedLanguage] &&
+                  voices[selectedLanguage].map((voice) => (
+                    <motion.button
+                      key={voice.id}
+                      onClick={() => handleVoiceChange(voice.id)}
+                      whileHover={{ x: 4 }}
+                      className={`w-full text-left px-4 py-3 rounded-lg transition-all ${
+                        selectedVoice === voice.id
+                          ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+                          : "bg-white/5 text-gray-300 hover:bg-white/10"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">{voice.name}</span>
+                        <span className="text-xs opacity-70">{voice.type}</span>
+                      </div>
+                    </motion.button>
+                  ))}
               </div>
             </div>
           </div>
@@ -300,8 +339,12 @@ const TextToSpeech = () => {
           <div className="glass p-6 rounded-2xl border border-white/10 space-y-6">
             <div>
               <div className="flex items-center justify-between mb-3">
-                <label className="text-sm font-semibold text-white">Speed</label>
-                <span className="text-sm text-blue-400 font-medium">{speed.toFixed(2)}x</span>
+                <label className="text-sm font-semibold text-white">
+                  Speed
+                </label>
+                <span className="text-sm text-blue-400 font-medium">
+                  {speed.toFixed(2)}x
+                </span>
               </div>
               <input
                 type="range"
@@ -326,15 +369,15 @@ const TextToSpeech = () => {
             disabled={isLoading || !text.trim()}
             className={`w-full py-4 rounded-xl font-semibold text-white flex items-center justify-center gap-2 transition-all ${
               isLoading || !text.trim()
-                ? 'bg-gray-600 cursor-not-allowed'
-                : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:shadow-lg hover:shadow-blue-500/30'
+                ? "bg-gray-600 cursor-not-allowed"
+                : "bg-gradient-to-r from-blue-500 to-purple-600 hover:shadow-lg hover:shadow-blue-500/30"
             }`}
           >
             {isLoading ? (
               <>
                 <motion.div
                   animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                 >
                   <Zap size={20} />
                 </motion.div>
@@ -352,8 +395,8 @@ const TextToSpeech = () => {
             <div
               className={`rounded-xl border px-4 py-3 text-sm ${
                 generationError
-                  ? 'border-red-500/30 bg-red-500/10 text-red-200'
-                  : 'border-green-500/30 bg-green-500/10 text-green-200'
+                  ? "border-red-500/30 bg-red-500/10 text-red-200"
+                  : "border-green-500/30 bg-green-500/10 text-green-200"
               }`}
             >
               {generationError || generationStatus}
@@ -392,7 +435,7 @@ const TextToSpeech = () => {
                       <Play size={20} fill="white" />
                     </motion.button>
                     <span className="text-sm text-gray-400">
-                      {isPlaying ? 'Playing...' : 'Ready to play'}
+                      {isPlaying ? "Playing..." : "Ready to play"}
                     </span>
                   </div>
 
@@ -422,28 +465,34 @@ const TextToSpeech = () => {
                   disabled={isLoading || !text.trim()}
                   className={`w-full py-3 rounded-lg font-medium text-white flex items-center justify-center gap-2 transition-all ${
                     isLoading || !text.trim()
-                      ? 'bg-gray-600 cursor-not-allowed'
-                      : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:shadow-lg hover:shadow-blue-500/30'
+                      ? "bg-gray-600 cursor-not-allowed"
+                      : "bg-gradient-to-r from-blue-500 to-purple-600 hover:shadow-lg hover:shadow-blue-500/30"
                   }`}
                 >
                   <Volume2 size={18} />
-                  {isLoading ? 'Generating...' : 'Generate New Audio'}
+                  {isLoading ? "Generating..." : "Generate New Audio"}
                 </motion.button>
 
                 <div className="bg-white/5 rounded-lg p-4 space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-400">Voice:</span>
                     <span className="text-white font-medium">
-                      {voices[selectedLanguage]?.find((v) => v.id === selectedVoice)?.name || 'Unknown'}
+                      {voices[selectedLanguage]?.find(
+                        (v) => v.id === selectedVoice,
+                      )?.name || "Unknown"}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-400">Speed:</span>
-                    <span className="text-white font-medium">{speed.toFixed(2)}x</span>
+                    <span className="text-white font-medium">
+                      {speed.toFixed(2)}x
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-400">Characters:</span>
-                    <span className="text-white font-medium">{text.length}</span>
+                    <span className="text-white font-medium">
+                      {text.length}
+                    </span>
                   </div>
                 </div>
               </>
@@ -462,13 +511,20 @@ const TextToSpeech = () => {
 
             <div className="glass-sm border border-white/5 rounded-lg p-4 space-y-2 bg-blue-500/10">
               <div className="flex gap-2">
-                <AlertCircle size={18} className="text-blue-400 flex-shrink-0 mt-0.5" />
+                <AlertCircle
+                  size={18}
+                  className="text-blue-400 flex-shrink-0 mt-0.5"
+                />
                 <div>
                   <p className="text-xs font-medium text-blue-300 mb-1">Tips</p>
                   <ul className="text-xs text-blue-200/80 space-y-1">
                     <li>Max 5000 characters per request</li>
-                    <li>Playback speed changes preview and download review only</li>
-                    <li>Try different voices and languages for narration style</li>
+                    <li>
+                      Playback speed changes preview and download review only
+                    </li>
+                    <li>
+                      Try different voices and languages for narration style
+                    </li>
                   </ul>
                 </div>
               </div>

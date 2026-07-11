@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { motion } from '../utils/motion';
-import { Search, Volume2 } from 'lucide-react';
-import { toast } from 'react-toastify';
-import axios from 'axios';
-import { API_BASE_URL } from '../config/api';
+import React, { useEffect, useState } from "react";
+import { motion } from "../utils/motion";
+import { Search, Volume2 } from "lucide-react";
+import { toast } from "react-toastify";
+import axios from "axios";
+import { API_BASE_URL } from "../config/api";
 
 const History = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
   const [history, setHistory] = useState([]);
 
@@ -17,7 +17,7 @@ const History = () => {
       const response = await axios.get(`${API_BASE_URL}/api/tts/history`);
       setHistory(response.data?.data || []);
     } catch (error) {
-      toast.error('Failed to load generation history');
+      toast.error("Failed to load generation history");
     } finally {
       setIsLoading(false);
     }
@@ -35,16 +35,18 @@ const History = () => {
     try {
       await axios.delete(`${API_BASE_URL}/api/tts/history`);
       setHistory([]);
-      toast.success('Generation history cleared');
+      toast.success("Generation history cleared");
     } catch (error) {
-      toast.error('Failed to clear history');
+      toast.error("Failed to clear history");
     }
   };
 
   const filteredHistory = history.filter((item) => {
-    const language = item.voice?.split('-').slice(0, 2).join('-') || '';
-    const matchesSearch = `${item.text} ${item.voice}`.toLowerCase().includes(searchQuery.toLowerCase());
-    if (selectedFilter !== 'all' && language !== selectedFilter) return false;
+    const language = item.voice?.split("-").slice(0, 2).join("-") || "";
+    const matchesSearch = `${item.text} ${item.voice}`
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    if (selectedFilter !== "all" && language !== selectedFilter) return false;
     return matchesSearch;
   });
 
@@ -56,8 +58,12 @@ const History = () => {
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <h1 className="text-4xl font-bold text-white mb-2">Generation History</h1>
-        <p className="text-gray-400">View and manage your previously generated audio files</p>
+        <h1 className="text-4xl font-bold text-white mb-2">
+          Generation History
+        </h1>
+        <p className="text-gray-400">
+          View and manage your previously generated audio files
+        </p>
       </motion.div>
 
       {/* Search & Filter */}
@@ -68,8 +74,12 @@ const History = () => {
       >
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-white">History Controls</h2>
-            <p className="text-sm text-gray-400 mt-2">Use search and filters to find generated audio items quickly.</p>
+            <h2 className="text-xl font-semibold text-white">
+              History Controls
+            </h2>
+            <p className="text-sm text-gray-400 mt-2">
+              Use search and filters to find generated audio items quickly.
+            </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <motion.button
@@ -93,9 +103,14 @@ const History = () => {
 
         <div className="grid gap-6 mt-6 md:grid-cols-3">
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-300 mb-3">Search</label>
+            <label className="block text-sm font-medium text-gray-300 mb-3">
+              Search
+            </label>
             <div className="relative">
-              <Search size={18} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
+              <Search
+                size={18}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"
+              />
               <input
                 type="text"
                 placeholder="Search by text or voice..."
@@ -107,20 +122,31 @@ const History = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-3">Language filter</label>
+            <label className="block text-sm font-medium text-gray-300 mb-3">
+              Language filter
+            </label>
             <div className="flex flex-wrap gap-2">
-              {['all', 'en-US', 'en-GB', 'en-AU', 'de-DE', 'fr-FR', 'ja-JP', 'uk-UA'].map((filter) => (
+              {[
+                "all",
+                "en-US",
+                "en-GB",
+                "en-AU",
+                "de-DE",
+                "fr-FR",
+                "ja-JP",
+                "uk-UA",
+              ].map((filter) => (
                 <motion.button
                   key={filter}
                   onClick={() => setSelectedFilter(filter)}
                   whileHover={{ scale: 1.05 }}
                   className={`px-4 py-2 rounded-lg font-medium transition-all ${
                     selectedFilter === filter
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                      ? "bg-blue-500 text-white"
+                      : "bg-white/10 text-gray-300 hover:bg-white/20"
                   }`}
                 >
-                  {filter === 'all' ? 'All Languages' : filter}
+                  {filter === "all" ? "All Languages" : filter}
                 </motion.button>
               ))}
             </div>
@@ -135,7 +161,9 @@ const History = () => {
           animate={{ opacity: 1, y: 0 }}
           className="glass p-6 rounded-2xl border border-white/10 text-center"
         >
-          <p className="text-white font-medium">Loading generation history...</p>
+          <p className="text-white font-medium">
+            Loading generation history...
+          </p>
         </motion.div>
       ) : filteredHistory.length === 0 ? (
         <motion.div
@@ -145,13 +173,16 @@ const History = () => {
         >
           <Volume2 size={48} className="text-gray-600 mx-auto mb-4" />
           <p className="text-gray-400 text-lg">No audio history found</p>
-          <p className="text-sm text-gray-500 mt-2">Try refreshing or changing the filter to show more results.</p>
+          <p className="text-sm text-gray-500 mt-2">
+            Try refreshing or changing the filter to show more results.
+          </p>
         </motion.div>
       ) : (
         <div className="space-y-3">
           {filteredHistory.map((item, idx) => {
             const date = new Date(item.timestamp);
-            const language = item.voice?.split('-').slice(0, 2).join('-') || 'Unknown';
+            const language =
+              item.voice?.split("-").slice(0, 2).join("-") || "Unknown";
             return (
               <motion.div
                 key={item.id}
@@ -167,7 +198,9 @@ const History = () => {
                         <Volume2 size={20} className="text-white" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-white font-medium truncate">{item.text}</p>
+                        <p className="text-white font-medium truncate">
+                          {item.text}
+                        </p>
                         <p className="text-xs text-gray-400 mt-1">
                           {item.voice} • {language} • {date.toLocaleString()}
                         </p>
@@ -175,15 +208,23 @@ const History = () => {
                     </div>
                     <div className="flex flex-wrap gap-3 text-xs text-gray-400">
                       <span>Saved in local generation history</span>
-                      <span>{item.duration ? `Duration: ${item.duration}s` : 'Duration unavailable'}</span>
-                      <span>{item.size ? `${item.size} KB` : 'Size unavailable'}</span>
+                      <span>
+                        {item.duration
+                          ? `Duration: ${item.duration}s`
+                          : "Duration unavailable"}
+                      </span>
+                      <span>
+                        {item.size ? `${item.size} KB` : "Size unavailable"}
+                      </span>
                     </div>
                   </div>
                   <div className="flex gap-2 flex-wrap">
                     <motion.button
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => toast.info('Playback is not available in this preview')}
+                      onClick={() =>
+                        toast.info("Playback is not available in this preview")
+                      }
                       className="px-4 py-2 bg-white/5 text-white rounded-lg border border-white/10 hover:bg-white/10"
                     >
                       Play
@@ -191,7 +232,10 @@ const History = () => {
                     <motion.button
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => toast.success('Saved entry copied to clipboard') && navigator.clipboard.writeText(item.text)}
+                      onClick={() =>
+                        toast.success("Saved entry copied to clipboard") &&
+                        navigator.clipboard.writeText(item.text)
+                      }
                       className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400"
                     >
                       Copy Text

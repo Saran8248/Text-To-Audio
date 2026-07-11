@@ -16,14 +16,18 @@ const xttsScript = path.join(__dirname, "xtts_generator.py");
 const frontendBuildDir = path.join(__dirname, "..", "frontend", "build");
 
 function getPythonCandidates() {
-  return [...new Set([
-    process.env.PYTHON_EXECUTABLE,
-    "python3.12",
-    "python3.11",
-    "python3.10",
-    "python3",
-    "python",
-  ].filter(Boolean))];
+  return [
+    ...new Set(
+      [
+        process.env.PYTHON_EXECUTABLE,
+        "python3.12",
+        "python3.11",
+        "python3.10",
+        "python3",
+        "python",
+      ].filter(Boolean),
+    ),
+  ];
 }
 
 function canImportModule(executable, moduleName) {
@@ -40,10 +44,15 @@ function resolvePythonExecutable(requiredModule) {
   if (!requiredModule) {
     return candidates[0] || null;
   }
-  return candidates.find((candidate) => canImportModule(candidate, requiredModule)) || null;
+  return (
+    candidates.find((candidate) =>
+      canImportModule(candidate, requiredModule),
+    ) || null
+  );
 }
 
-const defaultPythonExecutable = resolvePythonExecutable("edge_tts") || resolvePythonExecutable();
+const defaultPythonExecutable =
+  resolvePythonExecutable("edge_tts") || resolvePythonExecutable();
 let edgeVoiceSet = null;
 
 // Configuration
@@ -52,7 +61,8 @@ const HISTORY_FILE = path.join(__dirname, "history.json");
 const USERS_FILE = path.join(__dirname, "users.json");
 const MAX_TEXT_LENGTH = 5000;
 const REQUEST_TIMEOUT = 120000; // 2 minutes
-const REQUIRE_ADMIN_APPROVAL = String(process.env.REQUIRE_ADMIN_APPROVAL || "true").toLowerCase() === "true";
+const REQUIRE_ADMIN_APPROVAL =
+  String(process.env.REQUIRE_ADMIN_APPROVAL || "true").toLowerCase() === "true";
 const SESSION_TTL_DAYS = Number(process.env.SESSION_TTL_DAYS || 30);
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -227,18 +237,18 @@ const voiceMap = {
   "en-AU-TimNeural": "en-AU-TimNeural",
   "en-AU-TinaNeural": "en-AU-TinaNeural",
   "xtts-v2": "xtts-v2",
-  "coqui": "xtts-v2",
+  coqui: "xtts-v2",
   // Legacy mappings
-  "de": "de-DE-KatjaNeural",
+  de: "de-DE-KatjaNeural",
   "de-male": "de-DE-ConradNeural",
-  "en": "en-US-GuyNeural",
+  en: "en-US-GuyNeural",
   "en-male": "en-US-GuyNeural",
   "en-us": "en-US-JennyNeural",
   "en-uk": "en-GB-SoniaNeural",
   "en-au": "en-AU-NatashaNeural",
-  "fr": "fr-FR-HenriNeural",
-  "ja": "ja-JP-KeitaNeural",
-  "uk": "uk-UA-PolinaNeural",
+  fr: "fr-FR-HenriNeural",
+  ja: "ja-JP-KeitaNeural",
+  uk: "uk-UA-PolinaNeural",
   "uk-male": "uk-UA-OstapNeural",
   "uk-female": "uk-UA-PolinaNeural",
   // Backward-compatible mappings for old UI options that are not Edge voices.
@@ -259,15 +269,15 @@ const voiceMap = {
   "fr-FR-AntoineNeural": "fr-FR-RemyMultilingualNeural",
   "fr-FR-SophieNeural": "fr-FR-VivienneMultilingualNeural",
   "fr-FR-JulesNeural": "fr-FR-RemyMultilingualNeural",
-  "es": "es-ES-ElviraNeural",
+  es: "es-ES-ElviraNeural",
   "es-male": "es-ES-AlvaroNeural",
-  "hi": "hi-IN-SwaraNeural",
+  hi: "hi-IN-SwaraNeural",
   "hi-male": "hi-IN-MadhurNeural",
-  "it": "it-IT-ElsaNeural",
+  it: "it-IT-ElsaNeural",
   "it-male": "it-IT-DiegoNeural",
-  "pt": "pt-BR-FranciscaNeural",
+  pt: "pt-BR-FranciscaNeural",
   "pt-male": "pt-BR-AntonioNeural",
-  "zh": "zh-CN-XiaoxiaoNeural",
+  zh: "zh-CN-XiaoxiaoNeural",
   "zh-male": "zh-CN-YunxiNeural",
   "ja-JP-AoiNeural": "ja-JP-NanamiNeural",
   "ja-JP-SousukeNeural": "ja-JP-KeitaNeural",
@@ -301,7 +311,10 @@ function getEdgeVoiceSet() {
   });
 
   if (result.status !== 0) {
-    console.error("Failed to load Edge TTS voice list:", result.stderr || result.stdout);
+    console.error(
+      "Failed to load Edge TTS voice list:",
+      result.stderr || result.stdout,
+    );
     edgeVoiceSet = new Set();
     return edgeVoiceSet;
   }
@@ -323,56 +336,226 @@ function resolveVoice(requestedVoice) {
 function getAvailableVoices() {
   return {
     "de-DE": [
-      { id: "de-DE-SeraphinaMultilingualNeural", name: "Seraphina Multilingual", type: "Female", style: "Clear / Versatile" },
-      { id: "de-DE-FlorianMultilingualNeural", name: "Florian Multilingual", type: "Male", style: "Bold / Versatile" },
-      { id: "de-DE-AmalaNeural", name: "Amala", type: "Female", style: "Warm / Narrative" },
-      { id: "de-DE-ConradNeural", name: "Conrad", type: "Male", style: "Clear / Professional" },
-      { id: "de-DE-KatjaNeural", name: "Katja", type: "Female", style: "Soft / Natural" },
-      { id: "de-DE-KillianNeural", name: "Killian", type: "Male", style: "Bright / Conversational" },
-      { id: "de-DE-LaraNeural", name: "Lara", type: "Female", style: "Soft / Conversational" },
-      { id: "de-DE-FelixNeural", name: "Felix", type: "Male", style: "Clear / Conversational" },
-      { id: "de-DE-GretaNeural", name: "Greta", type: "Female", style: "Natural / Versatile" },
+      {
+        id: "de-DE-SeraphinaMultilingualNeural",
+        name: "Seraphina Multilingual",
+        type: "Female",
+        style: "Clear / Versatile",
+      },
+      {
+        id: "de-DE-FlorianMultilingualNeural",
+        name: "Florian Multilingual",
+        type: "Male",
+        style: "Bold / Versatile",
+      },
+      {
+        id: "de-DE-AmalaNeural",
+        name: "Amala",
+        type: "Female",
+        style: "Warm / Narrative",
+      },
+      {
+        id: "de-DE-ConradNeural",
+        name: "Conrad",
+        type: "Male",
+        style: "Clear / Professional",
+      },
+      {
+        id: "de-DE-KatjaNeural",
+        name: "Katja",
+        type: "Female",
+        style: "Soft / Natural",
+      },
+      {
+        id: "de-DE-KillianNeural",
+        name: "Killian",
+        type: "Male",
+        style: "Bright / Conversational",
+      },
+      {
+        id: "de-DE-LaraNeural",
+        name: "Lara",
+        type: "Female",
+        style: "Soft / Conversational",
+      },
+      {
+        id: "de-DE-FelixNeural",
+        name: "Felix",
+        type: "Male",
+        style: "Clear / Conversational",
+      },
+      {
+        id: "de-DE-GretaNeural",
+        name: "Greta",
+        type: "Female",
+        style: "Natural / Versatile",
+      },
     ],
     "en-AU": [
-      { id: "en-AU-NatashaNeural", name: "Natasha", type: "Female", style: "Natural" },
-      { id: "en-AU-WilliamMultilingualNeural", name: "William Multilingual", type: "Male", style: "Natural" },
+      {
+        id: "en-AU-NatashaNeural",
+        name: "Natasha",
+        type: "Female",
+        style: "Natural",
+      },
+      {
+        id: "en-AU-WilliamMultilingualNeural",
+        name: "William Multilingual",
+        type: "Male",
+        style: "Natural",
+      },
     ],
     "en-GB": [
-      { id: "en-GB-LibbyNeural", name: "Libby", type: "Female", style: "Natural" },
+      {
+        id: "en-GB-LibbyNeural",
+        name: "Libby",
+        type: "Female",
+        style: "Natural",
+      },
       { id: "en-GB-RyanNeural", name: "Ryan", type: "Male", style: "Natural" },
-      { id: "en-GB-MaisieNeural", name: "Maisie", type: "Female", style: "Natural" },
-      { id: "en-GB-ThomasNeural", name: "Thomas", type: "Male", style: "Natural" },
-      { id: "en-GB-SoniaNeural", name: "Sonia", type: "Female", style: "Natural" },
+      {
+        id: "en-GB-MaisieNeural",
+        name: "Maisie",
+        type: "Female",
+        style: "Natural",
+      },
+      {
+        id: "en-GB-ThomasNeural",
+        name: "Thomas",
+        type: "Male",
+        style: "Natural",
+      },
+      {
+        id: "en-GB-SoniaNeural",
+        name: "Sonia",
+        type: "Female",
+        style: "Natural",
+      },
     ],
     "en-US": [
-      { id: "en-US-AvaNeural", name: "Ava", type: "Female", style: "Soft / Narrative" },
-      { id: "en-US-AndrewNeural", name: "Andrew", type: "Male", style: "Natural" },
-      { id: "en-US-EmmaNeural", name: "Emma", type: "Female", style: "Natural" },
-      { id: "en-US-BrianNeural", name: "Brian", type: "Male", style: "Natural" },
+      {
+        id: "en-US-AvaNeural",
+        name: "Ava",
+        type: "Female",
+        style: "Soft / Narrative",
+      },
+      {
+        id: "en-US-AndrewNeural",
+        name: "Andrew",
+        type: "Male",
+        style: "Natural",
+      },
+      {
+        id: "en-US-EmmaNeural",
+        name: "Emma",
+        type: "Female",
+        style: "Natural",
+      },
+      {
+        id: "en-US-BrianNeural",
+        name: "Brian",
+        type: "Male",
+        style: "Natural",
+      },
       { id: "en-US-AnaNeural", name: "Ana", type: "Female", style: "Natural" },
-      { id: "en-US-AndrewMultilingualNeural", name: "Andrew Multilingual", type: "Male", style: "Natural" },
-      { id: "en-US-AriaNeural", name: "Aria", type: "Female", style: "Warm / Conversational" },
-      { id: "en-US-BrianMultilingualNeural", name: "Brian Multilingual", type: "Male", style: "Natural" },
+      {
+        id: "en-US-AndrewMultilingualNeural",
+        name: "Andrew Multilingual",
+        type: "Male",
+        style: "Natural",
+      },
+      {
+        id: "en-US-AriaNeural",
+        name: "Aria",
+        type: "Female",
+        style: "Warm / Conversational",
+      },
+      {
+        id: "en-US-BrianMultilingualNeural",
+        name: "Brian Multilingual",
+        type: "Male",
+        style: "Natural",
+      },
     ],
     "es-ES": [
-      { id: "es-ES-XimenaNeural", name: "Ximena", type: "Female", style: "Natural" },
-      { id: "es-ES-AlvaroNeural", name: "Alvaro", type: "Male", style: "Natural" },
-      { id: "es-ES-ElviraNeural", name: "Elvira", type: "Female", style: "Natural" },
+      {
+        id: "es-ES-XimenaNeural",
+        name: "Ximena",
+        type: "Female",
+        style: "Natural",
+      },
+      {
+        id: "es-ES-AlvaroNeural",
+        name: "Alvaro",
+        type: "Male",
+        style: "Natural",
+      },
+      {
+        id: "es-ES-ElviraNeural",
+        name: "Elvira",
+        type: "Female",
+        style: "Natural",
+      },
     ],
     "fr-FR": [
-      { id: "fr-FR-VivienneMultilingualNeural", name: "Vivienne Multilingual", type: "Female", style: "Natural" },
-      { id: "fr-FR-RemyMultilingualNeural", name: "Remy Multilingual", type: "Male", style: "Natural" },
-      { id: "fr-FR-DeniseNeural", name: "Denise", type: "Female", style: "Natural" },
-      { id: "fr-FR-HenriNeural", name: "Henri", type: "Male", style: "Natural" },
-      { id: "fr-FR-EloiseNeural", name: "Eloise", type: "Female", style: "Natural" },
+      {
+        id: "fr-FR-VivienneMultilingualNeural",
+        name: "Vivienne Multilingual",
+        type: "Female",
+        style: "Natural",
+      },
+      {
+        id: "fr-FR-RemyMultilingualNeural",
+        name: "Remy Multilingual",
+        type: "Male",
+        style: "Natural",
+      },
+      {
+        id: "fr-FR-DeniseNeural",
+        name: "Denise",
+        type: "Female",
+        style: "Natural",
+      },
+      {
+        id: "fr-FR-HenriNeural",
+        name: "Henri",
+        type: "Male",
+        style: "Natural",
+      },
+      {
+        id: "fr-FR-EloiseNeural",
+        name: "Eloise",
+        type: "Female",
+        style: "Natural",
+      },
     ],
     "ta-IN": [
-      { id: "ta-IN-PallaviNeural", name: "Pallavi", type: "Female", style: "Natural" },
-      { id: "ta-IN-ValluvarNeural", name: "Valluvar", type: "Male", style: "Natural" },
+      {
+        id: "ta-IN-PallaviNeural",
+        name: "Pallavi",
+        type: "Female",
+        style: "Natural",
+      },
+      {
+        id: "ta-IN-ValluvarNeural",
+        name: "Valluvar",
+        type: "Male",
+        style: "Natural",
+      },
     ],
     "ar-AE": [
-      { id: "ar-AE-FatimaNeural", name: "Fatima", type: "Female", style: "Natural" },
-      { id: "ar-AE-HamdanNeural", name: "Hamdan", type: "Male", style: "Natural" },
+      {
+        id: "ar-AE-FatimaNeural",
+        name: "Fatima",
+        type: "Female",
+        style: "Natural",
+      },
+      {
+        id: "ar-AE-HamdanNeural",
+        name: "Hamdan",
+        type: "Male",
+        style: "Natural",
+      },
     ],
   };
 }
@@ -384,16 +567,16 @@ function getVoiceMeta(voiceId) {
     if (match) {
       return {
         ...match,
-        language: voiceId.split('-').slice(0, 2).join('-'),
+        language: voiceId.split("-").slice(0, 2).join("-"),
       };
     }
   }
   return {
     id: voiceId,
     name: voiceId,
-    type: 'Unknown',
-    style: 'Unknown',
-    language: voiceId.split('-').slice(0, 2).join('-'),
+    type: "Unknown",
+    style: "Unknown",
+    language: voiceId.split("-").slice(0, 2).join("-"),
   };
 }
 
@@ -402,45 +585,61 @@ function isSupportedVoice(requestedVoice, requestedEngine) {
     return true;
   }
 
-  if (requestedEngine === "coqui" || requestedVoice === "xtts-v2" || requestedVoice === "coqui") {
+  if (
+    requestedEngine === "coqui" ||
+    requestedVoice === "xtts-v2" ||
+    requestedVoice === "coqui"
+  ) {
     return true;
   }
 
   const resolvedVoice = resolveVoice(requestedVoice);
-  return Boolean(voiceMap[requestedVoice]) || getEdgeVoiceSet().has(resolvedVoice);
+  return (
+    Boolean(voiceMap[requestedVoice]) || getEdgeVoiceSet().has(resolvedVoice)
+  );
 }
 
-const configuredAllowedOrigins = (process.env.CORS_ORIGINS || process.env.FRONTEND_URL || '')
-  .split(',')
-  .map((origin) => origin.trim().replace(/\/+$/, ''))
+const configuredAllowedOrigins = (
+  process.env.CORS_ORIGINS ||
+  process.env.FRONTEND_URL ||
+  ""
+)
+  .split(",")
+  .map((origin) => origin.trim().replace(/\/+$/, ""))
   .filter(Boolean);
 
-const corsOptions = configuredAllowedOrigins.length > 0
-  ? {
-      origin(origin, callback) {
-        if (!origin || configuredAllowedOrigins.includes(origin.replace(/\/+$/, ''))) {
-          callback(null, true);
-          return;
-        }
-        callback(new Error(`Origin not allowed by CORS: ${origin}`));
-      },
-      credentials: true,
-      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-      preflightContinue: false,
-      optionsSuccessStatus: 204,
-    }
-  : {
-      origin: true,
-      credentials: true,
-      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-      preflightContinue: false,
-      optionsSuccessStatus: 204,
-    };
+const corsOptions =
+  configuredAllowedOrigins.length > 0
+    ? {
+        origin(origin, callback) {
+          if (
+            !origin ||
+            configuredAllowedOrigins.includes(origin.replace(/\/+$/, ""))
+          ) {
+            callback(null, true);
+            return;
+          }
+          callback(new Error(`Origin not allowed by CORS: ${origin}`));
+        },
+        credentials: true,
+        methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+        preflightContinue: false,
+        optionsSuccessStatus: 204,
+      }
+    : {
+        origin: true,
+        credentials: true,
+        methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+        preflightContinue: false,
+        optionsSuccessStatus: 204,
+      };
 
 if (isProduction && configuredAllowedOrigins.length === 0) {
-  console.warn('CORS: no FRONTEND_URL or CORS_ORIGINS configured in production; allowing browser requests from any origin.');
+  console.warn(
+    "CORS: no FRONTEND_URL or CORS_ORIGINS configured in production; allowing browser requests from any origin.",
+  );
 }
 
 // Middleware
@@ -457,7 +656,8 @@ function normalizeUser(user) {
 }
 
 function publicUser(user) {
-  const { password, passwordHash, passwordSalt, sessions, ...safeUser } = normalizeUser(user);
+  const { password, passwordHash, passwordSalt, sessions, ...safeUser } =
+    normalizeUser(user);
   return safeUser;
 }
 
@@ -481,7 +681,7 @@ function loadUsers() {
 
 function saveUsers(users) {
   cachedUsers = users.map(normalizeUser);
-  
+
   try {
     fs.writeFileSync(USERS_FILE, JSON.stringify(cachedUsers, null, 2));
   } catch (error) {
@@ -489,16 +689,19 @@ function saveUsers(users) {
   }
 
   if (db) {
-    db.collection("users").deleteMany({})
+    db.collection("users")
+      .deleteMany({})
       .then(() => {
         if (cachedUsers.length > 0) {
           return db.collection("users").insertMany(cachedUsers);
         }
       })
       .then(() => {
-        console.log(`Successfully backed up ${cachedUsers.length} users to MongoDB in background.`);
+        console.log(
+          `Successfully backed up ${cachedUsers.length} users to MongoDB in background.`,
+        );
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("Failed to sync users to MongoDB:", err);
       });
   }
@@ -523,34 +726,42 @@ function saveUsers(users) {
               user.passwordSalt || "",
               JSON.stringify(user.profile || {}),
               JSON.stringify(user.sessions || []),
-              user.joined ? new Date(user.joined) : new Date()
-            ]
+              user.joined ? new Date(user.joined) : new Date(),
+            ],
           );
         }
         await client.query("COMMIT");
-        console.log(`Successfully backed up ${cachedUsers.length} users to PostgreSQL in background.`);
+        console.log(
+          `Successfully backed up ${cachedUsers.length} users to PostgreSQL in background.`,
+        );
       } catch (err) {
         await client.query("ROLLBACK");
         console.error("Failed to sync users to PostgreSQL:", err);
       } finally {
         client.release();
       }
-    })().catch(err => console.error("Unhandled error in PG saveUsers:", err));
+    })().catch((err) => console.error("Unhandled error in PG saveUsers:", err));
   }
 }
 
 function hashPassword(password, salt = crypto.randomBytes(16).toString("hex")) {
-  const passwordHash = crypto.pbkdf2Sync(password, salt, 100000, 64, "sha512").toString("hex");
+  const passwordHash = crypto
+    .pbkdf2Sync(password, salt, 100000, 64, "sha512")
+    .toString("hex");
   return { passwordSalt: salt, passwordHash };
 }
 
 function ensureDefaultAdminUser() {
-  const adminEmail = (process.env.DEFAULT_ADMIN_EMAIL || "sksaran987@gmail.com").trim().toLowerCase();
+  const adminEmail = (process.env.DEFAULT_ADMIN_EMAIL || "sksaran987@gmail.com")
+    .trim()
+    .toLowerCase();
   const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD || "Sarankd@987";
 
   if (!adminEmail || !adminPassword) {
     if (!isProduction) {
-      console.warn("Default admin user was not created. Set DEFAULT_ADMIN_EMAIL and DEFAULT_ADMIN_PASSWORD to enable bootstrap admin creation.");
+      console.warn(
+        "Default admin user was not created. Set DEFAULT_ADMIN_EMAIL and DEFAULT_ADMIN_PASSWORD to enable bootstrap admin creation.",
+      );
     }
     return;
   }
@@ -567,12 +778,15 @@ function ensureDefaultAdminUser() {
       passwordHash,
       passwordSalt,
       profile: {
-        displayName: existingAdmin.profile?.displayName || existingAdmin.name || "Admin",
+        displayName:
+          existingAdmin.profile?.displayName || existingAdmin.name || "Admin",
         email: adminEmail,
         avatarUrl: existingAdmin.profile?.avatarUrl || "",
       },
     });
-    saveUsers(users.map((user) => (user.id === existingAdmin.id ? updatedAdmin : user)));
+    saveUsers(
+      users.map((user) => (user.id === existingAdmin.id ? updatedAdmin : user)),
+    );
     return;
   }
 
@@ -597,13 +811,22 @@ function verifyPassword(password, user) {
     const { passwordHash } = hashPassword(password, user.passwordSalt);
     const expected = Buffer.from(user.passwordHash, "hex");
     const actual = Buffer.from(passwordHash, "hex");
-    return expected.length === actual.length && crypto.timingSafeEqual(actual, expected);
+    return (
+      expected.length === actual.length &&
+      crypto.timingSafeEqual(actual, expected)
+    );
   }
 
   return user.password === password;
 }
 
-function createUser({ name, email, password, role = "user", accessStatus = "pending" }) {
+function createUser({
+  name,
+  email,
+  password,
+  role = "user",
+  accessStatus = "pending",
+}) {
   const normalizedEmail = email.trim().toLowerCase();
   const { passwordHash, passwordSalt } = hashPassword(password);
 
@@ -641,11 +864,15 @@ function findUserByToken(token) {
   if (!token) return null;
   const now = Date.now();
   const sessionTtlMs = SESSION_TTL_DAYS * 24 * 60 * 60 * 1000;
-  return loadUsers().find((user) => user.sessions.some((session) => {
-    if (session.token !== token) return false;
-    const createdAt = new Date(session.createdAt).getTime();
-    return !Number.isNaN(createdAt) && now - createdAt <= sessionTtlMs;
-  })) || null;
+  return (
+    loadUsers().find((user) =>
+      user.sessions.some((session) => {
+        if (session.token !== token) return false;
+        const createdAt = new Date(session.createdAt).getTime();
+        return !Number.isNaN(createdAt) && now - createdAt <= sessionTtlMs;
+      }),
+    ) || null
+  );
 }
 
 function requireAuth(req, res, next) {
@@ -676,14 +903,20 @@ function requireAdmin(req, res, next) {
   });
 }
 
-function validateAccountFields({ name, email, password }, { requirePassword = true } = {}) {
+function validateAccountFields(
+  { name, email, password },
+  { requirePassword = true } = {},
+) {
   if (!name || typeof name !== "string" || !name.trim()) {
     return "Name is required.";
   }
   if (!email || typeof email !== "string" || !email.trim().includes("@")) {
     return "A valid email is required.";
   }
-  if (requirePassword && (!password || typeof password !== "string" || password.length < 8)) {
+  if (
+    requirePassword &&
+    (!password || typeof password !== "string" || password.length < 8)
+  ) {
     return "Password must be at least 8 characters.";
   }
   return null;
@@ -726,14 +959,14 @@ const validateTTSRequest = (req, res, next) => {
     });
   }
 
-  if (engine && !['edge-tts', 'coqui'].includes(engine)) {
+  if (engine && !["edge-tts", "coqui"].includes(engine)) {
     return res.status(400).json({
       error: "INVALID_ENGINE",
       message: "Invalid TTS engine selected",
     });
   }
 
-  if (language && typeof language !== 'string') {
+  if (language && typeof language !== "string") {
     return res.status(400).json({
       error: "INVALID_LANGUAGE",
       message: "Language must be a string",
@@ -744,15 +977,27 @@ const validateTTSRequest = (req, res, next) => {
 };
 
 const resolveEngine = (requestedVoice, requestedEngine) => {
-  if (requestedEngine === 'coqui' || requestedVoice === 'xtts-v2' || requestedVoice === 'coqui') {
-    return 'coqui';
+  if (
+    requestedEngine === "coqui" ||
+    requestedVoice === "xtts-v2" ||
+    requestedVoice === "coqui"
+  ) {
+    return "coqui";
   }
-  return 'edge-tts';
+  return "edge-tts";
 };
 
 // Generate cache key from text and voice
-const generateCacheKey = (text, voice, engine = 'edge-tts', language = 'en') => {
-  const hash = crypto.createHash("md5").update(`${text}|${voice}|${engine}|${language}`).digest("hex");
+const generateCacheKey = (
+  text,
+  voice,
+  engine = "edge-tts",
+  language = "en",
+) => {
+  const hash = crypto
+    .createHash("md5")
+    .update(`${text}|${voice}|${engine}|${language}`)
+    .digest("hex");
   return path.join(CACHE_DIR, `${hash}.mp3`);
 };
 
@@ -771,21 +1016,34 @@ function generateAudio(text, voice, cacheKey, options = {}) {
     const fileName = `audio-${Date.now()}-${Math.random().toString(36).slice(2)}.mp3`;
     const tempFilePath = path.join(__dirname, fileName);
     const engine = resolveEngine(voice, options.engine);
-    const language = options.language || 'en';
-    const script = engine === 'coqui' ? xttsScript : edgeTtsScript;
-    const requiredPythonModule = engine === 'coqui' ? 'TTS' : 'edge_tts';
+    const language = options.language || "en";
+    const script = engine === "coqui" ? xttsScript : edgeTtsScript;
+    const requiredPythonModule = engine === "coqui" ? "TTS" : "edge_tts";
     const pythonExecutable = resolvePythonExecutable(requiredPythonModule);
 
     if (!pythonExecutable) {
-      reject(new Error(
-        "The hosted voice service is not ready yet. Please try again shortly or contact the site owner."
-      ));
+      reject(
+        new Error(
+          "The hosted voice service is not ready yet. Please try again shortly or contact the site owner.",
+        ),
+      );
       return;
     }
 
-    const args = engine === 'coqui'
-      ? [script, "--text", text, "--language", language, "--voice", voice, "--output", tempFilePath]
-      : [script, "--text", text, "--voice", voice, "--output", tempFilePath];
+    const args =
+      engine === "coqui"
+        ? [
+            script,
+            "--text",
+            text,
+            "--language",
+            language,
+            "--voice",
+            voice,
+            "--output",
+            tempFilePath,
+          ]
+        : [script, "--text", text, "--voice", voice, "--output", tempFilePath];
 
     const child = spawn(pythonExecutable, args, {
       windowsHide: true,
@@ -798,7 +1056,9 @@ function generateAudio(text, voice, cacheKey, options = {}) {
       settled = true;
       child.kill();
       cleanupTempFile(tempFilePath);
-      reject(new Error("Audio generation timed out. Try shorter text or try again."));
+      reject(
+        new Error("Audio generation timed out. Try shorter text or try again."),
+      );
     }, REQUEST_TIMEOUT);
 
     child.stdout.on("data", (chunk) => {
@@ -824,13 +1084,28 @@ function generateAudio(text, voice, cacheKey, options = {}) {
 
       if (code !== 0) {
         cleanupTempFile(tempFilePath);
-        reject(new Error((stderr || stdout || `${engine === 'coqui' ? 'XTTS' : 'Edge TTS'} failed with exit code ${code}`).trim()));
+        reject(
+          new Error(
+            (
+              stderr ||
+              stdout ||
+              `${engine === "coqui" ? "XTTS" : "Edge TTS"} failed with exit code ${code}`
+            ).trim(),
+          ),
+        );
         return;
       }
 
-      if (!fs.existsSync(tempFilePath) || fs.statSync(tempFilePath).size === 0) {
+      if (
+        !fs.existsSync(tempFilePath) ||
+        fs.statSync(tempFilePath).size === 0
+      ) {
         cleanupTempFile(tempFilePath);
-        reject(new Error("Audio generation finished, but no audio file was created."));
+        reject(
+          new Error(
+            "Audio generation finished, but no audio file was created.",
+          ),
+        );
         return;
       }
 
@@ -866,7 +1141,7 @@ function saveHistory(history) {
 }
 
 // Add to history
-function addToHistory(text, voice, status = 'success', userId = null) {
+function addToHistory(text, voice, status = "success", userId = null) {
   const voiceMeta = getVoiceMeta(voice);
   const history = loadHistory();
   const newRecord = {
@@ -877,7 +1152,7 @@ function addToHistory(text, voice, status = 'success', userId = null) {
     gender: voiceMeta.type,
     status,
     timestamp: new Date().toISOString(),
-    user_id: userId
+    user_id: userId,
   };
 
   history.unshift(newRecord);
@@ -888,22 +1163,24 @@ function addToHistory(text, voice, status = 'success', userId = null) {
   saveHistory(history);
 
   if (pgPool) {
-    pgPool.query(
-      `INSERT INTO audio_history (user_id, text, voice, language, gender, status, timestamp, audio_file)
+    pgPool
+      .query(
+        `INSERT INTO audio_history (user_id, text, voice, language, gender, status, timestamp, audio_file)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-      [
-        userId,
-        newRecord.text,
-        newRecord.voice,
-        newRecord.language,
-        newRecord.gender,
-        newRecord.status,
-        newRecord.timestamp,
-        `cache/${voice}-${Date.now()}.mp3`
-      ]
-    ).catch(err => {
-      console.error("Failed to insert history to PostgreSQL:", err);
-    });
+        [
+          userId,
+          newRecord.text,
+          newRecord.voice,
+          newRecord.language,
+          newRecord.gender,
+          newRecord.status,
+          newRecord.timestamp,
+          `cache/${voice}-${Date.now()}.mp3`,
+        ],
+      )
+      .catch((err) => {
+        console.error("Failed to insert history to PostgreSQL:", err);
+      });
   }
 }
 
@@ -926,14 +1203,21 @@ app.get("/health", (req, res) => {
 app.post("/api/auth/register", (req, res) => {
   const validationError = validateAccountFields(req.body);
   if (validationError) {
-    res.status(400).json({ error: "INVALID_ACCOUNT", message: validationError });
+    res
+      .status(400)
+      .json({ error: "INVALID_ACCOUNT", message: validationError });
     return;
   }
 
   const users = loadUsers();
   const normalizedEmail = req.body.email.trim().toLowerCase();
   if (users.some((user) => user.email === normalizedEmail)) {
-    res.status(409).json({ error: "EMAIL_EXISTS", message: "This email is already registered." });
+    res
+      .status(409)
+      .json({
+        error: "EMAIL_EXISTS",
+        message: "This email is already registered.",
+      });
     return;
   }
 
@@ -957,35 +1241,49 @@ app.post("/api/auth/register", (req, res) => {
 });
 
 app.post("/api/auth/login", (req, res) => {
-  const email = String(req.body.email || "").trim().toLowerCase();
+  const email = String(req.body.email || "")
+    .trim()
+    .toLowerCase();
   const password = String(req.body.password || "");
   const users = loadUsers();
   const user = users.find((item) => item.email === email);
 
   if (!user || !verifyPassword(password, user)) {
-    res.status(401).json({ error: "INVALID_LOGIN", message: "Invalid email or password." });
+    res
+      .status(401)
+      .json({ error: "INVALID_LOGIN", message: "Invalid email or password." });
     return;
   }
 
   if (user.accessStatus !== "approved") {
-    res.status(403).json({ error: "ACCESS_PENDING", message: "Your account is waiting for admin access." });
+    res
+      .status(403)
+      .json({
+        error: "ACCESS_PENDING",
+        message: "Your account is waiting for admin access.",
+      });
     return;
   }
 
   const session = issueSession(user);
   const updatedUser = { ...user, sessions: [...user.sessions, session] };
-  saveUsers(users.map((item) => (item.id === updatedUser.id ? updatedUser : item)));
+  saveUsers(
+    users.map((item) => (item.id === updatedUser.id ? updatedUser : item)),
+  );
 
   res.json({ user: publicUser(updatedUser), token: session.token });
 });
 
 app.post("/api/auth/logout", requireAuth, (req, res) => {
   const token = readBearerToken(req);
-  const users = loadUsers().map((user) => (
+  const users = loadUsers().map((user) =>
     user.id === req.user.id
-      ? { ...user, sessions: user.sessions.filter((session) => session.token !== token) }
-      : user
-  ));
+      ? {
+          ...user,
+          sessions: user.sessions.filter((session) => session.token !== token),
+        }
+      : user,
+  );
   saveUsers(users);
   res.json({ message: "Logged out" });
 });
@@ -995,29 +1293,43 @@ app.get("/api/auth/me", requireAuth, (req, res) => {
 });
 
 app.put("/api/auth/profile", requireAuth, (req, res) => {
-  const validationError = validateAccountFields({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-  }, { requirePassword: false });
+  const validationError = validateAccountFields(
+    {
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+    },
+    { requirePassword: false },
+  );
 
   if (validationError) {
-    res.status(400).json({ error: "INVALID_PROFILE", message: validationError });
+    res
+      .status(400)
+      .json({ error: "INVALID_PROFILE", message: validationError });
     return;
   }
 
   const normalizedEmail = req.body.email.trim().toLowerCase();
   const users = loadUsers();
-  const emailTaken = users.some((user) => user.email === normalizedEmail && user.id !== req.user.id);
+  const emailTaken = users.some(
+    (user) => user.email === normalizedEmail && user.id !== req.user.id,
+  );
   if (emailTaken) {
-    res.status(409).json({ error: "EMAIL_EXISTS", message: "That email is already in use." });
+    res
+      .status(409)
+      .json({
+        error: "EMAIL_EXISTS",
+        message: "That email is already in use.",
+      });
     return;
   }
 
   const updatedUsers = users.map((user) => {
     if (user.id !== req.user.id) return user;
 
-    const passwordFields = req.body.password ? hashPassword(req.body.password) : {};
+    const passwordFields = req.body.password
+      ? hashPassword(req.body.password)
+      : {};
     return normalizeUser({
       ...user,
       ...passwordFields,
@@ -1026,13 +1338,16 @@ app.put("/api/auth/profile", requireAuth, (req, res) => {
       profile: {
         displayName: req.body.name.trim(),
         email: normalizedEmail,
-        avatarUrl: req.body.avatarUrl || (user.profile && user.profile.avatarUrl) || "",
+        avatarUrl:
+          req.body.avatarUrl || (user.profile && user.profile.avatarUrl) || "",
       },
     });
   });
 
   saveUsers(updatedUsers);
-  res.json({ user: publicUser(updatedUsers.find((user) => user.id === req.user.id)) });
+  res.json({
+    user: publicUser(updatedUsers.find((user) => user.id === req.user.id)),
+  });
 });
 
 app.delete("/api/auth/account", requireAuth, (req, res) => {
@@ -1048,14 +1363,21 @@ app.get("/api/admin/users", requireAdmin, (req, res) => {
 app.post("/api/admin/users", requireAdmin, (req, res) => {
   const validationError = validateAccountFields(req.body);
   if (validationError) {
-    res.status(400).json({ error: "INVALID_ACCOUNT", message: validationError });
+    res
+      .status(400)
+      .json({ error: "INVALID_ACCOUNT", message: validationError });
     return;
   }
 
   const users = loadUsers();
   const normalizedEmail = req.body.email.trim().toLowerCase();
   if (users.some((user) => user.email === normalizedEmail)) {
-    res.status(409).json({ error: "EMAIL_EXISTS", message: "This email is already registered." });
+    res
+      .status(409)
+      .json({
+        error: "EMAIL_EXISTS",
+        message: "This email is already registered.",
+      });
     return;
   }
 
@@ -1069,7 +1391,12 @@ app.post("/api/admin/users", requireAdmin, (req, res) => {
   });
 
   saveUsers([...users, newUser]);
-  res.status(201).json({ user: publicUser(newUser), users: [...users, newUser].map(publicUser) });
+  res
+    .status(201)
+    .json({
+      user: publicUser(newUser),
+      users: [...users, newUser].map(publicUser),
+    });
 });
 
 app.patch("/api/admin/users/:id", requireAdmin, (req, res) => {
@@ -1078,16 +1405,22 @@ app.patch("/api/admin/users/:id", requireAdmin, (req, res) => {
   const target = users.find((user) => String(user.id) === userId);
 
   if (!target) {
-    res.status(404).json({ error: "USER_NOT_FOUND", message: "User not found." });
+    res
+      .status(404)
+      .json({ error: "USER_NOT_FOUND", message: "User not found." });
     return;
   }
 
-  const accessStatus = ["approved", "pending"].includes(req.body.accessStatus) ? req.body.accessStatus : target.accessStatus;
-  const role = ["admin", "user"].includes(req.body.role) ? req.body.role : target.role;
+  const accessStatus = ["approved", "pending"].includes(req.body.accessStatus)
+    ? req.body.accessStatus
+    : target.accessStatus;
+  const role = ["admin", "user"].includes(req.body.role)
+    ? req.body.role
+    : target.role;
 
-  const updatedUsers = users.map((user) => (
-    String(user.id) === userId ? { ...user, accessStatus, role } : user
-  ));
+  const updatedUsers = users.map((user) =>
+    String(user.id) === userId ? { ...user, accessStatus, role } : user,
+  );
 
   saveUsers(updatedUsers);
   res.json({ users: updatedUsers.map(publicUser) });
@@ -1096,14 +1429,21 @@ app.patch("/api/admin/users/:id", requireAdmin, (req, res) => {
 app.delete("/api/admin/users/:id", requireAdmin, (req, res) => {
   const userId = String(req.params.id);
   if (String(req.user.id) === userId) {
-    res.status(400).json({ error: "SELF_DELETE", message: "You cannot delete your own admin account." });
+    res
+      .status(400)
+      .json({
+        error: "SELF_DELETE",
+        message: "You cannot delete your own admin account.",
+      });
     return;
   }
 
   const users = loadUsers();
   const updatedUsers = users.filter((user) => String(user.id) !== userId);
   if (updatedUsers.length === users.length) {
-    res.status(404).json({ error: "USER_NOT_FOUND", message: "User not found." });
+    res
+      .status(404)
+      .json({ error: "USER_NOT_FOUND", message: "User not found." });
     return;
   }
 
@@ -1112,160 +1452,221 @@ app.delete("/api/admin/users/:id", requireAdmin, (req, res) => {
 });
 
 // Legacy endpoint - kept for backward compatibility
-app.post("/convert", validateTTSRequest, asyncHandler(async (req, res) => {
-  const text = req.body.text.trim();
-  const requestedVoice = req.body.voice || "en-US-JennyNeural";
-  const voice = resolveVoice(requestedVoice);
-  const engine = resolveEngine(requestedVoice, req.body.engine);
+app.post(
+  "/convert",
+  validateTTSRequest,
+  asyncHandler(async (req, res) => {
+    const text = req.body.text.trim();
+    const requestedVoice = req.body.voice || "en-US-JennyNeural";
+    const voice = resolveVoice(requestedVoice);
+    const engine = resolveEngine(requestedVoice, req.body.engine);
 
-  try {
-    const cacheKey = generateCacheKey(text, voice, engine, req.body.language || 'en');
-    const { filePath } = await generateAudio(text, voice, cacheKey, { engine, language: req.body.language });
+    try {
+      const cacheKey = generateCacheKey(
+        text,
+        voice,
+        engine,
+        req.body.language || "en",
+      );
+      const { filePath } = await generateAudio(text, voice, cacheKey, {
+        engine,
+        language: req.body.language,
+      });
 
-    addToHistory(text, voice);
+      addToHistory(text, voice);
 
-    res.download(filePath, "audio.mp3", (downloadErr) => {
-      if (downloadErr && !res.headersSent) {
-        console.error("Error sending audio file:", downloadErr);
-      }
-    });
-  } catch (error) {
-    console.error("Error generating audio:", error);
-    res.status(500).json({
-      error: "GENERATION_FAILED",
-      message: error.message || "Failed to generate audio",
-    });
-  }
-}));
+      res.download(filePath, "audio.mp3", (downloadErr) => {
+        if (downloadErr && !res.headersSent) {
+          console.error("Error sending audio file:", downloadErr);
+        }
+      });
+    } catch (error) {
+      console.error("Error generating audio:", error);
+      res.status(500).json({
+        error: "GENERATION_FAILED",
+        message: error.message || "Failed to generate audio",
+      });
+    }
+  }),
+);
 
 // New API endpoints
 
 // Generate TTS audio
-app.post("/api/tts/generate", validateTTSRequest, asyncHandler(async (req, res) => {
-  const text = req.body.text.trim();
-  const requestedVoice = req.body.voice || "en-US-JennyNeural";
-  const selectedVoice = resolveVoice(requestedVoice);
-  const engine = resolveEngine(requestedVoice, req.body.engine);
+app.post(
+  "/api/tts/generate",
+  validateTTSRequest,
+  asyncHandler(async (req, res) => {
+    const text = req.body.text.trim();
+    const requestedVoice = req.body.voice || "en-US-JennyNeural";
+    const selectedVoice = resolveVoice(requestedVoice);
+    const engine = resolveEngine(requestedVoice, req.body.engine);
 
-  try {
-    const cacheKey = generateCacheKey(text, selectedVoice, engine, req.body.language || 'en');
-    const { filePath, fromCache } = await generateAudio(text, selectedVoice, cacheKey, { engine, language: req.body.language });
+    try {
+      const cacheKey = generateCacheKey(
+        text,
+        selectedVoice,
+        engine,
+        req.body.language || "en",
+      );
+      const { filePath, fromCache } = await generateAudio(
+        text,
+        selectedVoice,
+        cacheKey,
+        { engine, language: req.body.language },
+      );
 
-    addToHistory(text, selectedVoice, 'success');
+      addToHistory(text, selectedVoice, "success");
 
-    res.setHeader("Content-Type", "audio/mpeg");
-    res.setHeader("X-From-Cache", fromCache ? "true" : "false");
-    res.setHeader("X-Voice", selectedVoice);
-    res.setHeader("X-Engine", engine);
-    res.download(filePath, "audio.mp3", (downloadErr) => {
-      if (downloadErr && !res.headersSent) {
-        console.error("Error sending audio file:", downloadErr);
-      }
-    });
-  } catch (error) {
-    console.error("Error generating audio:", error);
-    addToHistory(text, requestedVoice, 'failure');
-    res.status(500).json({
-      error: "GENERATION_FAILED",
-      message: error.message || "Failed to generate audio",
-    });
-  }
-}));
+      res.setHeader("Content-Type", "audio/mpeg");
+      res.setHeader("X-From-Cache", fromCache ? "true" : "false");
+      res.setHeader("X-Voice", selectedVoice);
+      res.setHeader("X-Engine", engine);
+      res.download(filePath, "audio.mp3", (downloadErr) => {
+        if (downloadErr && !res.headersSent) {
+          console.error("Error sending audio file:", downloadErr);
+        }
+      });
+    } catch (error) {
+      console.error("Error generating audio:", error);
+      addToHistory(text, requestedVoice, "failure");
+      res.status(500).json({
+        error: "GENERATION_FAILED",
+        message: error.message || "Failed to generate audio",
+      });
+    }
+  }),
+);
 
-app.post("/api/tts/multi-speaker", requireAuth, asyncHandler(async (req, res) => {
-  const { text, voiceMapping } = req.body;
-  if (!text || typeof text !== "string" || !text.trim()) {
-    res.status(400).json({ error: "INVALID_REQUEST", message: "Conversation text is required." });
-    return;
-  }
-  if (!voiceMapping || typeof voiceMapping !== "object") {
-    res.status(400).json({ error: "INVALID_REQUEST", message: "Voice mapping is required." });
-    return;
-  }
+app.post(
+  "/api/tts/multi-speaker",
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const { text, voiceMapping } = req.body;
+    if (!text || typeof text !== "string" || !text.trim()) {
+      res
+        .status(400)
+        .json({
+          error: "INVALID_REQUEST",
+          message: "Conversation text is required.",
+        });
+      return;
+    }
+    if (!voiceMapping || typeof voiceMapping !== "object") {
+      res
+        .status(400)
+        .json({
+          error: "INVALID_REQUEST",
+          message: "Voice mapping is required.",
+        });
+      return;
+    }
 
-  const lines = text.split("\n");
-  const turns = [];
-  for (let line of lines) {
-    line = line.trim();
-    if (!line) continue;
+    const lines = text.split("\n");
+    const turns = [];
+    for (let line of lines) {
+      line = line.trim();
+      if (!line) continue;
 
-    const match = line.match(/^([a-zA-Z0-9\s_-]+):(.*)$/);
-    if (match) {
-      const speaker = match[1].trim();
-      const speech = match[2].trim();
-      const voice = voiceMapping[speaker] || "en-US-JennyNeural";
-      turns.push({ speaker, text: speech, voice });
-    } else {
-      if (turns.length > 0) {
-        turns[turns.length - 1].text += " " + line;
+      const match = line.match(/^([a-zA-Z0-9\s_-]+):(.*)$/);
+      if (match) {
+        const speaker = match[1].trim();
+        const speech = match[2].trim();
+        const voice = voiceMapping[speaker] || "en-US-JennyNeural";
+        turns.push({ speaker, text: speech, voice });
       } else {
-        const voice = voiceMapping["Narrator"] || Object.values(voiceMapping)[0] || "en-US-JennyNeural";
-        turns.push({ speaker: "Narrator", text: line, voice });
+        if (turns.length > 0) {
+          turns[turns.length - 1].text += " " + line;
+        } else {
+          const voice =
+            voiceMapping["Narrator"] ||
+            Object.values(voiceMapping)[0] ||
+            "en-US-JennyNeural";
+          turns.push({ speaker: "Narrator", text: line, voice });
+        }
       }
     }
-  }
 
-  if (turns.length === 0) {
-    res.status(400).json({ error: "INVALID_REQUEST", message: "No conversation turns detected." });
-    return;
-  }
-
-  try {
-    const buffers = [];
-
-    for (let i = 0; i < turns.length; i++) {
-      const turn = turns[i];
-      const selectedVoice = resolveVoice(turn.voice);
-      const engine = resolveEngine(selectedVoice);
-      
-      // Clean/transliterate German umlauts for non-German voices to prevent Microsoft socket crashes
-      let ttsText = turn.text;
-      if (!selectedVoice.startsWith("de-")) {
-        ttsText = ttsText
-          .replace(/ä/g, 'ae')
-          .replace(/ö/g, 'oe')
-          .replace(/ü/g, 'ue')
-          .replace(/ß/g, 'ss')
-          .replace(/Ä/g, 'Ae')
-          .replace(/Ö/g, 'Oe')
-          .replace(/Ü/g, 'Ue');
-      }
-
-      const cacheKey = generateCacheKey(ttsText, selectedVoice, engine, "en");
-      
-      if (i > 0) {
-        // Sleep for 500ms to prevent rate limiting Edge TTS connections
-        await new Promise((resolve) => setTimeout(resolve, 500));
-      }
-      
-      const { filePath } = await generateAudio(ttsText, selectedVoice, cacheKey, { engine });
-      
-      const buffer = fs.readFileSync(filePath);
-      buffers.push(buffer);
+    if (turns.length === 0) {
+      res
+        .status(400)
+        .json({
+          error: "INVALID_REQUEST",
+          message: "No conversation turns detected.",
+        });
+      return;
     }
 
-    const mergedBuffer = Buffer.concat(buffers);
-    const mergedFileName = `multi-speaker-${Date.now()}-${Math.random().toString(36).slice(2)}.mp3`;
-    const mergedFilePath = path.join(CACHE_DIR, mergedFileName);
-    fs.writeFileSync(mergedFilePath, mergedBuffer);
+    try {
+      const buffers = [];
 
-    addToHistory(`Multi-Speaker Conversation (${turns.length} turns)`, "Multi-Speaker", "success");
+      for (let i = 0; i < turns.length; i++) {
+        const turn = turns[i];
+        const selectedVoice = resolveVoice(turn.voice);
+        const engine = resolveEngine(selectedVoice);
 
-    res.setHeader("Content-Type", "audio/mpeg");
-    res.download(mergedFilePath, "merged_conversation.mp3", (downloadErr) => {
-      if (downloadErr && !res.headersSent) {
-        console.error("Error sending merged audio:", downloadErr);
+        // Clean/transliterate German umlauts for non-German voices to prevent Microsoft socket crashes
+        let ttsText = turn.text;
+        if (!selectedVoice.startsWith("de-")) {
+          ttsText = ttsText
+            .replace(/ä/g, "ae")
+            .replace(/ö/g, "oe")
+            .replace(/ü/g, "ue")
+            .replace(/ß/g, "ss")
+            .replace(/Ä/g, "Ae")
+            .replace(/Ö/g, "Oe")
+            .replace(/Ü/g, "Ue");
+        }
+
+        const cacheKey = generateCacheKey(ttsText, selectedVoice, engine, "en");
+
+        if (i > 0) {
+          // Sleep for 500ms to prevent rate limiting Edge TTS connections
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        }
+
+        const { filePath } = await generateAudio(
+          ttsText,
+          selectedVoice,
+          cacheKey,
+          { engine },
+        );
+
+        const buffer = fs.readFileSync(filePath);
+        buffers.push(buffer);
       }
-    });
-  } catch (error) {
-    console.error("Multi-speaker generation failed:", error);
-    addToHistory("Multi-Speaker Conversation (Failed)", "Multi-Speaker", "failure");
-    res.status(500).json({
-      error: "GENERATION_FAILED",
-      message: error.message || "Failed to generate multi-speaker audio",
-    });
-  }
-}));
+
+      const mergedBuffer = Buffer.concat(buffers);
+      const mergedFileName = `multi-speaker-${Date.now()}-${Math.random().toString(36).slice(2)}.mp3`;
+      const mergedFilePath = path.join(CACHE_DIR, mergedFileName);
+      fs.writeFileSync(mergedFilePath, mergedBuffer);
+
+      addToHistory(
+        `Multi-Speaker Conversation (${turns.length} turns)`,
+        "Multi-Speaker",
+        "success",
+      );
+
+      res.setHeader("Content-Type", "audio/mpeg");
+      res.download(mergedFilePath, "merged_conversation.mp3", (downloadErr) => {
+        if (downloadErr && !res.headersSent) {
+          console.error("Error sending merged audio:", downloadErr);
+        }
+      });
+    } catch (error) {
+      console.error("Multi-speaker generation failed:", error);
+      addToHistory(
+        "Multi-Speaker Conversation (Failed)",
+        "Multi-Speaker",
+        "failure",
+      );
+      res.status(500).json({
+        error: "GENERATION_FAILED",
+        message: error.message || "Failed to generate multi-speaker audio",
+      });
+    }
+  }),
+);
 
 // Get generation history
 app.get("/api/tts/history", (req, res) => {
@@ -1302,27 +1703,33 @@ app.get("/api/tts/voices", (req, res) => {
   res.json({ data: voices });
 });
 // Clear cache
-app.post("/api/cache/clear", asyncHandler(async (req, res) => {
-  try {
-    const files = fs.readdirSync(CACHE_DIR);
-    let deletedCount = 0;
+app.post(
+  "/api/cache/clear",
+  asyncHandler(async (req, res) => {
+    try {
+      const files = fs.readdirSync(CACHE_DIR);
+      let deletedCount = 0;
 
-    for (const file of files) {
-      const filePath = path.join(CACHE_DIR, file);
-      if (path.extname(filePath) === ".mp3" && fs.statSync(filePath).isFile()) {
-        fs.unlinkSync(filePath);
-        deletedCount++;
+      for (const file of files) {
+        const filePath = path.join(CACHE_DIR, file);
+        if (
+          path.extname(filePath) === ".mp3" &&
+          fs.statSync(filePath).isFile()
+        ) {
+          fs.unlinkSync(filePath);
+          deletedCount++;
+        }
       }
-    }
 
-    res.json({ message: "Cache cleared", deletedCount });
-  } catch (error) {
-    res.status(500).json({
-      error: "CACHE_CLEAR_FAILED",
-      message: error.message,
-    });
-  }
-}));
+      res.json({ message: "Cache cleared", deletedCount });
+    } catch (error) {
+      res.status(500).json({
+        error: "CACHE_CLEAR_FAILED",
+        message: error.message,
+      });
+    }
+  }),
+);
 
 // Get server stats
 app.get("/api/stats", (req, res) => {
@@ -1337,27 +1744,35 @@ app.get("/api/stats", (req, res) => {
       cacheSize += stats.size;
     }
 
-    const successCount = history.filter((item) => item.status !== 'failure').length;
-    const failureCount = history.filter((item) => item.status === 'failure').length;
+    const successCount = history.filter(
+      (item) => item.status !== "failure",
+    ).length;
+    const failureCount = history.filter(
+      (item) => item.status === "failure",
+    ).length;
     const genderCounts = history.reduce(
       (counts, item) => {
-        const type = String(item.gender || 'Unknown').toLowerCase();
-        if (type === 'male') counts.male += 1;
-        else if (type === 'female') counts.female += 1;
+        const type = String(item.gender || "Unknown").toLowerCase();
+        if (type === "male") counts.male += 1;
+        else if (type === "female") counts.female += 1;
         else counts.other += 1;
         return counts;
       },
-      { male: 0, female: 0, other: 0 }
+      { male: 0, female: 0, other: 0 },
     );
 
     const languageCounts = history.reduce((counts, item) => {
-      const language = String(item.language || item.voice || '').split('-').slice(0, 2).join('-') || 'unknown';
+      const language =
+        String(item.language || item.voice || "")
+          .split("-")
+          .slice(0, 2)
+          .join("-") || "unknown";
       counts[language] = (counts[language] || 0) + 1;
       return counts;
     }, {});
 
     res.json({
-      cacheSize: Math.round(cacheSize / 1024 / 1024 * 100) / 100 + " MB",
+      cacheSize: Math.round((cacheSize / 1024 / 1024) * 100) / 100 + " MB",
       cacheFiles: cacheFiles.length,
       historyEntries: history.length,
       successCount,
@@ -1378,7 +1793,11 @@ if (fs.existsSync(frontendBuildDir)) {
   app.use(express.static(frontendBuildDir));
 
   app.get(/.*/, (req, res, next) => {
-    if (req.path.startsWith("/api/") || req.path === "/health" || req.path === "/convert") {
+    if (
+      req.path.startsWith("/api/") ||
+      req.path === "/health" ||
+      req.path === "/convert"
+    ) {
       next();
       return;
     }
@@ -1400,7 +1819,8 @@ app.use((err, req, res, next) => {
   console.error("Unhandled error:", err);
   res.status(500).json({
     error: "INTERNAL_SERVER_ERROR",
-    message: process.env.NODE_ENV === "production" ? "An error occurred" : err.message,
+    message:
+      process.env.NODE_ENV === "production" ? "An error occurred" : err.message,
   });
 });
 
@@ -1412,17 +1832,24 @@ if (DATABASE_URL) {
   console.log("Attempting to connect to PostgreSQL database...");
   pgPool = new Pool({
     connectionString: DATABASE_URL,
-    ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false
+    ssl:
+      process.env.NODE_ENV === "production"
+        ? { rejectUnauthorized: false }
+        : false,
   });
 
   (async () => {
     let client;
     try {
       client = await pgPool.connect();
-      const { rows: dbInfo } = await client.query("SELECT current_database(), current_user");
-      console.log(`Connected to PostgreSQL database: "${dbInfo[0].current_database}" as user: "${dbInfo[0].current_user}"`);
+      const { rows: dbInfo } = await client.query(
+        "SELECT current_database(), current_user",
+      );
+      console.log(
+        `Connected to PostgreSQL database: "${dbInfo[0].current_database}" as user: "${dbInfo[0].current_user}"`,
+      );
       console.log("Connected to PostgreSQL successfully! Adjusting schema...");
-      
+
       // Drop foreign key constraint first to prevent conflict during alter
       await client.query(`
         ALTER TABLE audio_history DROP CONSTRAINT IF EXISTS audio_history_user_id_fkey;
@@ -1457,21 +1884,35 @@ if (DATABASE_URL) {
       // Fetch users from PostgreSQL into local cache
       const { rows: pgUsers } = await client.query("SELECT * FROM users");
       if (pgUsers && pgUsers.length > 0) {
-        cachedUsers = pgUsers.map(row => normalizeUser({
-          id: row.id,
-          name: row.name,
-          email: row.email,
-          role: row.role,
-          accessStatus: row.access_status,
-          passwordHash: row.password_hash,
-          passwordSalt: row.password_salt,
-          profile: typeof row.profile === "string" ? JSON.parse(row.profile) : row.profile,
-          sessions: typeof row.sessions === "string" ? JSON.parse(row.sessions) : row.sessions,
-          joined: row.created_at ? new Date(row.created_at).toISOString() : new Date().toISOString()
-        }));
-        console.log(`Loaded ${cachedUsers.length} users from PostgreSQL into memory cache.`);
+        cachedUsers = pgUsers.map((row) =>
+          normalizeUser({
+            id: row.id,
+            name: row.name,
+            email: row.email,
+            role: row.role,
+            accessStatus: row.access_status,
+            passwordHash: row.password_hash,
+            passwordSalt: row.password_salt,
+            profile:
+              typeof row.profile === "string"
+                ? JSON.parse(row.profile)
+                : row.profile,
+            sessions:
+              typeof row.sessions === "string"
+                ? JSON.parse(row.sessions)
+                : row.sessions,
+            joined: row.created_at
+              ? new Date(row.created_at).toISOString()
+              : new Date().toISOString(),
+          }),
+        );
+        console.log(
+          `Loaded ${cachedUsers.length} users from PostgreSQL into memory cache.`,
+        );
       } else {
-        console.log("PostgreSQL users table is empty. Syncing local users to PostgreSQL...");
+        console.log(
+          "PostgreSQL users table is empty. Syncing local users to PostgreSQL...",
+        );
         const currentUsers = loadUsers();
         if (currentUsers.length > 0) {
           for (const user of currentUsers) {
@@ -1488,17 +1929,19 @@ if (DATABASE_URL) {
                 user.passwordSalt || "",
                 JSON.stringify(user.profile || {}),
                 JSON.stringify(user.sessions || []),
-                user.joined ? new Date(user.joined) : new Date()
-              ]
+                user.joined ? new Date(user.joined) : new Date(),
+              ],
             );
           }
         }
       }
 
       // Fetch history records from PostgreSQL
-      const { rows: pgHistory } = await client.query("SELECT * FROM audio_history ORDER BY created_at DESC LIMIT 100");
+      const { rows: pgHistory } = await client.query(
+        "SELECT * FROM audio_history ORDER BY created_at DESC LIMIT 100",
+      );
       if (pgHistory && pgHistory.length > 0) {
-        const historyList = pgHistory.map(row => ({
+        const historyList = pgHistory.map((row) => ({
           id: row.id,
           user_id: row.user_id,
           text: row.text,
@@ -1506,36 +1949,46 @@ if (DATABASE_URL) {
           language: row.language,
           gender: row.gender,
           status: row.status,
-          timestamp: row.timestamp || (row.created_at ? new Date(row.created_at).toISOString() : new Date().toISOString())
+          timestamp:
+            row.timestamp ||
+            (row.created_at
+              ? new Date(row.created_at).toISOString()
+              : new Date().toISOString()),
         }));
         fs.writeFileSync(HISTORY_FILE, JSON.stringify(historyList, null, 2));
-        console.log(`Loaded ${historyList.length} history records from PostgreSQL.`);
+        console.log(
+          `Loaded ${historyList.length} history records from PostgreSQL.`,
+        );
       }
     } catch (err) {
       console.error("PostgreSQL initialization error:", err);
     } finally {
       if (client) client.release();
     }
-    
+
     ensureDefaultAdminUser();
-  })().catch(err => {
+  })().catch((err) => {
     console.error("Unhandled async PG error:", err);
     ensureDefaultAdminUser();
   });
 } else if (MONGODB_URI) {
   console.log("Attempting to connect to MongoDB Atlas...");
   MongoClient.connect(MONGODB_URI)
-    .then(client => {
+    .then((client) => {
       db = client.db();
       console.log("Connected to MongoDB successfully!");
       return db.collection("users").find({}).toArray();
     })
-    .then(dbUsers => {
+    .then((dbUsers) => {
       if (dbUsers && dbUsers.length > 0) {
         cachedUsers = dbUsers.map(({ _id, ...user }) => normalizeUser(user));
-        console.log(`Loaded ${cachedUsers.length} users from MongoDB into memory cache.`);
+        console.log(
+          `Loaded ${cachedUsers.length} users from MongoDB into memory cache.`,
+        );
       } else {
-        console.log("MongoDB users collection is empty. Backing up local users to MongoDB...");
+        console.log(
+          "MongoDB users collection is empty. Backing up local users to MongoDB...",
+        );
         const currentUsers = loadUsers();
         if (currentUsers.length > 0) {
           return db.collection("users").insertMany(currentUsers);
@@ -1545,7 +1998,7 @@ if (DATABASE_URL) {
     .then(() => {
       ensureDefaultAdminUser();
     })
-    .catch(err => {
+    .catch((err) => {
       console.error("MongoDB initialization failed:", err);
       ensureDefaultAdminUser();
     });

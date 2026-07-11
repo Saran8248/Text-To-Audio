@@ -1,23 +1,50 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from '../utils/motion';
-import { Bell, ChevronDown, Sun, Moon, Search, ShieldCheck } from 'lucide-react';
-import { isAdmin } from '../utils/auth';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "../utils/motion";
+import {
+  Bell,
+  ChevronDown,
+  Sun,
+  Moon,
+  Search,
+  ShieldCheck,
+} from "lucide-react";
+import { isAdmin } from "../utils/auth";
 
 const Navbar = ({ user, onLogout, theme, onToggleTheme }) => {
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const isDark = theme === 'dark';
+  const [searchQuery, setSearchQuery] = useState("");
+  const isDark = theme === "dark";
 
   const searchItems = [
-    { label: 'Dashboard', keywords: 'dashboard home stats', path: '/' },
-    { label: 'Text to Speech', keywords: 'text speech generate audio tts', path: '/tts' },
-    { label: 'Voice Library', keywords: 'voices library language', path: '/voices' },
-    { label: 'History', keywords: 'history generated audio', path: '/history' },
-    { label: 'Settings', keywords: 'settings profile theme password', path: '/settings' },
-    ...(isAdmin(user) ? [{ label: 'Admin Access', keywords: 'admin access users approve search', path: '/admin' }] : []),
+    { label: "Dashboard", keywords: "dashboard home stats", path: "/" },
+    {
+      label: "Text to Speech",
+      keywords: "text speech generate audio tts",
+      path: "/tts",
+    },
+    {
+      label: "Voice Library",
+      keywords: "voices library language",
+      path: "/voices",
+    },
+    { label: "History", keywords: "history generated audio", path: "/history" },
+    {
+      label: "Settings",
+      keywords: "settings profile theme password",
+      path: "/settings",
+    },
+    ...(isAdmin(user)
+      ? [
+          {
+            label: "Admin Access",
+            keywords: "admin access users approve search",
+            path: "/admin",
+          },
+        ]
+      : []),
   ];
 
   const handleSearchSubmit = (event) => {
@@ -25,20 +52,35 @@ const Navbar = ({ user, onLogout, theme, onToggleTheme }) => {
     const query = searchQuery.trim().toLowerCase();
     if (!query) return;
 
-    const match = searchItems.find((item) => (
-      `${item.label} ${item.keywords}`.toLowerCase().includes(query)
-    ));
+    const match = searchItems.find((item) =>
+      `${item.label} ${item.keywords}`.toLowerCase().includes(query),
+    );
 
     if (match) {
       navigate(match.path);
-      setSearchQuery('');
+      setSearchQuery("");
     }
   };
 
   const notifications = [
-    { id: 1, title: 'Audio generated', message: 'Your text-to-speech is ready', time: '2m ago' },
-    { id: 2, title: 'New voice added', message: 'British English voice available', time: '1h ago' },
-    { id: 3, title: 'Usage updated', message: 'Check your monthly stats', time: '3h ago' },
+    {
+      id: 1,
+      title: "Audio generated",
+      message: "Your text-to-speech is ready",
+      time: "2m ago",
+    },
+    {
+      id: 2,
+      title: "New voice added",
+      message: "British English voice available",
+      time: "1h ago",
+    },
+    {
+      id: 3,
+      title: "Usage updated",
+      message: "Check your monthly stats",
+      time: "3h ago",
+    },
   ];
 
   return (
@@ -47,8 +89,14 @@ const Navbar = ({ user, onLogout, theme, onToggleTheme }) => {
         <div className="flex items-center justify-between">
           {/* Left side */}
           <div className="flex items-center gap-4 flex-1">
-            <form onSubmit={handleSearchSubmit} className="relative w-full max-w-md hidden md:block">
-              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+            <form
+              onSubmit={handleSearchSubmit}
+              className="relative w-full max-w-md hidden md:block"
+            >
+              <Search
+                size={18}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
+              />
               <input
                 type="search"
                 value={searchQuery}
@@ -65,7 +113,7 @@ const Navbar = ({ user, onLogout, theme, onToggleTheme }) => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => navigate('/admin')}
+                onClick={() => navigate("/admin")}
                 className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
               >
                 <ShieldCheck size={18} />
@@ -108,7 +156,9 @@ const Navbar = ({ user, onLogout, theme, onToggleTheme }) => {
                     className="absolute right-0 top-full mt-2 w-80 glass rounded-2xl border border-white/10 overflow-hidden shadow-xl"
                   >
                     <div className="p-4 border-b border-white/10">
-                      <h3 className="font-semibold text-white">Notifications</h3>
+                      <h3 className="font-semibold text-white">
+                        Notifications
+                      </h3>
                     </div>
                     <div className="divide-y divide-white/5 max-h-96 overflow-y-auto">
                       {notifications.map((notif) => (
@@ -118,9 +168,15 @@ const Navbar = ({ user, onLogout, theme, onToggleTheme }) => {
                           animate={{ opacity: 1, x: 0 }}
                           className="p-4 hover:bg-white/5 cursor-pointer transition-colors"
                         >
-                          <p className="font-medium text-white text-sm">{notif.title}</p>
-                          <p className="text-xs text-gray-400 mt-1">{notif.message}</p>
-                          <p className="text-xs text-gray-600 mt-2">{notif.time}</p>
+                          <p className="font-medium text-white text-sm">
+                            {notif.title}
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            {notif.message}
+                          </p>
+                          <p className="text-xs text-gray-600 mt-2">
+                            {notif.time}
+                          </p>
                         </motion.div>
                       ))}
                     </div>
@@ -138,13 +194,29 @@ const Navbar = ({ user, onLogout, theme, onToggleTheme }) => {
               >
                 <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center text-white text-xs font-semibold bg-gradient-to-br from-blue-400 to-purple-600 shadow-inner">
                   {user?.profile?.avatarUrl ? (
-                    <img src={user.profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                    <img
+                      src={user.profile.avatarUrl}
+                      alt="Avatar"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : user?.name ? (
+                    user.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .slice(0, 2)
+                      .toUpperCase()
                   ) : (
-                    user?.name ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'U'
+                    "U"
                   )}
                 </div>
-                <span className="text-sm font-medium text-white hidden sm:inline">{user?.name || user?.email || 'User'}</span>
-                <ChevronDown size={16} className={`text-gray-400 transition-transform ${showProfile ? 'rotate-180' : ''}`} />
+                <span className="text-sm font-medium text-white hidden sm:inline">
+                  {user?.name || user?.email || "User"}
+                </span>
+                <ChevronDown
+                  size={16}
+                  className={`text-gray-400 transition-transform ${showProfile ? "rotate-180" : ""}`}
+                />
               </motion.button>
 
               <AnimatePresence>
@@ -156,13 +228,15 @@ const Navbar = ({ user, onLogout, theme, onToggleTheme }) => {
                     className="absolute right-0 top-full mt-2 w-48 glass rounded-2xl border border-white/10 overflow-hidden shadow-xl"
                   >
                     <div className="p-4 border-b border-white/10">
-                      <p className="text-sm font-medium text-white">{user?.email || 'Logged in user'}</p>
+                      <p className="text-sm font-medium text-white">
+                        {user?.email || "Logged in user"}
+                      </p>
                     </div>
                     <div className="p-2 space-y-1">
                       <motion.button
                         whileHover={{ x: 4 }}
                         onClick={() => {
-                          navigate('/settings');
+                          navigate("/settings");
                           setShowProfile(false);
                         }}
                         className="w-full text-left px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
@@ -173,7 +247,7 @@ const Navbar = ({ user, onLogout, theme, onToggleTheme }) => {
                         whileHover={{ x: 4 }}
                         onClick={() => {
                           onLogout();
-                          navigate('/login');
+                          navigate("/login");
                         }}
                         className="w-full text-left px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
                       >

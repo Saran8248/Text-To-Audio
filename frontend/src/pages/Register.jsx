@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion } from '../utils/motion';
-import { toast } from 'react-toastify';
-import { registerUser } from '../utils/auth';
-import { Eye, EyeOff } from 'lucide-react';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { motion } from "../utils/motion";
+import { toast } from "react-toastify";
+import { registerUser } from "../utils/auth";
+import { Eye, EyeOff } from "lucide-react";
 
 const Register = ({ onRegister }) => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ const Register = ({ onRegister }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (password !== confirmPassword) {
-      toast.error('Passwords do not match');
+      toast.error("Passwords do not match");
       return;
     }
 
@@ -27,15 +27,17 @@ const Register = ({ onRegister }) => {
       return;
     }
 
-    if (result.user.accessStatus !== 'approved') {
-      toast.info('Account request sent. An admin must approve access before login.');
-      navigate('/login', { replace: true });
+    if (result.user.accessStatus !== "approved") {
+      toast.info(
+        "Account request sent. An admin must approve access before login.",
+      );
+      navigate("/login", { replace: true });
       return;
     }
 
     onRegister(result.user);
-    toast.success('Account created successfully');
-    navigate('/', { replace: true });
+    toast.success("Account created successfully");
+    navigate("/", { replace: true });
   };
 
   return (
@@ -47,12 +49,16 @@ const Register = ({ onRegister }) => {
       >
         <div className="mb-8 text-center">
           <h1 className="text-4xl font-bold text-white">Create account</h1>
-          <p className="mt-3 text-gray-400">Create an account to access your sound generation dashboard.</p>
+          <p className="mt-3 text-gray-400">
+            Create an account to access your sound generation dashboard.
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm text-gray-400 mb-2">Full Name</label>
+            <label className="block text-sm text-gray-400 mb-2">
+              Full Name
+            </label>
             <input
               type="text"
               value={name}
@@ -77,7 +83,7 @@ const Register = ({ onRegister }) => {
             <label className="block text-sm text-gray-400 mb-2">Password</label>
             <div className="relative">
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -87,8 +93,8 @@ const Register = ({ onRegister }) => {
                 type="button"
                 onClick={() => setShowPassword((current) => !current)}
                 className="absolute inset-y-0 right-3 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400/60"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-                title={showPassword ? 'Hide password' : 'Show password'}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                title={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -96,10 +102,12 @@ const Register = ({ onRegister }) => {
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-2">Confirm Password</label>
+            <label className="block text-sm text-gray-400 mb-2">
+              Confirm Password
+            </label>
             <div className="relative">
               <input
-                type={showConfirmPassword ? 'text' : 'password'}
+                type={showConfirmPassword ? "text" : "password"}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
@@ -109,8 +117,10 @@ const Register = ({ onRegister }) => {
                 type="button"
                 onClick={() => setShowConfirmPassword((current) => !current)}
                 className="absolute inset-y-0 right-3 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400/60"
-                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-                title={showConfirmPassword ? 'Hide password' : 'Show password'}
+                aria-label={
+                  showConfirmPassword ? "Hide password" : "Show password"
+                }
+                title={showConfirmPassword ? "Hide password" : "Show password"}
               >
                 {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -128,7 +138,7 @@ const Register = ({ onRegister }) => {
         </form>
 
         <p className="mt-6 text-center text-gray-400">
-          Already have an account?{' '}
+          Already have an account?{" "}
           <Link to="/login" className="text-blue-400 hover:text-blue-200">
             Sign in
           </Link>

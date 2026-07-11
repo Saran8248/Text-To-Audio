@@ -1,7 +1,18 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from '../utils/motion';
-import { Upload, FileAudio, Play, Pause, Trash2, ArrowUp, ArrowDown, Download, CheckCircle, RefreshCw } from 'lucide-react';
-import { toast } from 'react-toastify';
+import React, { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "../utils/motion";
+import {
+  Upload,
+  FileAudio,
+  Play,
+  Pause,
+  Trash2,
+  ArrowUp,
+  ArrowDown,
+  Download,
+  CheckCircle,
+  RefreshCw,
+} from "lucide-react";
+import { toast } from "react-toastify";
 
 // Waveform visual canvas renderer
 const AudioWaveform = ({ buffer }) => {
@@ -10,7 +21,7 @@ const AudioWaveform = ({ buffer }) => {
   useEffect(() => {
     if (!buffer || !canvasRef.current) return;
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     const width = canvas.width;
     const height = canvas.height;
 
@@ -18,7 +29,7 @@ const AudioWaveform = ({ buffer }) => {
     const step = Math.ceil(data.length / width);
 
     ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = '#60a5fa'; // Blue-400
+    ctx.fillStyle = "#60a5fa"; // Blue-400
 
     for (let i = 0; i < width; i++) {
       let min = 1.0;
@@ -28,11 +39,23 @@ const AudioWaveform = ({ buffer }) => {
         if (datum < min) min = datum;
         if (datum > max) max = datum;
       }
-      ctx.fillRect(i, (1 + min) * height / 2, 1, Math.max(1, (max - min) * height / 2));
+      ctx.fillRect(
+        i,
+        ((1 + min) * height) / 2,
+        1,
+        Math.max(1, ((max - min) * height) / 2),
+      );
     }
   }, [buffer]);
 
-  return <canvas ref={canvasRef} width={400} height={40} className="w-full h-10 opacity-70" />;
+  return (
+    <canvas
+      ref={canvasRef}
+      width={400}
+      height={40}
+      className="w-full h-10 opacity-70"
+    />
+  );
 };
 
 const MergeAudio = () => {
@@ -59,9 +82,9 @@ const MergeAudio = () => {
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
+    if (e.type === "dragenter" || e.type === "dragover") {
       setDragActive(true);
-    } else if (e.type === 'dragleave') {
+    } else if (e.type === "dragleave") {
       setDragActive(false);
     }
   };
@@ -87,7 +110,9 @@ const MergeAudio = () => {
       const reader = new FileReader();
       reader.onload = async (e) => {
         try {
-          const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          const audioCtx = new (
+            window.AudioContext || window.webkitAudioContext
+          )();
           const arrayBuffer = e.target.result;
           const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
           resolve(audioBuffer);
@@ -101,13 +126,15 @@ const MergeAudio = () => {
   };
 
   const handleFiles = async (fileList) => {
-    const audioFiles = fileList.filter(file => file.type.startsWith('audio/'));
+    const audioFiles = fileList.filter((file) =>
+      file.type.startsWith("audio/"),
+    );
     if (audioFiles.length === 0) {
-      toast.error('Please select valid audio files.');
+      toast.error("Please select valid audio files.");
       return;
     }
 
-    const loadingToast = toast.loading('Decoding audio tracks...');
+    const loadingToast = toast.loading("Decoding audio tracks...");
 
     const newTracks = [];
     for (const file of audioFiles) {
@@ -116,7 +143,7 @@ const MergeAudio = () => {
         newTracks.push({
           id: Date.now() + Math.random().toString(36).substr(2, 9),
           name: file.name,
-          size: (file.size / (1024 * 1024)).toFixed(2) + ' MB',
+          size: (file.size / (1024 * 1024)).toFixed(2) + " MB",
           duration: buffer.duration,
           buffer: buffer,
           file: file,
@@ -137,7 +164,7 @@ const MergeAudio = () => {
   };
 
   const deleteTrack = (id) => {
-    setTracks(tracks.filter(t => t.id !== id));
+    setTracks(tracks.filter((t) => t.id !== id));
     setMergedBlob(null);
     setMergedUrl(null);
   };
@@ -159,45 +186,48 @@ const MergeAudio = () => {
   // Convert AudioBuffer to WAV format
   const bufferToWav = (buffer) => {
     let numOfChan = buffer.numberOfChannels,
-        length = buffer.length * numOfChan * 2 + 44,
-        bufferArr = new ArrayBuffer(length),
-        view = new DataView(bufferArr),
-        channels = [], i, sample,
-        offset = 0,
-        pos = 0;
+      length = buffer.length * numOfChan * 2 + 44,
+      bufferArr = new ArrayBuffer(length),
+      view = new DataView(bufferArr),
+      channels = [],
+      i,
+      sample,
+      offset = 0,
+      pos = 0;
 
     // write WAVE header
-    setUint32(0x46464952);                         // "RIFF"
-    setUint32(length - 8);                         // file length - 8
-    setUint32(0x45564157);                         // "WAVE"
+    setUint32(0x46464952); // "RIFF"
+    setUint32(length - 8); // file length - 8
+    setUint32(0x45564157); // "WAVE"
 
-    setUint32(0x20746d66);                         // "fmt " chunk
-    setUint32(16);                                 // chunk length
-    setUint16(1);                                  // sample format (raw)
-    setUint16(numOfChan);                          // channel count
-    setUint32(buffer.sampleRate);                  // sample rate
+    setUint32(0x20746d66); // "fmt " chunk
+    setUint32(16); // chunk length
+    setUint16(1); // sample format (raw)
+    setUint16(numOfChan); // channel count
+    setUint32(buffer.sampleRate); // sample rate
     setUint32(buffer.sampleRate * 2 * numOfChan); // byte rate (sample rate * block align)
-    setUint16(numOfChan * 2);                      // block align (channel count * bytes per sample)
-    setUint16(16);                                 // bits per sample
+    setUint16(numOfChan * 2); // block align (channel count * bytes per sample)
+    setUint16(16); // bits per sample
 
-    setUint32(0x61746164);                         // "data" chunk
-    setUint32(length - pos - 4);                   // chunk length
+    setUint32(0x61746164); // "data" chunk
+    setUint32(length - pos - 4); // chunk length
 
     // write interleaved data
-    for(i=0; i<buffer.numberOfChannels; i++)
+    for (i = 0; i < buffer.numberOfChannels; i++)
       channels.push(buffer.getChannelData(i));
 
-    while(pos < length) {
-      for(i=0; i<numOfChan; i++) {             // interleave channels
+    while (pos < length) {
+      for (i = 0; i < numOfChan; i++) {
+        // interleave channels
         sample = Math.max(-1, Math.min(1, channels[i][offset])); // clamp
-        sample = (sample < 0 ? sample * 0x8000 : sample * 0x7FFF); // scale to 16-bit signed int
-        view.setInt16(pos, sample, true);          // write 16-bit sample
+        sample = sample < 0 ? sample * 0x8000 : sample * 0x7fff; // scale to 16-bit signed int
+        view.setInt16(pos, sample, true); // write 16-bit sample
         pos += 2;
       }
-      offset++;                                     // next sample
+      offset++; // next sample
     }
 
-    return new Blob([bufferArr], {type: "audio/wav"});
+    return new Blob([bufferArr], { type: "audio/wav" });
 
     function setUint16(data) {
       view.setUint16(pos, data, true);
@@ -212,32 +242,38 @@ const MergeAudio = () => {
 
   const handleMerge = async () => {
     if (tracks.length < 2) {
-      toast.warn('Add at least 2 tracks to merge.');
+      toast.warn("Add at least 2 tracks to merge.");
       return;
     }
 
     setIsMerging(true);
-    const mergeToast = toast.loading('Merging audio files together...');
+    const mergeToast = toast.loading("Merging audio files together...");
 
     try {
       // Calculate total duration and build OfflineAudioContext
       let totalDuration = 0;
       const sampleRate = tracks[0].buffer.sampleRate;
-      const numChannels = Math.max(...tracks.map(t => t.buffer.numberOfChannels));
+      const numChannels = Math.max(
+        ...tracks.map((t) => t.buffer.numberOfChannels),
+      );
       const activeFade = crossfade ? parseFloat(crossfadeDuration) : 0;
 
       tracks.forEach((track, idx) => {
         if (idx === 0) {
           totalDuration += track.duration;
         } else {
-          totalDuration += (track.duration - activeFade);
+          totalDuration += track.duration - activeFade;
         }
       });
 
       // Clamp totalDuration to ensure positive values
       totalDuration = Math.max(0.1, totalDuration);
 
-      const offlineCtx = new OfflineAudioContext(numChannels, sampleRate * totalDuration, sampleRate);
+      const offlineCtx = new OfflineAudioContext(
+        numChannels,
+        sampleRate * totalDuration,
+        sampleRate,
+      );
 
       let currentOffset = 0;
       tracks.forEach((track, idx) => {
@@ -273,7 +309,7 @@ const MergeAudio = () => {
         source.start(startTime);
 
         // Advance start time offset for next track
-        currentOffset += (track.duration - activeFade);
+        currentOffset += track.duration - activeFade;
       });
 
       const renderedBuffer = await offlineCtx.startRendering();
@@ -283,11 +319,11 @@ const MergeAudio = () => {
       setMergedBlob(finalBlob);
       setMergedUrl(url);
       toast.dismiss(mergeToast);
-      toast.success('Audio files successfully merged!');
+      toast.success("Audio files successfully merged!");
     } catch (err) {
       console.error(err);
       toast.dismiss(mergeToast);
-      toast.error('An error occurred during audio merging.');
+      toast.error("An error occurred during audio merging.");
     } finally {
       setIsMerging(false);
     }
@@ -307,15 +343,15 @@ const MergeAudio = () => {
   const formatDuration = (sec) => {
     const mins = Math.floor(sec / 60);
     const secs = Math.floor(sec % 60);
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
   const calculateTrackTimeline = (index) => {
     let start = 0;
     const activeFade = crossfade ? parseFloat(crossfadeDuration) : 0;
-    
+
     for (let i = 0; i < index; i++) {
-      start += (tracks[i].duration - activeFade);
+      start += tracks[i].duration - activeFade;
     }
 
     const end = start + tracks[index].duration;
@@ -339,7 +375,10 @@ const MergeAudio = () => {
       >
         <div>
           <h1 className="text-4xl font-bold text-white mb-2">Merge Audio</h1>
-          <p className="text-gray-400">Combine audio clips sequentially into a single file with professional crossfade.</p>
+          <p className="text-gray-400">
+            Combine audio clips sequentially into a single file with
+            professional crossfade.
+          </p>
         </div>
         {tracks.length > 0 && (
           <motion.button
@@ -364,8 +403,8 @@ const MergeAudio = () => {
           onDrop={handleDrop}
           className={`flex flex-col items-center justify-center border-2 border-dashed rounded-3xl p-16 text-center cursor-pointer transition-all duration-300 ${
             dragActive
-              ? 'border-blue-400 bg-blue-500/5 shadow-2xl scale-[1.01]'
-              : 'border-white/10 bg-white/5 hover:border-white/20'
+              ? "border-blue-400 bg-blue-500/5 shadow-2xl scale-[1.01]"
+              : "border-white/10 bg-white/5 hover:border-white/20"
           }`}
           onClick={() => fileInputRef.current.click()}
         >
@@ -380,8 +419,13 @@ const MergeAudio = () => {
           <div className="w-16 h-16 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-6">
             <Upload className="text-blue-400" size={28} />
           </div>
-          <h3 className="text-2xl font-semibold text-white mb-2">Merge Audio Files Online - Join Tracks Free</h3>
-          <p className="text-gray-400 mb-6 max-w-sm">Select or Drag & Drop audio clips to combine them one after another into a single file.</p>
+          <h3 className="text-2xl font-semibold text-white mb-2">
+            Merge Audio Files Online - Join Tracks Free
+          </h3>
+          <p className="text-gray-400 mb-6 max-w-sm">
+            Select or Drag & Drop audio clips to combine them one after another
+            into a single file.
+          </p>
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -417,10 +461,14 @@ const MergeAudio = () => {
                     max="5"
                     step="0.5"
                     value={crossfadeDuration}
-                    onChange={(e) => setCrossfadeDuration(parseFloat(e.target.value))}
+                    onChange={(e) =>
+                      setCrossfadeDuration(parseFloat(e.target.value))
+                    }
                     className="w-24 h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500"
                   />
-                  <span className="text-xs font-semibold text-blue-400 min-w-8">{crossfadeDuration}s</span>
+                  <span className="text-xs font-semibold text-blue-400 min-w-8">
+                    {crossfadeDuration}s
+                  </span>
                 </div>
               )}
             </div>
@@ -470,8 +518,12 @@ const MergeAudio = () => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1.5">
                       <FileAudio size={16} className="text-blue-400" />
-                      <span className="text-sm font-medium text-white truncate">{track.name}</span>
-                      <span className="text-xs text-gray-500">{track.size}</span>
+                      <span className="text-sm font-medium text-white truncate">
+                        {track.name}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {track.size}
+                      </span>
                     </div>
 
                     {/* Waveform Drawing */}
@@ -520,7 +572,7 @@ const MergeAudio = () => {
                 disabled={isMerging || tracks.length < 2}
                 className="px-8 py-3 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 font-medium text-white hover:shadow-lg disabled:opacity-50"
               >
-                {isMerging ? 'Merging Audio...' : 'Merge Tracks'}
+                {isMerging ? "Merging Audio..." : "Merge Tracks"}
               </motion.button>
             </motion.div>
           )}
@@ -539,8 +591,12 @@ const MergeAudio = () => {
               <CheckCircle className="text-emerald-400" size={20} />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">Merge Completed successfully!</h3>
-              <p className="text-xs text-gray-400">Your single merged audio track is ready for download.</p>
+              <h3 className="text-lg font-bold text-white">
+                Merge Completed successfully!
+              </h3>
+              <p className="text-xs text-gray-400">
+                Your single merged audio track is ready for download.
+              </p>
             </div>
           </div>
 
@@ -557,7 +613,11 @@ const MergeAudio = () => {
               onClick={handlePlayToggle}
               className="w-12 h-12 rounded-full bg-blue-500 hover:bg-blue-600 flex items-center justify-center text-white"
             >
-              {isPlaying ? <Pause size={20} /> : <Play className="ml-0.5" size={20} />}
+              {isPlaying ? (
+                <Pause size={20} />
+              ) : (
+                <Play className="ml-0.5" size={20} />
+              )}
             </motion.button>
 
             <div className="flex-1 text-sm font-medium text-white truncate">

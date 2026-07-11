@@ -1860,6 +1860,39 @@ if (DATABASE_URL) {
       );
       console.log("Connected to PostgreSQL successfully! Adjusting schema...");
 
+      // Create tables automatically if they do not exist
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS users (
+          id VARCHAR(100) PRIMARY KEY,
+          name VARCHAR(100),
+          email VARCHAR(150) UNIQUE,
+          password VARCHAR(255),
+          role VARCHAR(50) DEFAULT 'user',
+          access_status VARCHAR(50) DEFAULT 'approved',
+          password_hash VARCHAR(255),
+          password_salt VARCHAR(255),
+          profile JSONB,
+          sessions JSONB DEFAULT '[]'::jsonb,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS audio_history (
+          id SERIAL PRIMARY KEY,
+          user_id VARCHAR(100),
+          text TEXT,
+          voice VARCHAR(100),
+          language VARCHAR(50),
+          gender VARCHAR(50),
+          status VARCHAR(50),
+          timestamp VARCHAR(100),
+          audio_file VARCHAR(255),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+      `);
+
       // Drop foreign key constraint first to prevent conflict during alter
       await client.query(`
         ALTER TABLE audio_history DROP CONSTRAINT IF EXISTS audio_history_user_id_fkey;

@@ -714,12 +714,13 @@ function saveUsers(users) {
         await client.query("DELETE FROM users");
         for (const user of cachedUsers) {
           await client.query(
-            `INSERT INTO users (id, name, email, role, access_status, password_hash, password_salt, profile, sessions, created_at)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+            `INSERT INTO users (id, name, email, password, role, access_status, password_hash, password_salt, profile, sessions, created_at)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
             [
               String(user.id),
               user.name,
               user.email,
+              user.passwordHash || "",
               user.role,
               user.accessStatus,
               user.passwordHash || "",
@@ -1212,12 +1213,10 @@ app.post("/api/auth/register", (req, res) => {
   const users = loadUsers();
   const normalizedEmail = req.body.email.trim().toLowerCase();
   if (users.some((user) => user.email === normalizedEmail)) {
-    res
-      .status(409)
-      .json({
-        error: "EMAIL_EXISTS",
-        message: "This email is already registered.",
-      });
+    res.status(409).json({
+      error: "EMAIL_EXISTS",
+      message: "This email is already registered.",
+    });
     return;
   }
 
@@ -1256,12 +1255,10 @@ app.post("/api/auth/login", (req, res) => {
   }
 
   if (user.accessStatus !== "approved") {
-    res
-      .status(403)
-      .json({
-        error: "ACCESS_PENDING",
-        message: "Your account is waiting for admin access.",
-      });
+    res.status(403).json({
+      error: "ACCESS_PENDING",
+      message: "Your account is waiting for admin access.",
+    });
     return;
   }
 
@@ -1315,12 +1312,10 @@ app.put("/api/auth/profile", requireAuth, (req, res) => {
     (user) => user.email === normalizedEmail && user.id !== req.user.id,
   );
   if (emailTaken) {
-    res
-      .status(409)
-      .json({
-        error: "EMAIL_EXISTS",
-        message: "That email is already in use.",
-      });
+    res.status(409).json({
+      error: "EMAIL_EXISTS",
+      message: "That email is already in use.",
+    });
     return;
   }
 
@@ -1372,12 +1367,10 @@ app.post("/api/admin/users", requireAdmin, (req, res) => {
   const users = loadUsers();
   const normalizedEmail = req.body.email.trim().toLowerCase();
   if (users.some((user) => user.email === normalizedEmail)) {
-    res
-      .status(409)
-      .json({
-        error: "EMAIL_EXISTS",
-        message: "This email is already registered.",
-      });
+    res.status(409).json({
+      error: "EMAIL_EXISTS",
+      message: "This email is already registered.",
+    });
     return;
   }
 
@@ -1391,12 +1384,10 @@ app.post("/api/admin/users", requireAdmin, (req, res) => {
   });
 
   saveUsers([...users, newUser]);
-  res
-    .status(201)
-    .json({
-      user: publicUser(newUser),
-      users: [...users, newUser].map(publicUser),
-    });
+  res.status(201).json({
+    user: publicUser(newUser),
+    users: [...users, newUser].map(publicUser),
+  });
 });
 
 app.patch("/api/admin/users/:id", requireAdmin, (req, res) => {
@@ -1429,12 +1420,10 @@ app.patch("/api/admin/users/:id", requireAdmin, (req, res) => {
 app.delete("/api/admin/users/:id", requireAdmin, (req, res) => {
   const userId = String(req.params.id);
   if (String(req.user.id) === userId) {
-    res
-      .status(400)
-      .json({
-        error: "SELF_DELETE",
-        message: "You cannot delete your own admin account.",
-      });
+    res.status(400).json({
+      error: "SELF_DELETE",
+      message: "You cannot delete your own admin account.",
+    });
     return;
   }
 
@@ -1544,21 +1533,17 @@ app.post(
   asyncHandler(async (req, res) => {
     const { text, voiceMapping } = req.body;
     if (!text || typeof text !== "string" || !text.trim()) {
-      res
-        .status(400)
-        .json({
-          error: "INVALID_REQUEST",
-          message: "Conversation text is required.",
-        });
+      res.status(400).json({
+        error: "INVALID_REQUEST",
+        message: "Conversation text is required.",
+      });
       return;
     }
     if (!voiceMapping || typeof voiceMapping !== "object") {
-      res
-        .status(400)
-        .json({
-          error: "INVALID_REQUEST",
-          message: "Voice mapping is required.",
-        });
+      res.status(400).json({
+        error: "INVALID_REQUEST",
+        message: "Voice mapping is required.",
+      });
       return;
     }
 
@@ -1588,12 +1573,10 @@ app.post(
     }
 
     if (turns.length === 0) {
-      res
-        .status(400)
-        .json({
-          error: "INVALID_REQUEST",
-          message: "No conversation turns detected.",
-        });
+      res.status(400).json({
+        error: "INVALID_REQUEST",
+        message: "No conversation turns detected.",
+      });
       return;
     }
 

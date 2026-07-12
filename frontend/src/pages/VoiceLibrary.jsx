@@ -99,65 +99,56 @@ const VoiceLibrary = () => {
 
   const playSample = async (voice) => {
     try {
-      // stop any existing playback
       stopPlayback();
-      // If URL is a placeholder/example or missing, fallback to SpeechSynthesis
-      const isPlaceholder = !voice.url || voice.url.includes("example.com");
-      if (
-        isPlaceholder ||
-        typeof window === "undefined" ||
-        !("Audio" in window)
-      ) {
-        // Fallback: use Web Speech API to produce a short sample phrase
-        if ("speechSynthesis" in window) {
-          const utter = new SpeechSynthesisUtterance(
-            `Sample voice ${voice.name}`,
-          );
-          // optional: map some basic language hints
-          if (voice.language && voice.language.toLowerCase().includes("german"))
-            utter.lang = "de-DE";
-          if (voice.language?.toLowerCase().includes("french"))
-            utter.lang = "fr-FR";
-          if (voice.language?.toLowerCase().includes("japanese"))
-            utter.lang = "ja-JP";
-          if (voice.language?.toLowerCase().includes("ukrainian"))
-            utter.lang = "uk-UA";
-          if (voice.language?.toLowerCase().includes("english (au)"))
-            utter.lang = "en-AU";
-          if (voice.language?.toLowerCase().includes("english (uk)"))
-            utter.lang = "en-GB";
-          if (voice.language?.toLowerCase().includes("english (us)"))
-            utter.lang = "en-US";
+      setPlayingId(voice.id);
 
-          setPlayingId(voice.id);
-          audioRef.current = { synth: true };
-          utter.onend = () => {
-            setPlayingId(null);
-            audioRef.current = null;
-          };
-          window.speechSynthesis.cancel();
-          window.speechSynthesis.speak(utter);
-          toast.success("Playing sample audio (synth)");
-          return;
-        }
+      // Generate localized text based on the language
+      let sampleText = `Hello! I am ${voice.name}. How does my voice sound?`;
+      const langLower = (voice.language || "").toLowerCase();
+      if (langLower.includes("german")) {
+        sampleText = `Hallo! Ich bin ${voice.name}. Wie klingt meine Stimme?`;
+      } else if (langLower.includes("spanish")) {
+        sampleText = `¡Hola! Soy ${voice.name}. ¿Cómo suena mi voz?`;
+      } else if (langLower.includes("french")) {
+        sampleText = `Bonjour! Je m'appelle ${voice.name}. Comment sonne ma voix?`;
+      } else if (langLower.includes("tamil")) {
+        sampleText = `வணக்கம்! என் பெயர் ${voice.name}. என் குரல் எப்படி இருக்கிறது?`;
+      } else if (langLower.includes("arabic")) {
+        sampleText = `مرحباً! أنا ${voice.name}. كيف يبدو صوتي؟`;
       }
 
-      // create and play new audio (user gesture required)
-      const a = new Audio(voice.url);
+      // Fetch dynamic audio from backend
+      const response = await fetch("/api/tts/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: sampleText,
+          voice: voice.id,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate voice sample");
+      }
+
+      const blob = await response.blob();
+      const audioUrl = URL.createObjectURL(blob);
+
+      const a = new Audio(audioUrl);
       audioRef.current = a;
-      setPlayingId(voice.id);
 
       a.onended = () => {
         setPlayingId(null);
         audioRef.current = null;
+        URL.revokeObjectURL(audioUrl);
       };
 
       const playPromise = a.play();
       if (playPromise !== undefined) {
         await playPromise;
-        toast.success("Playing sample audio");
-      } else {
-        toast.success("Playing sample audio");
+        toast.success(`Playing sample for ${voice.name}`);
       }
     } catch (err) {
       console.error("Playback error", err);

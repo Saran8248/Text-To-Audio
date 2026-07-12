@@ -4,14 +4,12 @@ import { Users, Cpu, CheckCircle, Download } from "lucide-react";
 import { toast } from "react-toastify";
 
 const localeNames = {
-  "en-US": "English (US)",
-  "en-GB": "English (UK)",
-  "en-AU": "English (Australia)",
-  "de-DE": "German (Germany)",
-  "fr-FR": "French",
-  "es-ES": "Spanish",
-  "ta-IN": "Tamil (India)",
-  "ar-AE": "Arabic (UAE)",
+  de: "German",
+  en: "English",
+  es: "Spanish",
+  fr: "French",
+  ta: "Tamil",
+  ar: "Arabic",
 };
 
 const MultiSpeaker = () => {
@@ -284,7 +282,7 @@ const MultiSpeaker = () => {
                     {/* Language Dropdown */}
                     <div className="flex-1 relative">
                       <select
-                        value={speakerLanguages[speaker] || "de-DE"}
+                        value={speakerLanguages[speaker] || "de"}
                         onChange={(e) =>
                           handleLanguageChange(speaker, e.target.value)
                         }
@@ -324,7 +322,7 @@ const MultiSpeaker = () => {
                           .filter(
                             (v) =>
                               v.locale ===
-                              (speakerLanguages[speaker] || "de-DE"),
+                              (speakerLanguages[speaker] || "de"),
                           )
                           .map((voice) => (
                             <option

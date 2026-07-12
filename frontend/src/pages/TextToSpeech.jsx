@@ -35,8 +35,8 @@ const TextToSpeech = () => {
   const [text, setText] = useState("");
   const [audioUrl, setAudioUrl] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedVoice, setSelectedVoice] = useState("en-US-JennyNeural");
-  const [selectedLanguage, setSelectedLanguage] = useState("en-US");
+  const [selectedVoice, setSelectedVoice] = useState("en-US-AriaNeural");
+  const [selectedLanguage, setSelectedLanguage] = useState("en");
   const [languageCode, setLanguageCode] = useState("en");
   const [speed, setSpeed] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -72,14 +72,12 @@ const TextToSpeech = () => {
   }, []);
 
   const languageNames = {
-    "en-US": "English (United States)",
-    "en-GB": "English (United Kingdom)",
-    "en-AU": "English (Australia)",
-    "de-DE": "German (Germany)",
-    "fr-FR": "French (France)",
-    "es-ES": "Spanish (Spain)",
-    "ta-IN": "Tamil (India)",
-    "ar-AE": "Arabic (UAE)",
+    de: "German",
+    en: "English",
+    es: "Spanish",
+    fr: "French",
+    ta: "Tamil",
+    ar: "Arabic",
   };
 
   const languages = Object.keys(voices).map((lang) => ({

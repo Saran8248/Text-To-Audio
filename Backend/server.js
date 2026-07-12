@@ -403,6 +403,30 @@ function getAvailableVoices() {
         type: "Female",
         style: "Natural / Versatile",
       },
+      {
+        id: "de-AT-IngridNeural",
+        name: "Ingrid",
+        type: "Female",
+        style: "Friendly / Austrian",
+      },
+      {
+        id: "de-AT-JonasNeural",
+        name: "Jonas",
+        type: "Male",
+        style: "Friendly / Austrian",
+      },
+      {
+        id: "de-CH-LeniNeural",
+        name: "Leni",
+        type: "Female",
+        style: "Soft / Swiss",
+      },
+      {
+        id: "de-CH-JanNeural",
+        name: "Jan",
+        type: "Male",
+        style: "Clear / Swiss",
+      },
     ],
     "en-AU": [
       {

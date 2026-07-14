@@ -530,9 +530,21 @@ function publicUser(user) {
 }
 
 function adminPublicUser(user) {
-  const { password, passwordHash, passwordSalt, sessions, ...safeUser } =
-    normalizeUser(user);
-  return safeUser;
+  const normalized = normalizeUser(user);
+  
+  let lastLogin = "Never";
+  if (normalized.sessions && normalized.sessions.length > 0) {
+    const latest = normalized.sessions[normalized.sessions.length - 1];
+    if (latest && latest.createdAt) {
+      lastLogin = latest.createdAt;
+    }
+  }
+
+  const { password, plainPassword, passwordHash, passwordSalt, sessions, ...safeUser } = normalized;
+  return {
+    ...safeUser,
+    lastLogin
+  };
 }
 
 function loadUsers() {
@@ -594,7 +606,7 @@ function saveUsers(users) {
               String(user.id),
               user.name,
               user.email,
-              user.plainPassword || "",
+              "",
               user.role,
               user.accessStatus,
               user.passwordHash || "",
@@ -716,7 +728,6 @@ function createUser({
     email: normalizedEmail,
     passwordHash,
     passwordSalt,
-    plainPassword: password,
     role,
     accessStatus,
     joined: new Date().toISOString(),
@@ -1894,7 +1905,6 @@ if (DATABASE_URL) {
             id: row.id,
             name: row.name,
             email: row.email,
-            plainPassword: (row.password && !/^[0-9a-fA-F]{64}$/.test(row.password)) ? row.password : "",
             role: row.role,
             accessStatus: row.access_status,
             passwordHash: row.password_hash,

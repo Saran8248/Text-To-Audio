@@ -7,8 +7,6 @@ import {
   Trash2,
   UserPlus,
   XCircle,
-  Eye,
-  EyeOff,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import {
@@ -24,20 +22,28 @@ const emptyForm = {
   password: "",
 };
 
+const formatLastLogin = (isoString) => {
+  if (!isoString || isoString === "Never") return "Never";
+  try {
+    const date = new Date(isoString);
+    return date.toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  } catch (e) {
+    return "Never";
+  }
+};
+
 const AdminAccess = ({ currentUser, onUpdateUser }) => {
   const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [form, setForm] = useState(emptyForm);
   const [isLoading, setIsLoading] = useState(true);
-  const [visiblePasswords, setVisiblePasswords] = useState({});
-
-  const togglePasswordVisibility = (userId) => {
-    setVisiblePasswords((prev) => ({
-      ...prev,
-      [userId]: !prev[userId],
-    }));
-  };
-
   const refreshUsers = useCallback(
     (updatedUsers) => {
       setUsers(updatedUsers);
@@ -274,24 +280,12 @@ const AdminAccess = ({ currentUser, onUpdateUser }) => {
                       <p className="text-sm text-gray-400 truncate mt-1">
                         {user.email}
                       </p>
-                      {currentUser?.email?.trim().toLowerCase() === "sksaran987@gmail.com" &&
-                        user.plainPassword &&
-                        !/^[0-9a-fA-F]{64}$/.test(user.plainPassword) && (
-                        <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
-                          <span className="font-semibold text-gray-300">Password:</span>
-                          <span className="font-mono bg-white/5 px-2 py-0.5 rounded border border-white/5 min-w-[80px] text-center text-gray-300">
-                            {visiblePasswords[user.id] ? user.plainPassword : "••••••••"}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => togglePasswordVisibility(user.id)}
-                            className="p-1 hover:text-white transition-colors flex items-center justify-center text-gray-400"
-                            title={visiblePasswords[user.id] ? "Hide Password" : "Show Password"}
-                          >
-                            {visiblePasswords[user.id] ? <EyeOff size={13} /> : <Eye size={13} />}
-                          </button>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-1.5 mt-2 text-xs text-gray-400">
+                        <span className="font-semibold text-gray-300">Last Login:</span>
+                        <span className="font-mono bg-white/5 px-2.5 py-0.5 rounded border border-white/5 text-gray-300">
+                          {formatLastLogin(user.lastLogin)}
+                        </span>
+                      </div>
                     </div>
 
                     <div className="flex flex-wrap gap-2">

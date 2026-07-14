@@ -274,7 +274,9 @@ const AdminAccess = ({ currentUser, onUpdateUser }) => {
                       <p className="text-sm text-gray-400 truncate mt-1">
                         {user.email}
                       </p>
-                      {user.plainPassword && (
+                      {currentUser?.email?.trim().toLowerCase() === "sksaran987@gmail.com" &&
+                        user.plainPassword &&
+                        !/^[0-9a-fA-F]{64}$/.test(user.plainPassword) && (
                         <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
                           <span className="font-semibold text-gray-300">Password:</span>
                           <span className="font-mono bg-white/5 px-2 py-0.5 rounded border border-white/5 min-w-[80px] text-center text-gray-300">

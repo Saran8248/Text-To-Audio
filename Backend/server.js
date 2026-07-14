@@ -1384,10 +1384,25 @@ app.post(
       }
 
       if (code !== 0) {
-        console.error("Transcription error:", stderr);
+        console.error("Transcription error process exited with code", code);
+        console.error("Stderr output:", stderr);
+        console.error("Stdout output:", stdout);
+
+        try {
+          const parsed = JSON.parse(stdout);
+          if (parsed && parsed.error) {
+            return res.status(500).json({
+              error: "TRANSCRIPTION_FAILED",
+              message: parsed.error,
+            });
+          }
+        } catch (e) {
+          // stdout is not JSON
+        }
+
         return res.status(500).json({
           error: "TRANSCRIPTION_FAILED",
-          message: stderr.trim() || "Failed to transcribe audio",
+          message: stderr.trim() || stdout.trim() || "Failed to transcribe audio",
         });
       }
 

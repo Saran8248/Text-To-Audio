@@ -132,7 +132,7 @@ def process_audio(file_path):
     speaker_labels, separation = kmeans_2(features)
     
     # If the voices are extremely similar (separation < 0.15), classify as monologue
-    is_monologue = separation < 0.15
+    is_monologue = bool(separation < 0.15)
 
     recognizer = sr.Recognizer()
     segments = []

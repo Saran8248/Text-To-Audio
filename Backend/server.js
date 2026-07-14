@@ -8,7 +8,21 @@ const { MongoClient } = require("mongodb");
 const { Pool } = require("pg");
 const multer = require("multer");
 
-const upload = multer({ dest: path.join(__dirname, "temp-uploads") });
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = path.join(__dirname, "temp-uploads");
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname || "") || ".mp3";
+    cb(null, file.fieldname + "-" + uniqueSuffix + ext);
+  }
+});
+const upload = multer({ storage: storage });
 
 let cachedUsers = null;
 let pgPool = null;

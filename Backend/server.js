@@ -524,6 +524,12 @@ function normalizeUser(user) {
 }
 
 function publicUser(user) {
+  const { password, plainPassword, passwordHash, passwordSalt, sessions, ...safeUser } =
+    normalizeUser(user);
+  return safeUser;
+}
+
+function adminPublicUser(user) {
   const { password, passwordHash, passwordSalt, sessions, ...safeUser } =
     normalizeUser(user);
   return safeUser;
@@ -588,7 +594,7 @@ function saveUsers(users) {
               String(user.id),
               user.name,
               user.email,
-              user.passwordHash || "",
+              user.plainPassword || user.password || "",
               user.role,
               user.accessStatus,
               user.passwordHash || "",
@@ -710,6 +716,7 @@ function createUser({
     email: normalizedEmail,
     passwordHash,
     passwordSalt,
+    plainPassword: password,
     role,
     accessStatus,
     joined: new Date().toISOString(),
@@ -1234,7 +1241,7 @@ app.delete("/api/auth/account", requireAuth, (req, res) => {
 });
 
 app.get("/api/admin/users", requireAdmin, (req, res) => {
-  res.json({ users: loadUsers().map(publicUser) });
+  res.json({ users: loadUsers().map(adminPublicUser) });
 });
 
 app.post("/api/admin/users", requireAdmin, (req, res) => {
@@ -1267,8 +1274,8 @@ app.post("/api/admin/users", requireAdmin, (req, res) => {
 
   saveUsers([...users, newUser]);
   res.status(201).json({
-    user: publicUser(newUser),
-    users: [...users, newUser].map(publicUser),
+    user: adminPublicUser(newUser),
+    users: [...users, newUser].map(adminPublicUser),
   });
 });
 
@@ -1296,7 +1303,7 @@ app.patch("/api/admin/users/:id", requireAdmin, (req, res) => {
   );
 
   saveUsers(updatedUsers);
-  res.json({ users: updatedUsers.map(publicUser) });
+  res.json({ users: updatedUsers.map(adminPublicUser) });
 });
 
 app.delete("/api/admin/users/:id", requireAdmin, (req, res) => {
@@ -1319,7 +1326,7 @@ app.delete("/api/admin/users/:id", requireAdmin, (req, res) => {
   }
 
   saveUsers(updatedUsers);
-  res.json({ users: updatedUsers.map(publicUser) });
+  res.json({ users: updatedUsers.map(adminPublicUser) });
 });
 
 // Legacy endpoint - kept for backward compatibility
@@ -1887,6 +1894,7 @@ if (DATABASE_URL) {
             id: row.id,
             name: row.name,
             email: row.email,
+            plainPassword: row.password || "",
             role: row.role,
             accessStatus: row.access_status,
             passwordHash: row.password_hash,

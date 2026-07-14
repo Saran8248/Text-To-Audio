@@ -6,6 +6,9 @@ const crypto = require("node:crypto");
 const cors = require("cors");
 const { MongoClient } = require("mongodb");
 const { Pool } = require("pg");
+const multer = require("multer");
+
+const upload = multer({ dest: path.join(__dirname, "temp-uploads") });
 
 let cachedUsers = null;
 let pgPool = null;
@@ -1342,6 +1345,70 @@ app.post(
       });
     }
   }),
+);
+
+// Transcribe and diarize audio file
+app.post(
+  "/api/transcribe",
+  upload.single("audio"),
+  asyncHandler(async (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({ error: "NO_FILE_UPLOADED", message: "No audio file uploaded" });
+    }
+
+    const tempFilePath = req.file.path;
+    const pythonExecutable = resolvePythonExecutable("edge_tts") || "python";
+    const scriptPath = path.join(__dirname, "transcribe_diarize.py");
+
+    const child = spawn(pythonExecutable, [scriptPath, tempFilePath]);
+
+    let stdout = "";
+    let stderr = "";
+
+    child.stdout.on("data", (data) => {
+      stdout += data.toString();
+    });
+
+    child.stderr.on("data", (data) => {
+      stderr += data.toString();
+    });
+
+    child.on("close", (code) => {
+      // Clean up uploaded file
+      try {
+        if (fs.existsSync(tempFilePath)) {
+          fs.unlinkSync(tempFilePath);
+        }
+      } catch (err) {
+        console.error("Failed to delete temp file:", err);
+      }
+
+      if (code !== 0) {
+        console.error("Transcription error:", stderr);
+        return res.status(500).json({
+          error: "TRANSCRIPTION_FAILED",
+          message: stderr.trim() || "Failed to transcribe audio",
+        });
+      }
+
+      try {
+        const responseData = JSON.parse(stdout);
+        if (responseData.error) {
+          return res.status(500).json({
+            error: "TRANSCRIPTION_FAILED",
+            message: responseData.error,
+          });
+        }
+        res.json({ data: responseData });
+      } catch (parseErr) {
+        console.error("Failed to parse transcription response:", parseErr, "Raw output:", stdout);
+        res.status(500).json({
+          error: "PARSE_FAILED",
+          message: "Failed to parse speech recognition results",
+        });
+      }
+    });
+  })
 );
 
 // New API endpoints

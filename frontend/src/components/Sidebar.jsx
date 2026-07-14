@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   GitMerge,
   Users,
+  FileText,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { isAdmin } from "../utils/auth";
@@ -27,6 +28,7 @@ const Sidebar = ({ user, onLogout }) => {
     { name: "Multi Speaker", icon: Users, path: "/multi-speaker", isNew: true },
     { name: "Voice Library", icon: Music, path: "/voices" },
     { name: "Merge Audio", icon: GitMerge, path: "/merge" },
+    { name: "Audio to Text", icon: FileText, path: "/transcribe", isNew: true },
     { name: "History", icon: History, path: "/history" },
     ...(isAdmin(user)
       ? [{ name: "Admin Access", icon: ShieldCheck, path: "/admin" }]

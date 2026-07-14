@@ -191,6 +191,14 @@ const Dashboard = ({ user }) => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => navigate("/transcribe")}
+              className="px-6 py-3 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-lg font-medium text-white hover:shadow-lg hover:shadow-teal-500/30"
+            >
+              Audio to Text
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => navigate("/voices")}
               className="px-6 py-3 glass border border-white/20 rounded-lg font-medium text-white hover:bg-white/10"
             >

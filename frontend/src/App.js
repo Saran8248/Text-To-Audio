@@ -13,6 +13,7 @@ import Settings from './pages/Settings';
 import AdminAccess from './pages/AdminAccess';
 import MergeAudio from './pages/MergeAudio';
 import MultiSpeaker from './pages/MultiSpeaker';
+import AudioToText from './pages/AudioToText';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import { getCurrentUser, isAdmin, logout as authLogout, refreshCurrentUser } from './utils/auth';
@@ -46,6 +47,7 @@ const ProtectedLayout = ({ user, onLogout, onUpdateUser, theme, onThemeChange })
             <Route path="/voices" element={<VoiceLibrary />} />
             <Route path="/history" element={<History />} />
             <Route path="/merge" element={<MergeAudio user={user} />} />
+            <Route path="/transcribe" element={<AudioToText />} />
             <Route path="/api-keys" element={<Navigate to="/" replace />} />
             <Route path="/admin" element={<RequireAdmin user={user}><AdminAccess currentUser={user} onUpdateUser={onUpdateUser} /></RequireAdmin>} />
             <Route path="/settings" element={<Settings user={user} onUpdateUser={onUpdateUser} theme={theme} onThemeChange={onThemeChange} onLogout={onLogout} />} />

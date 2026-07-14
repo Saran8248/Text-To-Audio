@@ -6,59 +6,69 @@ from pydub import AudioSegment
 from pydub.silence import detect_nonsilent
 import speech_recognition as sr
 
-def kmeans_2(features):
-    # Normalize features to [0, 1] range for robust clustering
+def cluster_speakers(features):
     features = np.array(features)
-    if len(features) < 2:
+    n_samples = len(features)
+    if n_samples == 0:
+        return {}, 0.0
+    if n_samples == 1:
         return {0: "Speaker 1"}, 0.0
 
+    # Normalize each feature dimension to [0, 1] range
     f_min = features.min(axis=0)
     f_max = features.max(axis=0)
     f_range = f_max - f_min
-    # Avoid division by zero
     f_range[f_range == 0] = 1.0
     norm_features = (features - f_min) / f_range
 
-    # Initialize centroids: pick first point and the point furthest from it
-    c1 = norm_features[0]
-    distances = np.linalg.norm(norm_features - c1, axis=1)
-    c2 = norm_features[np.argmax(distances)]
+    # Threshold for grouping voice profiles (0.24 is optimal to separate neural voices)
+    THRESHOLD = 0.24
+    
+    speakers = []       # List of centroids (numpy arrays)
+    speaker_counts = [] # List of segment counts per speaker
+    labels = {}         # Map of segment index to speaker name
 
-    # If the furthest distance is tiny, it's a monologue
-    if np.linalg.norm(c1 - c2) < 0.05:
-        return {i: "Speaker 1" for i in range(len(features))}, 0.0
+    for idx, f in enumerate(norm_features):
+        if not speakers:
+            # First segment is Speaker 1
+            speakers.append(f)
+            speaker_counts.append(1)
+            labels[idx] = "Speaker 1"
+            continue
 
-    # Run k-means iterations
-    for _ in range(25):
-        clusters = [[], []]
-        indices = [[], []]
-        for idx, f in enumerate(norm_features):
-            d1 = np.linalg.norm(f - c1)
-            d2 = np.linalg.norm(f - c2)
-            if d1 <= d2:
-                clusters[0].append(f)
-                indices[0].append(idx)
-            else:
-                clusters[1].append(f)
-                indices[1].append(idx)
+        # Find closest speaker centroid
+        best_dist = float('inf')
+        best_spk_idx = -1
+        for spk_idx, centroid in enumerate(speakers):
+            dist = np.linalg.norm(f - centroid)
+            if dist < best_dist:
+                best_dist = dist
+                best_spk_idx = spk_idx
 
-        if len(clusters[0]) == 0 or len(clusters[1]) == 0:
-            break
+        if best_dist < THRESHOLD:
+            # Assign to closest speaker and update their centroid incrementally
+            labels[idx] = f"Speaker {best_spk_idx + 1}"
+            count = speaker_counts[best_spk_idx]
+            speakers[best_spk_idx] = (speakers[best_spk_idx] * count + f) / (count + 1)
+            speaker_counts[best_spk_idx] += 1
+        else:
+            # Create a new speaker
+            new_spk_idx = len(speakers)
+            speakers.append(f)
+            speaker_counts.append(1)
+            labels[idx] = f"Speaker {new_spk_idx + 1}"
 
-        new_c1 = np.mean(clusters[0], axis=0)
-        new_c2 = np.mean(clusters[1], axis=0)
-        if np.allclose(c1, new_c1) and np.allclose(c2, new_c2):
-            break
-        c1, c2 = new_c1, new_c2
+    # If only 1 speaker is detected, separation is 0.0. Otherwise, average distance between centroids.
+    if len(speakers) <= 1:
+        separation = 0.0
+    else:
+        dists = []
+        for i in range(len(speakers)):
+            for j in range(i + 1, len(speakers)):
+                dists.append(np.linalg.norm(speakers[i] - speakers[j]))
+        separation = float(np.mean(dists))
 
-    labels = {}
-    for idx in indices[0]:
-        labels[idx] = "Speaker 1"
-    for idx in indices[1]:
-        labels[idx] = "Speaker 2"
-
-    centroid_dist = np.linalg.norm(c1 - c2)
-    return labels, centroid_dist
+    return labels, separation
 
 def load_audio(file_path):
     from pydub.utils import which
@@ -117,22 +127,27 @@ def process_audio(file_path):
         # 1. Zero Crossing Rate (ZCR)
         zcr = np.sum(np.diff(np.sign(samples)) != 0) / len(samples)
         
-        # 2. Spectral Centroid (Center of gravity of the spectrum)
+        # 2. Spectral Centroid
         fft_vals = np.abs(np.fft.rfft(samples))
         freqs = np.fft.rfftfreq(len(samples), 1.0 / sr_sample_rate)
         fft_sum = np.sum(fft_vals)
         centroid = np.sum(freqs * fft_vals) / fft_sum if fft_sum > 0 else 0.0
         
-        # 3. Standard deviation of amplitude envelope
-        std_amp = np.std(samples)
-        
-        features.append([zcr, centroid, std_amp])
+        # 3. Spectral Rolloff (85% energy frequency)
+        rolloff = 0.0
+        if fft_sum > 0:
+            cumsum = np.cumsum(fft_vals)
+            idx_rolloff = np.searchsorted(cumsum, 0.85 * fft_sum)
+            rolloff = freqs[idx_rolloff] if idx_rolloff < len(freqs) else freqs[-1]
+            
+        features.append([zcr, centroid, rolloff])
 
-    # Cluster segments to identify speaker turns
-    speaker_labels, separation = kmeans_2(features)
+    # Cluster segments to identify speaker turns dynamically
+    speaker_labels, separation = cluster_speakers(features)
     
-    # If the voices are extremely similar (separation < 0.15), classify as monologue
-    is_monologue = bool(separation < 0.15)
+    # If the number of unique speakers is 1, classify as monologue
+    unique_speakers = set(speaker_labels.values())
+    is_monologue = len(unique_speakers) <= 1
 
     recognizer = sr.Recognizer()
     segments = []

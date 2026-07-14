@@ -60,9 +60,36 @@ def kmeans_2(features):
     centroid_dist = np.linalg.norm(c1 - c2)
     return labels, centroid_dist
 
+def load_audio(file_path):
+    from pydub.utils import which
+    has_ffmpeg = which("ffmpeg") is not None or which("avconv") is not None
+    
+    if not has_ffmpeg and file_path.lower().endswith(".mp3"):
+        try:
+            import mp3
+            with open(file_path, "rb") as f:
+                dec = mp3.Decoder(f)
+                pcm = []
+                while True:
+                    chunk = dec.read(4096)
+                    if not chunk:
+                        break
+                    pcm.append(chunk)
+                raw = b"".join(pcm)
+                return AudioSegment(
+                    data=raw,
+                    sample_width=2,
+                    frame_rate=dec.get_sample_rate(),
+                    channels=dec.get_channels()
+                )
+        except Exception as e:
+            sys.stderr.write(f"Warning: Failed to decode MP3 using pymp3 ({e}). Falling back to default.\n")
+            
+    return AudioSegment.from_file(file_path)
+
 def process_audio(file_path):
-    # Load audio file (pydub parses mp3, wav, ogg, m4a, etc. via ffmpeg)
-    audio = AudioSegment.from_file(file_path)
+    # Load audio file (handling offline fallback without ffmpeg for mp3)
+    audio = load_audio(file_path)
     sr_sample_rate = audio.frame_rate
     
     # Detect nonsilent intervals

@@ -1533,8 +1533,17 @@ app.post(
       if (!line) continue;
 
       const match = line.match(/^([a-zA-Z0-9\s_-]+):(.*)$/);
+      let matchedSpeaker = null;
       if (match) {
-        const speaker = match[1].trim();
+        const potentialSpeaker = match[1].trim();
+        const foundKey = Object.keys(voiceMapping).find(k => k.toLowerCase() === potentialSpeaker.toLowerCase());
+        if (foundKey) {
+          matchedSpeaker = foundKey;
+        }
+      }
+
+      if (match && matchedSpeaker) {
+        const speaker = matchedSpeaker;
         const speech = match[2].trim();
         const voice = voiceMapping[speaker] || "en-US-JennyNeural";
         turns.push({ speaker, text: speech, voice });

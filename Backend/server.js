@@ -1542,10 +1542,12 @@ app.post(
         }
       }
 
-      if (match && matchedSpeaker) {
-        const speaker = matchedSpeaker;
+      const isWordSpeaker = match && !/^\d+$/.test(match[1].trim());
+
+      if (match && (matchedSpeaker || isWordSpeaker)) {
+        const speaker = matchedSpeaker || match[1].trim();
         const speech = match[2].trim();
-        const voice = voiceMapping[speaker] || "en-US-JennyNeural";
+        const voice = voiceMapping[speaker] || voiceMapping["Narrator"] || Object.values(voiceMapping)[0] || "en-US-JennyNeural";
         turns.push({ speaker, text: speech, voice });
       } else {
         if (turns.length > 0) {

@@ -116,9 +116,8 @@ const MultiSpeaker = () => {
 
         const voiceId = newMapping[speaker];
         const voiceObj = voices.find((v) => v.shortName === voiceId);
-        newLanguages[speaker] = voiceObj
-          ? voiceObj.locale
-          : voiceId.split("-").slice(0, 2).join("-");
+        const fullLocale = voiceObj ? voiceObj.locale : (voiceId.split("-").slice(0, 2).join("-") || "de");
+        newLanguages[speaker] = fullLocale.split("-")[0];
       });
 
       setSpeakerLanguages(newLanguages);
@@ -135,7 +134,7 @@ const MultiSpeaker = () => {
         if (!updated[speaker]) {
           const found = voices.find((v) => v.shortName === voiceId);
           if (found) {
-            updated[speaker] = found.locale;
+            updated[speaker] = found.locale.split("-")[0];
           }
         }
       });
@@ -149,7 +148,7 @@ const MultiSpeaker = () => {
       [speaker]: newLocale,
     }));
 
-    const localeVoices = voices.filter((v) => v.locale === newLocale);
+    const localeVoices = voices.filter((v) => v.locale.startsWith(newLocale));
     if (localeVoices.length > 0) {
       setVoiceMapping((prev) => ({
         ...prev,
@@ -324,8 +323,9 @@ const MultiSpeaker = () => {
                         {voices
                           .filter(
                             (v) =>
-                              v.locale ===
-                              (speakerLanguages[speaker] || "de"),
+                              v.locale.startsWith(
+                                speakerLanguages[speaker] || "de",
+                              ),
                           )
                           .map((voice) => (
                             <option

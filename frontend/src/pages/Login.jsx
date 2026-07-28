@@ -3,27 +3,35 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "../utils/motion";
 import { toast } from "react-toastify";
 import { loginUser } from "../utils/auth";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 
 const Login = ({ onLogin }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const result = await loginUser({ email, password });
-    if (!result.success) {
-      toast.error(result.message);
-      return;
-    }
+    setLoading(true);
+    try {
+      const result = await loginUser({ email, password });
+      if (!result.success) {
+        toast.error(result.message);
+        return;
+      }
 
-    onLogin(result.user);
-    toast.success("Logged in successfully");
-    navigate(from, { replace: true });
+      onLogin(result.user);
+      toast.success("Logged in successfully");
+      navigate(from, { replace: true });
+    } catch (error) {
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -48,7 +56,8 @@ const Login = ({ onLogin }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:border-blue-400"
+              disabled={loading}
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:border-blue-400 disabled:opacity-50"
             />
           </div>
 
@@ -60,12 +69,14 @@ const Login = ({ onLogin }) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-3 pr-12 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:border-blue-400"
+                disabled={loading}
+                className="w-full px-4 py-3 pr-12 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:border-blue-400 disabled:opacity-50"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((current) => !current)}
-                className="absolute inset-y-0 right-3 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400/60"
+                disabled={loading}
+                className="absolute inset-y-0 right-3 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400/60 disabled:opacity-50"
                 aria-label={showPassword ? "Hide password" : "Show password"}
                 title={showPassword ? "Hide password" : "Show password"}
               >
@@ -75,12 +86,22 @@ const Login = ({ onLogin }) => {
           </div>
 
           <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={!loading ? { scale: 1.02 } : {}}
+            whileTap={!loading ? { scale: 0.98 } : {}}
             type="submit"
-            className="w-full py-3 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold"
+            disabled={loading}
+            className={`w-full py-3 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold flex items-center justify-center gap-2 transition-all ${
+              loading ? "opacity-70 cursor-not-allowed" : "hover:shadow-lg hover:shadow-blue-500/20"
+            }`}
           >
-            Log In
+            {loading ? (
+              <>
+                <Loader2 className="animate-spin" size={20} />
+                Logging in...
+              </>
+            ) : (
+              "Log In"
+            )}
           </motion.button>
         </form>
 

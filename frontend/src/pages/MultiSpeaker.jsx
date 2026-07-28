@@ -110,7 +110,7 @@ const MultiSpeaker = () => {
           ) {
             newMapping[speaker] = "de-DE-AmalaNeural";
           } else {
-            newMapping[speaker] = "de-DE-ChristophNeural";
+            newMapping[speaker] = "de-DE-KillianNeural";
           }
         }
 

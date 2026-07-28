@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "../utils/motion";
 import { toast } from "react-toastify";
 import { registerUser } from "../utils/auth";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 
 const Register = ({ onRegister }) => {
   const [name, setName] = useState("");
@@ -12,6 +12,7 @@ const Register = ({ onRegister }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
@@ -21,23 +22,30 @@ const Register = ({ onRegister }) => {
       return;
     }
 
-    const result = await registerUser({ name, email, password });
-    if (!result.success) {
-      toast.error(result.message);
-      return;
-    }
+    setLoading(true);
+    try {
+      const result = await registerUser({ name, email, password });
+      if (!result.success) {
+        toast.error(result.message);
+        return;
+      }
 
-    if (result.user.accessStatus !== "approved") {
-      toast.info(
-        "Account request sent. An admin must approve access before login.",
-      );
-      navigate("/login", { replace: true });
-      return;
-    }
+      if (result.user.accessStatus !== "approved") {
+        toast.info(
+          "Account request sent. An admin must approve access before login.",
+        );
+        navigate("/login", { replace: true });
+        return;
+      }
 
-    onRegister(result.user);
-    toast.success("Account created successfully");
-    navigate("/", { replace: true });
+      onRegister(result.user);
+      toast.success("Account created successfully");
+      navigate("/", { replace: true });
+    } catch (error) {
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -64,7 +72,8 @@ const Register = ({ onRegister }) => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:border-blue-400"
+              disabled={loading}
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:border-blue-400 disabled:opacity-50"
             />
           </div>
 
@@ -75,7 +84,8 @@ const Register = ({ onRegister }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:border-blue-400"
+              disabled={loading}
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:border-blue-400 disabled:opacity-50"
             />
           </div>
 
@@ -87,12 +97,14 @@ const Register = ({ onRegister }) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-3 pr-12 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:border-blue-400"
+                disabled={loading}
+                className="w-full px-4 py-3 pr-12 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:border-blue-400 disabled:opacity-50"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((current) => !current)}
-                className="absolute inset-y-0 right-3 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400/60"
+                disabled={loading}
+                className="absolute inset-y-0 right-3 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400/60 disabled:opacity-50"
                 aria-label={showPassword ? "Hide password" : "Show password"}
                 title={showPassword ? "Hide password" : "Show password"}
               >
@@ -111,12 +123,14 @@ const Register = ({ onRegister }) => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className="w-full px-4 py-3 pr-12 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:border-blue-400"
+                disabled={loading}
+                className="w-full px-4 py-3 pr-12 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:border-blue-400 disabled:opacity-50"
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword((current) => !current)}
-                className="absolute inset-y-0 right-3 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400/60"
+                disabled={loading}
+                className="absolute inset-y-0 right-3 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400/60 disabled:opacity-50"
                 aria-label={
                   showConfirmPassword ? "Hide password" : "Show password"
                 }
@@ -128,12 +142,22 @@ const Register = ({ onRegister }) => {
           </div>
 
           <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={!loading ? { scale: 1.02 } : {}}
+            whileTap={!loading ? { scale: 0.98 } : {}}
             type="submit"
-            className="w-full py-3 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold"
+            disabled={loading}
+            className={`w-full py-3 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold flex items-center justify-center gap-2 transition-all ${
+              loading ? "opacity-70 cursor-not-allowed" : "hover:shadow-lg hover:shadow-blue-500/20"
+            }`}
           >
-            Create Account
+            {loading ? (
+              <>
+                <Loader2 className="animate-spin" size={20} />
+                Creating Account...
+              </>
+            ) : (
+              "Create Account"
+            )}
           </motion.button>
         </form>
 

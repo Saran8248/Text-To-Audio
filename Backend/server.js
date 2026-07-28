@@ -1528,10 +1528,24 @@ app.post(
 
     const lines = text.split("\n");
     const turns = [];
+    let currentSpeaker = null;
+    let currentVoice = null;
+
     for (let line of lines) {
       line = line.trim();
       if (!line) continue;
 
+      // 1. Check for speaker definition metadata line (e.g. speaker: saran)
+      const speakerDefineMatch = line.match(/^(speaker|char|character|voice|speaker\s*name|name|voice\s*name|person)\s*:\s*([a-zA-Z0-9\s_-]+)$/i);
+      if (speakerDefineMatch) {
+        const speakerName = speakerDefineMatch[2].trim();
+        currentSpeaker = speakerName;
+        const foundKey = Object.keys(voiceMapping).find(k => k.toLowerCase() === speakerName.toLowerCase());
+        currentVoice = foundKey ? voiceMapping[foundKey] : (voiceMapping["Narrator"] || Object.values(voiceMapping)[0] || "en-US-JennyNeural");
+        continue; // Skip generating audio for the metadata line itself
+      }
+
+      // 2. Regular speaker line (e.g. Saran: Hello)
       const match = line.match(/^([a-zA-Z0-9\s_-]+):(.*)$/);
       let matchedSpeaker = null;
       if (match) {
@@ -1548,16 +1562,21 @@ app.post(
         const speaker = matchedSpeaker || match[1].trim();
         const speech = match[2].trim();
         const voice = voiceMapping[speaker] || voiceMapping["Narrator"] || Object.values(voiceMapping)[0] || "en-US-JennyNeural";
+        
+        // Update active context speaker
+        currentSpeaker = speaker;
+        currentVoice = voice;
+        
         turns.push({ speaker, text: speech, voice });
       } else {
-        if (turns.length > 0) {
+        // Plain text / list items get spoken by the active context speaker
+        const activeSpeaker = currentSpeaker || "Narrator";
+        const activeVoice = currentVoice || voiceMapping["Narrator"] || Object.values(voiceMapping)[0] || "en-US-JennyNeural";
+
+        if (turns.length > 0 && turns[turns.length - 1].speaker === activeSpeaker) {
           turns[turns.length - 1].text += " " + line;
         } else {
-          const voice =
-            voiceMapping["Narrator"] ||
-            Object.values(voiceMapping)[0] ||
-            "en-US-JennyNeural";
-          turns.push({ speaker: "Narrator", text: line, voice });
+          turns.push({ speaker: activeSpeaker, text: line, voice: activeVoice });
         }
       }
     }

@@ -1536,7 +1536,7 @@ app.post(
       if (!line) continue;
 
       // 1. Check for speaker definition metadata line (e.g. speaker: saran)
-      const speakerDefineMatch = line.match(/^(speaker|char|character|voice|speaker\s*name|name|voice\s*name|person)\s*:\s*([a-zA-Z0-9\s_-]+)$/i);
+      const speakerDefineMatch = line.match(/^(speaker|char|character|voice|speaker\s*name|name|voice\s*name|person)\s*:\s*([\p{L}\p{N}\s_-]+)$/iu);
       if (speakerDefineMatch) {
         const speakerName = speakerDefineMatch[2].trim();
         currentSpeaker = speakerName;
@@ -1546,7 +1546,7 @@ app.post(
       }
 
       // 2. Regular speaker line (e.g. Saran: Hello)
-      const match = line.match(/^([a-zA-Z0-9\s_-]+):(.*)$/);
+      const match = line.match(/^([\p{L}\p{N}\s_-]+):(.*)$/u);
       let matchedSpeaker = null;
       if (match) {
         const potentialSpeaker = match[1].trim();

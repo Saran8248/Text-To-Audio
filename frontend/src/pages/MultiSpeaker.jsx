@@ -71,7 +71,7 @@ const MultiSpeaker = () => {
     const uniqueSpeakers = new Set();
 
     lines.forEach((line) => {
-      const match = line.trim().match(/^([a-zA-Z0-9\s_-]+):/);
+      const match = line.trim().match(/^([\p{L}\p{N}\s_-]+):/u);
       if (match) {
         const potentialSpeaker = match[1].trim();
         if (!/^\d+$/.test(potentialSpeaker)) {

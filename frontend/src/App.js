@@ -16,13 +16,9 @@ import MultiSpeaker from './pages/MultiSpeaker';
 import AudioToText from './pages/AudioToText';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import { getCurrentUser, isAdmin, logout as authLogout, refreshCurrentUser } from './utils/auth';
+import { getCurrentUser, isAdmin, logout as authLogout, refreshCurrentUser, loginUser } from './utils/auth';
 
 const RequireAuth = ({ user, children }) => {
-  const location = useLocation();
-  if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
   return children;
 };
 
@@ -59,22 +55,22 @@ const ProtectedLayout = ({ user, onLogout, onUpdateUser, theme, onThemeChange })
   </div>
 );
 
-function App() {
-  const [user, setUser] = useState(getCurrentUser());
-  const [theme, setTheme] = useState(() => localStorage.getItem('terra_tern_theme') || 'dark');
+const defaultAdminUser = {
+  id: 1782834818981,
+  name: "Saran Admin",
+  email: "sksaran987@gmail.com",
+  role: "admin",
+  accessStatus: "approved",
+  profile: {
+    displayName: "Saran Admin",
+    email: "sksaran987@gmail.com",
+    avatarUrl: ""
+  }
+};
 
-  useEffect(() => {
-    refreshCurrentUser()
-      .then((currentUser) => {
-        if (currentUser) {
-          setUser(currentUser);
-        }
-      })
-      .catch(() => {
-        authLogout();
-        setUser(null);
-      });
-  }, []);
+function App() {
+  const [user, setUser] = useState(defaultAdminUser);
+  const [theme, setTheme] = useState(() => localStorage.getItem('terra_tern_theme') || 'dark');
 
   useEffect(() => {
     document.body.classList.toggle('theme-light', theme === 'light');
@@ -83,8 +79,7 @@ function App() {
   }, [theme]);
 
   const handleLogout = async () => {
-    await authLogout();
-    setUser(null);
+    // Logout is disabled since login is removed
   };
 
   const handleThemeToggle = () => setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
@@ -92,14 +87,10 @@ function App() {
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
-        <Route path="/login" element={<Login onLogin={setUser} />} />
-        <Route path="/register" element={<Register onRegister={setUser} />} />
         <Route
           path="/*"
           element={
-            <RequireAuth user={user}>
-              <ProtectedLayout user={user} onLogout={handleLogout} onUpdateUser={setUser} theme={theme} onThemeChange={handleThemeToggle} />
-            </RequireAuth>
+            <ProtectedLayout user={user} onLogout={handleLogout} onUpdateUser={setUser} theme={theme} onThemeChange={handleThemeToggle} />
           }
         />
       </Routes>

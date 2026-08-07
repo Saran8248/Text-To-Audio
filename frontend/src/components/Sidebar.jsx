@@ -8,20 +8,18 @@ import {
   Music,
   History,
   Settings,
-  LogOut,
   ShieldCheck,
   GitMerge,
   Users,
   FileText,
   Files,
 } from "lucide-react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { isAdmin } from "../utils/auth";
 
 const Sidebar = ({ user, onLogout }) => {
   const [isOpen, setIsOpen] = useState(true);
   const location = useLocation();
-  const navigate = useNavigate();
 
   const menuItems = [
     { name: "Dashboard", icon: Home, path: "/" },
@@ -172,18 +170,6 @@ const Sidebar = ({ user, onLogout }) => {
                 )}
               </div>
             </div>
-            <button
-              onClick={() => {
-                if (onLogout) {
-                  onLogout();
-                }
-                navigate("/login");
-              }}
-              className="w-full flex items-center gap-2 px-4 py-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-            >
-              <LogOut size={18} />
-              <span className="text-sm font-medium">Logout</span>
-            </button>
           </motion.div>
         </div>
       </motion.div>

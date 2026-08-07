@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -15,13 +15,8 @@ import MergeAudio from './pages/MergeAudio';
 import MergeWord from './pages/MergeWord';
 import MultiSpeaker from './pages/MultiSpeaker';
 import AudioToText from './pages/AudioToText';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import { getCurrentUser, isAdmin, logout as authLogout, refreshCurrentUser, loginUser } from './utils/auth';
+import { isAdmin } from './utils/auth';
 
-const RequireAuth = ({ user, children }) => {
-  return children;
-};
 
 const RequireAdmin = ({ user, children }) => {
   if (!isAdmin(user)) {

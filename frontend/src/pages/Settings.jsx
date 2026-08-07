@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion } from "../utils/motion";
 import {
   Bell,
@@ -17,13 +16,11 @@ import {
 } from "lucide-react";
 import { toast } from "react-toastify";
 import {
-  deleteUserAccount,
   getCurrentUser,
   updateUserProfile,
 } from "../utils/auth";
 
 const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
-  const navigate = useNavigate();
   const fileInputRef = useRef(null);
 
   const [settings, setSettings] = useState({
@@ -183,24 +180,6 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
     }, 1500);
   };
 
-  const handleDeleteAccount = async () => {
-    if (
-      !window.confirm("This will permanently delete your account. Continue?")
-    ) {
-      return;
-    }
-
-    const result = await deleteUserAccount();
-    if (result.success) {
-      toast.success("Account deleted successfully");
-      if (onLogout) {
-        onLogout();
-      }
-      navigate("/login");
-    } else {
-      toast.error(result.message || "Unable to delete account");
-    }
-  };
 
   const handleToggle = (key) => {
     setSettings({ ...settings, [key]: !settings[key] });
@@ -711,23 +690,6 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
             </motion.button>
           </form>
         </div>
-      </motion.div>
-
-      {/* Danger Zone */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="glass p-6 rounded-2xl border border-red-500/20 bg-red-500/5"
-      >
-        <h3 className="text-xl font-semibold text-red-400 mb-6">Danger Zone</h3>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={handleDeleteAccount}
-          className="px-6 py-3 bg-red-500/20 border border-red-500/30 rounded-lg font-medium text-red-400 hover:bg-red-500/30 transition-colors"
-        >
-          Delete Account
-        </motion.button>
       </motion.div>
     </div>
   );

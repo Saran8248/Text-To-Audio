@@ -165,7 +165,7 @@ const Dashboard = ({ user }) => {
         <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-3xl -z-0" />
         <div className="relative z-10">
           <h1 className="text-4xl font-bold text-white mb-2">
-            Welcome back, {user?.name || "User"}
+            Welcome to Terra Tern
           </h1>
           <p className="text-gray-400 mb-6">
             You've generated {stats.thisMonth} audio files this month. Keep

@@ -1,18 +1,14 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "../utils/motion";
 import {
   Bell,
-  ChevronDown,
   Sun,
   Moon,
 } from "lucide-react";
 
 
 const Navbar = ({ user, onLogout, theme, onToggleTheme }) => {
-  const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
   const isDark = theme === "dark";
 
 
@@ -113,69 +109,6 @@ const Navbar = ({ user, onLogout, theme, onToggleTheme }) => {
               </AnimatePresence>
             </div>
 
-            {/* Profile Dropdown */}
-            <div className="relative">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                onClick={() => setShowProfile(!showProfile)}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg glass-sm hover:bg-white/10"
-              >
-                <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center text-white text-xs font-semibold bg-gradient-to-br from-blue-400 to-purple-600 shadow-inner">
-                  {user?.profile?.avatarUrl ? (
-                    <img
-                      src={user.profile.avatarUrl}
-                      alt="Avatar"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : user?.name ? (
-                    user.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")
-                      .slice(0, 2)
-                      .toUpperCase()
-                  ) : (
-                    "U"
-                  )}
-                </div>
-                <span className="text-sm font-medium text-white hidden sm:inline">
-                  {user?.name || user?.email || "User"}
-                </span>
-                <ChevronDown
-                  size={16}
-                  className={`text-gray-400 transition-transform ${showProfile ? "rotate-180" : ""}`}
-                />
-              </motion.button>
-
-              <AnimatePresence>
-                {showProfile && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="absolute right-0 top-full mt-2 w-48 glass rounded-2xl border border-white/10 overflow-hidden shadow-xl"
-                  >
-                    <div className="p-4 border-b border-white/10">
-                      <p className="text-sm font-medium text-white">
-                        {user?.email || "Logged in user"}
-                      </p>
-                    </div>
-                    <div className="p-2 space-y-1">
-                      <motion.button
-                        whileHover={{ x: 4 }}
-                        onClick={() => {
-                          navigate("/settings");
-                          setShowProfile(false);
-                        }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
-                      >
-                        Settings
-                      </motion.button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
           </div>
         </div>
       </div>

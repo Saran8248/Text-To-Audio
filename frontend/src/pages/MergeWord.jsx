@@ -23,7 +23,7 @@ const MergeWord = () => {
   const [alignment, setAlignment] = useState("left"); // left, center, right, justify
   const [mergeType, setMergeType] = useState("page-break"); // page-break, continuous, double-space
   const [isMerging, setIsMerging] = useState(false);
-  const [mergedBlob, setMergedBlob] = useState(null);
+  const [, setMergedBlob] = useState(null);
   const [mergedUrl, setMergedUrl] = useState(null);
   const [dragActive, setDragActive] = useState(false);
   const [mammothLoaded, setMammothLoaded] = useState(false);

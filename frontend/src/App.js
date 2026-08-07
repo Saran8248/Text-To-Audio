@@ -10,20 +10,13 @@ import TextToSpeech from './pages/TextToSpeech';
 import VoiceLibrary from './pages/VoiceLibrary';
 import History from './pages/History';
 import Settings from './pages/Settings';
-import AdminAccess from './pages/AdminAccess';
 import MergeAudio from './pages/MergeAudio';
 import MergeWord from './pages/MergeWord';
 import MultiSpeaker from './pages/MultiSpeaker';
 import AudioToText from './pages/AudioToText';
-import { isAdmin } from './utils/auth';
 
 
-const RequireAdmin = ({ user, children }) => {
-  if (!isAdmin(user)) {
-    return <Navigate to="/" replace />;
-  }
-  return children;
-};
+
 
 const ProtectedLayout = ({ user, onLogout, onUpdateUser, theme, onThemeChange }) => (
   <div className={`flex h-screen ${theme === 'light' ? 'bg-slate-100 text-slate-900' : 'bg-dark-950 text-white'}`}>
@@ -42,7 +35,7 @@ const ProtectedLayout = ({ user, onLogout, onUpdateUser, theme, onThemeChange })
             <Route path="/merge-word" element={<MergeWord user={user} />} />
             <Route path="/transcribe" element={<AudioToText />} />
             <Route path="/api-keys" element={<Navigate to="/" replace />} />
-            <Route path="/admin" element={<RequireAdmin user={user}><AdminAccess currentUser={user} onUpdateUser={onUpdateUser} /></RequireAdmin>} />
+
             <Route path="/settings" element={<Settings user={user} onUpdateUser={onUpdateUser} theme={theme} onThemeChange={onThemeChange} onLogout={onLogout} />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

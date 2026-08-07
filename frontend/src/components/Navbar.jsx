@@ -6,9 +6,8 @@ import {
   ChevronDown,
   Sun,
   Moon,
-  ShieldCheck,
 } from "lucide-react";
-import { isAdmin } from "../utils/auth";
+
 
 const Navbar = ({ user, onLogout, theme, onToggleTheme }) => {
   const navigate = useNavigate();
@@ -49,17 +48,6 @@ const Navbar = ({ user, onLogout, theme, onToggleTheme }) => {
 
           {/* Right side */}
           <div className="flex items-center gap-4">
-            {isAdmin(user) && (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => navigate("/admin")}
-                className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
-              >
-                <ShieldCheck size={18} />
-                <span className="text-sm font-medium">Admin</span>
-              </motion.button>
-            )}
 
             {/* Theme Toggle */}
             <motion.button

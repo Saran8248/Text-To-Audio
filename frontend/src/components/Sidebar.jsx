@@ -8,14 +8,13 @@ import {
   Music,
   History,
   Settings,
-  ShieldCheck,
   GitMerge,
   Users,
   FileText,
   Files,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { isAdmin } from "../utils/auth";
+
 
 const Sidebar = ({ user, onLogout }) => {
   const [isOpen, setIsOpen] = useState(true);
@@ -30,9 +29,6 @@ const Sidebar = ({ user, onLogout }) => {
     { name: "Merge Word", icon: Files, path: "/merge-word" },
     { name: "Audio to Text", icon: FileText, path: "/transcribe", isNew: true },
     { name: "History", icon: History, path: "/history" },
-    ...(isAdmin(user)
-      ? [{ name: "Admin Access", icon: ShieldCheck, path: "/admin" }]
-      : []),
     { name: "Settings", icon: Settings, path: "/settings" },
   ];
 
@@ -165,9 +161,6 @@ const Sidebar = ({ user, onLogout }) => {
                 <p className="text-xs text-gray-400 truncate">
                   {user?.email || "user@example.com"}
                 </p>
-                {isAdmin(user) && (
-                  <p className="text-xs text-emerald-300">Admin access</p>
-                )}
               </div>
             </div>
           </motion.div>

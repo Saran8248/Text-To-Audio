@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "../utils/motion";
 import {
   Upload,
   FileText,
@@ -287,10 +286,7 @@ const MergeWord = () => {
   return (
     <div className="space-y-8 max-w-4xl">
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex justify-between items-start"
+      <div className="flex justify-between items-start"
       >
         <div>
           <h1 className="text-4xl font-bold text-white mb-2">Merge Word</h1>
@@ -299,23 +295,18 @@ const MergeWord = () => {
           </p>
         </div>
         {documents.length > 0 && (
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            onClick={resetAll}
+          <button onClick={resetAll}
             className="flex items-center gap-1.5 px-4 py-2 border border-red-500/20 bg-red-500/5 text-red-400 rounded-xl text-sm font-medium hover:bg-red-500/10 transition-all"
           >
             <RefreshCw size={15} />
             Reset All
-          </motion.button>
+          </button>
         )}
-      </motion.div>
+      </div>
 
       {/* Screen 1: File Uploader */}
       {documents.length === 0 ? (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          onDragEnter={handleDrag}
+        <div onDragEnter={handleDrag}
           onDragOver={handleDrag}
           onDragLeave={handleDrag}
           onDrop={handleDrop}
@@ -343,22 +334,16 @@ const MergeWord = () => {
           <p className="text-gray-400 mb-6 max-w-sm">
             Select or Drag & Drop Word (.docx) or plain text (.txt) files to combine them.
           </p>
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="px-6 py-3 rounded-2xl bg-blue-500 text-white font-medium hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/25"
+          <button className="px-6 py-3 rounded-2xl bg-blue-500 text-white font-medium hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/25"
           >
             Select Word Files
-          </motion.button>
-        </motion.div>
+          </button>
+        </div>
       ) : (
         /* Screen 2: Document Editor & Merger */
         <div className="space-y-6">
           {/* Controls Bar */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col md:flex-row justify-between items-start md:items-center p-5 glass rounded-2xl border border-white/10 gap-6"
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-5 glass rounded-2xl border border-white/10 gap-6"
           >
             {/* Merge Options */}
             <div className="flex flex-wrap items-center gap-6">
@@ -423,14 +408,11 @@ const MergeWord = () => {
             </div>
 
             <div className="flex gap-3 w-full md:w-auto self-end md:self-auto">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => fileInputRef.current.click()}
+              <button onClick={() => fileInputRef.current.click()}
                 className="flex-1 md:flex-none px-4 py-2 border border-white/10 hover:bg-white/5 rounded-xl text-sm font-medium text-white transition-colors"
               >
                 + Add Files
-              </motion.button>
+              </button>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -440,28 +422,22 @@ const MergeWord = () => {
                 onChange={handleFileSelect}
               />
             </div>
-          </motion.div>
+          </div>
 
           {/* Document List */}
           <div className="space-y-3">
-            <AnimatePresence initial={false}>
+            
               {documents.map((doc, idx) => (
-                <motion.div
-                  key={doc.id}
-                  initial={{ opacity: 0, x: -30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 30 }}
-                  layout
+                <div
+                  key={doc.id} layout
                   className="flex items-center gap-4 p-4 glass rounded-2xl border border-white/10 group"
                 >
                   {/* Delete Button */}
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    onClick={() => deleteDocument(doc.id)}
+                  <button onClick={() => deleteDocument(doc.id)}
                     className="p-2 border border-red-500/20 bg-red-500/5 text-red-400 rounded-xl hover:bg-red-500/15"
                   >
                     <Trash2 size={16} />
-                  </motion.button>
+                  </button>
 
                   {/* Document Details */}
                   <div className="flex-1 min-w-0 flex items-center gap-3">
@@ -495,38 +471,29 @@ const MergeWord = () => {
                       <ArrowDown size={15} />
                     </button>
                   </div>
-                </motion.div>
+                </div>
               ))}
-            </AnimatePresence>
+            
           </div>
 
           {/* Merge Trigger Button */}
           {!mergedUrl && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex justify-end pt-2"
+            <div className="flex justify-end pt-2"
             >
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleMerge}
+              <button onClick={handleMerge}
                 disabled={isMerging || documents.length < 2}
                 className="px-8 py-3 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 font-medium text-white hover:shadow-lg disabled:opacity-50"
               >
                 {isMerging ? "Merging Documents..." : "Merge Documents"}
-              </motion.button>
-            </motion.div>
+              </button>
+            </div>
           )}
         </div>
       )}
 
       {/* Screen 3: Merged Results Panel */}
       {mergedUrl && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="glass p-6 rounded-3xl border border-emerald-500/20 bg-emerald-500/5 space-y-6"
+        <div className="glass p-6 rounded-3xl border border-emerald-500/20 bg-emerald-500/5 space-y-6"
         >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
@@ -562,7 +529,7 @@ const MergeWord = () => {
               </a>
             </div>
           </div>
-        </motion.div>
+        </div>
       )}
     </div>
   );

@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import { motion } from "../utils/motion";
 import {
   Bell,
   Moon,
@@ -208,7 +207,7 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
     value,
     onChange,
   }) => (
-    <div className="flex items-center justify-between p-4 glass-sm rounded-lg border border-white/5 hover:border-white/10">
+    <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 shadow-sm rounded-lg border border-white/5 hover:border-white/10">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
           <Icon size={20} className="text-blue-400" />
@@ -218,40 +217,29 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
           <p className="text-xs text-gray-400 mt-1">{description}</p>
         </div>
       </div>
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        onClick={onChange}
+      <button onClick={onChange}
         className={`relative w-12 h-6 rounded-full transition-colors ${
           value ? "bg-blue-500" : "bg-gray-600"
         }`}
       >
-        <motion.div
-          initial={false}
-          animate={{ x: value ? 24 : 4 }}
-          className="absolute top-1 left-1 w-4 h-4 bg-white rounded-full"
+        <div className="absolute top-1 left-1 w-4 h-4 bg-white rounded-full"
         />
-      </motion.button>
+      </button>
     </div>
   );
 
   return (
     <div className="space-y-8 max-w-4xl">
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
+      <div >
         <h1 className="text-4xl font-bold text-white mb-2">Settings</h1>
         <p className="text-gray-400">
           Manage your profile, preferences, security, and contact support
         </p>
-      </motion.div>
+      </div>
 
       {/* Profile Settings */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="glass p-6 rounded-2xl border border-white/10"
+      <div className="glass p-6 rounded-2xl border border-white/10"
       >
         <h3 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
           <User className="text-blue-400" size={22} />
@@ -319,23 +307,17 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:border-blue-400 focus:outline-none"
               />
             </div>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={handleProfileSave}
+            <button onClick={handleProfileSave}
               className="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg font-medium text-white hover:shadow-lg"
             >
               Save Profile
-            </motion.button>
+            </button>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Security & Password Changing (Professional Form) */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="glass p-6 rounded-2xl border border-white/10"
+      <div className="glass p-6 rounded-2xl border border-white/10"
       >
         <h3 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
           <Shield className="text-blue-400" size={22} />
@@ -403,14 +385,11 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
             </div>
           </div>
 
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            type="submit"
+          <button type="submit"
             className="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg font-medium text-white hover:shadow-lg"
           >
             Update Password
-          </motion.button>
+          </button>
         </form>
 
         <div className="mt-6 pt-6 border-t border-white/10">
@@ -422,13 +401,10 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
             onChange={() => handleToggle("twoFactor")}
           />
         </div>
-      </motion.div>
+      </div>
 
       {/* Preferences */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="glass p-6 rounded-2xl border border-white/10"
+      <div className="glass p-6 rounded-2xl border border-white/10"
       >
         <h3 className="text-xl font-semibold text-white mb-6">Preferences</h3>
         <div className="space-y-4">
@@ -558,7 +534,7 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
               Theme
             </label>
             <div className="flex gap-3">
-              <motion.button
+              <button
                 onClick={() => handleThemeChange("dark")}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
                   settings.theme === "dark"
@@ -568,8 +544,8 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
               >
                 <Moon size={18} />
                 Dark
-              </motion.button>
-              <motion.button
+              </button>
+              <button
                 onClick={() => handleThemeChange("light")}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
                   settings.theme === "light"
@@ -579,17 +555,14 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
               >
                 <Sun size={18} />
                 Light
-              </motion.button>
+              </button>
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Notifications */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="glass p-6 rounded-2xl border border-white/10"
+      <div className="glass p-6 rounded-2xl border border-white/10"
       >
         <h3 className="text-xl font-semibold text-white mb-6">Notifications</h3>
         <div className="space-y-4">
@@ -608,13 +581,10 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
             onChange={() => handleToggle("emailUpdates")}
           />
         </div>
-      </motion.div>
+      </div>
 
       {/* Help & Customer Support (Contact Support) */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="glass p-6 rounded-2xl border border-white/10"
+      <div className="glass p-6 rounded-2xl border border-white/10"
       >
         <h3 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
           <HelpCircle className="text-blue-400" size={22} />
@@ -678,19 +648,16 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:border-blue-400 focus:outline-none resize-none"
               />
             </div>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              type="submit"
+            <button type="submit"
               disabled={isSubmittingSupport}
               className="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg font-medium text-white flex items-center gap-2 hover:shadow-lg disabled:opacity-50"
             >
               <Send size={16} />
               {isSubmittingSupport ? "Sending..." : "Send Message"}
-            </motion.button>
+            </button>
           </form>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "../utils/motion";
 import {
   Bell,
 } from "lucide-react";
@@ -7,9 +6,6 @@ import {
 
 const Navbar = ({ user, onLogout, theme, onToggleTheme }) => {
   const [showNotifications, setShowNotifications] = useState(false);
-
-
-
 
   const notifications = [
     {
@@ -33,7 +29,7 @@ const Navbar = ({ user, onLogout, theme, onToggleTheme }) => {
   ];
 
   return (
-    <div className="sticky top-0 z-30 glass-dark border-b border-ember-500/20 backdrop-blur-xl">
+    <div className="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-sm">
       <div className="max-w-full px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between">
           {/* Left side */}
@@ -45,56 +41,46 @@ const Navbar = ({ user, onLogout, theme, onToggleTheme }) => {
 
             {/* Notifications */}
             <div className="relative">
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
+              <button
                 onClick={() => setShowNotifications(!showNotifications)}
-                className="relative p-2 rounded-lg glass-sm hover:bg-void-800/50 text-ember-400 hover:text-ember-50 hover:shadow-glow-sm"
+                className="relative p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-colors"
               >
                 <Bell size={20} />
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute top-1 right-1 w-2.5 h-2.5 bg-ember-500 rounded-full shadow-glow-sm"
+                <div
+                  className="absolute top-1 right-1 w-2.5 h-2.5 bg-sky-500 rounded-full border-2 border-white"
                 />
-              </motion.button>
+              </button>
 
-              <AnimatePresence>
+              
                 {showNotifications && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="absolute right-0 top-full mt-2 w-80 glass-dark rounded-2xl border border-ember-500/20 overflow-hidden shadow-glow-ember"
+                  <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl border border-slate-200 overflow-hidden shadow-elevated"
                   >
-                    <div className="p-4 border-b border-ember-500/20">
-                      <h3 className="font-semibold text-ember-50">
+                    <div className="p-4 border-b border-slate-100">
+                      <h3 className="font-semibold text-slate-900">
                         Notifications
                       </h3>
                     </div>
-                    <div className="divide-y divide-ember-500/10 max-h-96 overflow-y-auto">
+                    <div className="divide-y divide-slate-100 max-h-96 overflow-y-auto">
                       {notifications.map((notif) => (
-                        <motion.div
+                        <div
                           key={notif.id}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          className="p-4 hover:bg-void-800/50 cursor-pointer transition-colors"
+                          className="p-4 hover:bg-slate-50 cursor-pointer transition-colors"
                         >
-                          <p className="font-medium text-ember-100 text-sm">
+                          <p className="font-medium text-slate-800 text-sm">
                             {notif.title}
                           </p>
-                          <p className="text-xs text-ember-400 mt-1">
+                          <p className="text-xs text-slate-500 mt-1">
                             {notif.message}
                           </p>
-                          <p className="text-xs text-void-500 mt-2">
+                          <p className="text-xs text-slate-400 mt-2">
                             {notif.time}
                           </p>
-                        </motion.div>
+                        </div>
                       ))}
                     </div>
-                  </motion.div>
+                  </div>
                 )}
-              </AnimatePresence>
+              
             </div>
 
           </div>

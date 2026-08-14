@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { motion } from "../utils/motion";
 import { toast } from "react-toastify";
 import { loginUser } from "../utils/auth";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
@@ -36,10 +35,7 @@ const Login = ({ onLogin }) => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-dark-950 px-4 py-10">
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md glass p-8 rounded-3xl border border-white/10"
+      <div className="w-full max-w-md glass p-8 rounded-3xl border border-white/10"
       >
         <div className="mb-8 text-center">
           <h1 className="text-4xl font-bold text-white">Terra Tern</h1>
@@ -85,7 +81,7 @@ const Login = ({ onLogin }) => {
             </div>
           </div>
 
-          <motion.button
+          <button
             whileHover={!loading ? { scale: 1.02 } : {}}
             whileTap={!loading ? { scale: 0.98 } : {}}
             type="submit"
@@ -102,7 +98,7 @@ const Login = ({ onLogin }) => {
             ) : (
               "Log In"
             )}
-          </motion.button>
+          </button>
         </form>
 
         <p className="mt-6 text-center text-gray-400">
@@ -111,7 +107,7 @@ const Login = ({ onLogin }) => {
             Create an account
           </Link>
         </p>
-      </motion.div>
+      </div>
     </div>
   );
 };

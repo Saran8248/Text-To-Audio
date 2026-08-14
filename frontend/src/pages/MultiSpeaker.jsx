@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { motion, Reorder } from "framer-motion";
 import { Users, Cpu, CheckCircle, Download } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -228,32 +227,27 @@ const MultiSpeaker = () => {
   return (
     <div className="space-y-8 max-w-4xl">
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <h1 className="text-4xl font-bold text-ember-50 mb-2 tracking-wide uppercase">
+      <div>
+        <h1 className="text-4xl font-bold text-slate-900 mb-2 tracking-wide uppercase">
           Multi Speaker Script
         </h1>
-        <p className="text-ember-400/80">
+        <p className="text-slate-600">
           Paste your dialog conversation and map distinct voices to each speaker
           dynamically.
         </p>
-      </motion.div>
+      </div>
 
       {/* Main Single Configuration Card */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="glass-dark p-8 rounded-3xl border border-ember-500/20 space-y-8 shadow-glow-sm relative overflow-hidden"
+      <div
+        className="glass p-8 rounded-3xl border border-slate-200 space-y-8 shadow-sm relative overflow-hidden"
       >
         {/* Paste Conversation Section */}
         <div className="relative z-10">
-          <h3 className="text-xl font-bold text-ember-50 mb-4 flex items-center gap-3">
-            <Cpu size={24} className="text-crimson-500" />
+          <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-3">
+            <Cpu size={24} className="text-sky-500" />
             Script Input
           </h3>
-          <div className="p-1 rounded-2xl bg-gradient-to-r from-ember-500/30 via-crimson-500/30 to-ember-500/30">
+          <div className="p-1 rounded-2xl bg-slate-100 border border-slate-200">
             <textarea
               value={conversationText}
               onChange={(e) => {
@@ -262,36 +256,34 @@ const MultiSpeaker = () => {
               }}
               placeholder="Paste your script dialog here (e.g. Tom: Hello)..."
               rows="8"
-              className="w-full px-6 py-5 bg-void-950/90 rounded-[14px] text-ember-50 placeholder-ember-500/30 focus:outline-none resize-none font-mono text-sm leading-relaxed tracking-wide"
+              className="w-full px-6 py-5 bg-white rounded-[14px] text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-brand-500 resize-none font-mono text-sm leading-relaxed tracking-wide"
             />
           </div>
         </div>
 
         {/* Detected Speakers Section (Directly Downside of the Box) */}
-        <div className="pt-8 border-t border-ember-500/20 space-y-6 relative z-10">
-          <h3 className="text-xl font-bold text-ember-50 flex items-center gap-3">
-            <Users size={24} className="text-crimson-500" />
+        <div className="pt-8 border-t border-slate-200 space-y-6 relative z-10">
+          <h3 className="text-xl font-bold text-slate-900 flex items-center gap-3">
+            <Users size={24} className="text-sky-500" />
             Dialogue Blocks
           </h3>
 
           {Object.keys(voiceMapping).length === 0 ? (
-            <p className="text-sm text-ember-400/60 italic">
+            <p className="text-sm text-slate-500 italic">
               No speakers detected. Type conversation lines (e.g. "Tom: Hallo")
               to configure speaker voices below.
             </p>
           ) : (
-            <Reorder.Group axis="y" values={speakerOrder} onReorder={setSpeakerOrder} className="space-y-4 relative">
-              <div className="absolute inset-y-0 left-5 w-[1px] bg-ember-500/20 shadow-[0_0_10px_#ffa62e] -z-10" />
+            <div className="space-y-4 relative">
+              <div className="absolute inset-y-0 left-5 w-[1px] bg-slate-200 -z-10" />
               {speakerOrder.map((speaker) => (
-                <Reorder.Item
+                <div
                   key={speaker}
-                  value={speaker}
-                  whileDrag={{ scale: 1.05, rotate: 2, boxShadow: "0px 20px 40px rgba(255, 166, 46, 0.4)" }}
-                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 glass-dark rounded-xl border border-ember-500/20 hover:border-ember-500/50 transition-all gap-6 bg-void-900/80 cursor-grab active:cursor-grabbing group shadow-glow-sm"
+                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 bg-white rounded-xl border border-slate-200 gap-6 shadow-sm"
                 >
                   <div className="flex items-center gap-4 min-w-[140px]">
-                    <span className="w-3 h-3 rounded-full bg-crimson-500 shadow-glow-ember ring-4 ring-void-950" />
-                    <span className="font-bold text-ember-50 truncate text-lg tracking-wide group-hover:text-ember-400 transition-colors">
+                    <span className="w-3 h-3 rounded-full bg-sky-500 shadow-sm ring-4 ring-brand-50" />
+                    <span className="font-bold text-slate-900 truncate text-lg tracking-wide">
                       {speaker}
                     </span>
                   </div>
@@ -304,19 +296,19 @@ const MultiSpeaker = () => {
                         onChange={(e) =>
                           handleLanguageChange(speaker, e.target.value)
                         }
-                        className="w-full pl-4 pr-10 py-3 bg-void-800/50 border border-void-700 rounded-lg text-ember-50 focus:border-ember-500 focus:outline-none appearance-none cursor-pointer text-sm font-medium hover:border-ember-500/50"
+                        className="w-full pl-4 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:border-sky-500 focus:outline-none appearance-none cursor-pointer text-sm font-medium hover:border-slate-300"
                       >
                         {Object.entries(localeNames).map(([locale, name]) => (
                           <option
                             key={locale}
                             value={locale}
-                            className="bg-void-950 text-ember-50"
+                            className="bg-white text-slate-900"
                           >
                             {name}
                           </option>
                         ))}
                       </select>
-                      <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-ember-500">
+                      <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-slate-400">
                         <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                           <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
                         </svg>
@@ -330,7 +322,7 @@ const MultiSpeaker = () => {
                         onChange={(e) =>
                           handleVoiceChange(speaker, e.target.value)
                         }
-                        className="w-full pl-4 pr-10 py-3 bg-void-800/50 border border-void-700 rounded-lg text-ember-50 focus:border-ember-500 focus:outline-none appearance-none cursor-pointer text-sm font-medium hover:border-ember-500/50"
+                        className="w-full pl-4 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:border-sky-500 focus:outline-none appearance-none cursor-pointer text-sm font-medium hover:border-slate-300"
                       >
                         {voices
                           .filter((v) => v.locale.startsWith(speakerLanguages[speaker] || "de"))
@@ -338,93 +330,88 @@ const MultiSpeaker = () => {
                             <option
                               key={voice.shortName}
                               value={voice.shortName}
-                              className="bg-void-950 text-ember-50"
+                              className="bg-white text-slate-900"
                             >
                               {voice.displayName} ({voice.gender})
                             </option>
                           ))}
                       </select>
-                      <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-ember-500">
+                      <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-slate-400">
                         <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                           <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
                         </svg>
                       </div>
                     </div>
                   </div>
-                </Reorder.Item>
+                </div>
               ))}
-            </Reorder.Group>
+            </div>
           )}
         </div>
 
         {/* Audio Generating Options & Trigger Button (Directly Downside of Speaker Config) */}
-        <div className="pt-8 border-t border-ember-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative z-10">
+        <div className="pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative z-10">
           <div className="flex items-center gap-3">
-            <span className="text-sm text-ember-400 font-medium">
+            <span className="text-sm text-slate-500 font-medium">
               Output Format:
             </span>
-            <label className="flex items-center gap-2 text-ember-50 font-bold text-sm cursor-pointer px-3 py-1.5 rounded-lg bg-void-800 border border-ember-500/30">
+            <label className="flex items-center gap-2 text-slate-900 font-bold text-sm cursor-pointer px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200">
               <input
                 type="radio"
                 name="format"
                 defaultChecked
-                className="w-4 h-4 text-ember-500 border-void-700 bg-void-900 focus:ring-0 focus:ring-offset-0"
+                className="w-4 h-4 text-sky-500 border-slate-300 bg-white focus:ring-0 focus:ring-offset-0"
               />
               MP3
             </label>
           </div>
 
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+          <button
             onClick={handleGenerateAudio}
             disabled={isGenerating || Object.keys(voiceMapping).length === 0}
-            className="w-full sm:w-auto px-10 py-4 bg-liquid-fire shadow-glow-ember hover:shadow-[0_0_30px_rgba(255,166,46,0.6)] rounded-xl font-bold text-white transition-all disabled:opacity-50"
+            className="w-full sm:w-auto px-10 py-4 bg-sky-500 hover:bg-sky-600 rounded-xl font-bold text-white transition-all disabled:opacity-50 shadow-sm"
           >
             {isGenerating ? "Forging Audio..." : "Generate Sequence"}
-          </motion.button>
+          </button>
         </div>
-      </motion.div>
+      </div>
 
       {mergedUrl && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.98, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          className="glass p-6 rounded-3xl border border-crimson-500/30 bg-crimson-500/5 space-y-4 shadow-glow-sm relative overflow-hidden"
+        <div
+          className="glass p-6 rounded-3xl border border-sky-200 bg-sky-50 space-y-4 shadow-sm relative overflow-hidden"
         >
-          <div className="absolute inset-0 bg-liquid-fire opacity-10 pointer-events-none" />
           <div className="flex items-center gap-3 relative z-10">
-            <div className="w-10 h-10 rounded-full bg-crimson-500/20 border border-crimson-500/40 flex items-center justify-center">
-              <CheckCircle className="text-crimson-400" size={20} />
+            <div className="w-10 h-10 rounded-full bg-brand-100 border border-sky-200 flex items-center justify-center">
+              <CheckCircle className="text-sky-600" size={20} />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-ember-50">
+              <h3 className="text-lg font-bold text-slate-900">
                 Forge Complete!
               </h3>
-              <p className="text-xs text-ember-400/80">
+              <p className="text-xs text-slate-600">
                 All dialogue blocks merged into a unified audio artifact.
               </p>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-void-950/80 rounded-2xl border border-ember-500/20 gap-4 relative z-10">
+          <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-white rounded-2xl border border-slate-200 gap-4 relative z-10 shadow-sm">
             <audio
               ref={audioRef}
               src={mergedUrl}
               controls
-              className="w-full flex-1 rounded-lg text-white"
+              className="w-full flex-1 rounded-lg"
             />
 
             <a
               href={mergedUrl}
               download="merged_conversation.mp3"
-              className="flex items-center gap-2 px-5 py-2.5 bg-void-800 border border-ember-500/50 hover:bg-void-700 text-ember-50 text-sm font-semibold rounded-xl hover:shadow-glow-sm transition-all hover:scale-105 active:scale-95 shrink-0"
+              className="flex items-center gap-2 px-5 py-2.5 bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition-all shrink-0"
             >
               <Download size={16} />
               Download MP3
             </a>
           </div>
-        </motion.div>
+        </div>
       )}
     </div>
   );

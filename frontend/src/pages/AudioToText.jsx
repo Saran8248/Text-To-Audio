@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-import { motion } from "../utils/motion";
 import {
   Upload,
   FileAudio,
@@ -324,10 +323,7 @@ const AudioToText = () => {
 
       {!transcriptData && !isTranscribing ? (
         /* Screen 1: File Uploader */
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          onDragEnter={handleDrag}
+        <div onDragEnter={handleDrag}
           onDragOver={handleDrag}
           onDragLeave={handleDrag}
           onDrop={handleDrop}
@@ -395,13 +391,10 @@ const AudioToText = () => {
               </button>
             </div>
           )}
-        </motion.div>
+        </div>
       ) : isTranscribing ? (
         /* Screen 2: Transcribing Loader */
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex flex-col items-center justify-center p-20 glass rounded-3xl border border-white/10"
+        <div className="flex flex-col items-center justify-center p-20 glass rounded-3xl border border-white/10"
         >
           <div className="relative w-20 h-20 mb-8">
             <div className="absolute inset-0 rounded-full border-4 border-white/5" />
@@ -412,16 +405,13 @@ const AudioToText = () => {
           <p className="text-xs text-gray-500 mt-4 max-w-xs text-center">
             This might take up to a minute depending on your audio length. Please keep this tab open.
           </p>
-        </motion.div>
+        </div>
       ) : (
         /* Screen 3: Results Dashboard */
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Transcript Display Box */}
           <div className="lg:col-span-2 space-y-6">
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="glass p-6 rounded-3xl border border-white/10 flex flex-col h-[520px]"
+            <div className="glass p-6 rounded-3xl border border-white/10 flex flex-col h-[520px]"
             >
               <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
                 <div className="flex items-center gap-3">
@@ -497,16 +487,13 @@ const AudioToText = () => {
                     ))
                 )}
               </div>
-            </motion.div>
+            </div>
           </div>
 
           {/* Side Controls Boxes */}
           <div className="space-y-6">
             {/* Box 1: Exporter Control */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="glass p-6 rounded-3xl border border-white/10 space-y-4"
+            <div className="glass p-6 rounded-3xl border border-white/10 space-y-4"
             >
               <h3 className="font-bold text-white text-lg flex items-center gap-2">
                 <Download size={18} className="text-blue-400" />
@@ -553,14 +540,11 @@ const AudioToText = () => {
                   Download File
                 </button>
               </div>
-            </motion.div>
+            </div>
 
             {/* Box 2: Speaker Filter Selection (Shows only for multi-speaker/conversation audio) */}
             {!transcriptData.is_monologue && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="glass p-6 rounded-3xl border border-white/10 space-y-4"
+              <div className="glass p-6 rounded-3xl border border-white/10 space-y-4"
               >
                 <h3 className="font-bold text-white text-lg flex items-center gap-2">
                   <Filter size={18} className="text-purple-400" />
@@ -598,7 +582,7 @@ const AudioToText = () => {
                     </button>
                   ))}
                 </div>
-              </motion.div>
+              </div>
             )}
 
             {/* Reset Button */}

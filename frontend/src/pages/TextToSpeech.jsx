@@ -1,6 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { motion } from "../utils/motion";
-import VortexLoader from "../components/VortexLoader";
 import {
   Play,
   Download,
@@ -196,55 +194,51 @@ const TextToSpeech = () => {
 
   return (
     <div className="space-y-8">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="glass-dark p-6 sm:p-8 rounded-2xl border border-ember-500/20 shadow-glow-sm relative overflow-hidden"
+      <div
+        className="glass p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden"
       >
-        <div className="absolute top-0 right-0 w-64 h-64 bg-ember-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-sky-50 rounded-full blur-3xl pointer-events-none" />
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between relative z-10">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-widest text-crimson-400">
+            <p className="text-sm font-semibold uppercase tracking-widest text-sky-600">
               AI audio studio
             </p>
-            <h1 className="text-3xl sm:text-4xl font-bold text-ember-50 mt-2">
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mt-2">
               Text to Speech
             </h1>
-            <p className="text-ember-400 mt-2 max-w-2xl">
+            <p className="text-slate-600 mt-2 max-w-2xl">
               Create clean MP3 voiceovers with production-ready Edge voices.
             </p>
           </div>
           <div className="grid grid-cols-3 gap-3 text-center">
-            <div className="glass-sm px-4 py-3 rounded-xl border border-ember-500/10">
-              <p className="text-xs text-ember-400">Limit</p>
-              <p className="text-sm font-semibold text-ember-50">5000 chars</p>
+            <div className="bg-slate-50 px-4 py-3 rounded-xl border border-slate-200">
+              <p className="text-xs text-slate-500">Limit</p>
+              <p className="text-sm font-semibold text-slate-900">5000 chars</p>
             </div>
-            <div className="glass-sm px-4 py-3 rounded-xl border border-ember-500/10">
-              <p className="text-xs text-ember-400">Format</p>
-              <p className="text-sm font-semibold text-ember-50">MP3</p>
+            <div className="bg-slate-50 px-4 py-3 rounded-xl border border-slate-200">
+              <p className="text-xs text-slate-500">Format</p>
+              <p className="text-sm font-semibold text-slate-900">MP3</p>
             </div>
-            <div className="glass-sm px-4 py-3 rounded-xl border border-ember-500/10">
-              <p className="text-xs text-ember-400">Voice</p>
-              <p className="text-sm font-semibold text-ember-50">
+            <div className="bg-slate-50 px-4 py-3 rounded-xl border border-slate-200">
+              <p className="text-xs text-slate-500">Voice</p>
+              <p className="text-sm font-semibold text-slate-900">
                 {selectedVoice.split("-").slice(-1)[0].replace("Neural", "")}
               </p>
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+        <div
           className="lg:col-span-2 space-y-6"
         >
-          <div className="glass-dark p-6 rounded-2xl border border-ember-500/10 focus-within:border-ember-500/50 focus-within:shadow-glow-ember transition-all duration-500 group relative">
+          <div className="glass p-6 rounded-2xl border border-slate-200 focus-within:border-sky-500 focus-within:ring-1 focus-within:ring-brand-500 transition-all duration-300 relative">
             <div className="flex items-center justify-between mb-4 relative z-10">
-              <label className="text-lg font-semibold text-ember-50">
+              <label className="text-lg font-semibold text-slate-900">
                 Your Text
               </label>
-              <span className="text-sm text-ember-400">
+              <span className="text-sm text-slate-500">
                 {text.length} / 5000 characters
               </span>
             </div>
@@ -252,96 +246,90 @@ const TextToSpeech = () => {
               value={text}
               onChange={(e) => handleTextChange(e.target.value)}
               placeholder="Speak your mind..."
-              className="w-full h-48 bg-transparent border-0 p-4 text-ember-50 placeholder-ember-500/30 focus:outline-none focus:ring-0 resize-none font-mono tracking-wide relative z-10"
+              className="w-full h-48 bg-transparent border-0 p-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-0 resize-none font-mono tracking-wide relative z-10"
             />
             <div className="flex gap-2 mt-4 relative z-10">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+              <button
                 onClick={handleCopyText}
-                className="flex items-center gap-2 px-4 py-2 glass-sm border border-ember-500/20 rounded-lg text-ember-400 hover:text-ember-50 hover:border-ember-500/50 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
               >
                 <Copy size={18} />
                 Copy
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+              </button>
+              <button
                 onClick={() => {
                   setText("");
                   clearGeneratedAudio("");
                 }}
-                className="flex items-center gap-2 px-4 py-2 glass-sm border border-ember-500/20 rounded-lg text-ember-400 hover:text-ember-50 hover:border-ember-500/50 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
               >
                 <RotateCcw size={18} />
                 Clear
-              </motion.button>
+              </button>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div className="glass-dark p-6 rounded-2xl border border-ember-500/10">
+            <div className="glass p-6 rounded-2xl border border-slate-200">
               <label
                 htmlFor="tts-language"
-                className="block text-sm font-semibold text-ember-50 mb-4"
+                className="block text-sm font-semibold text-slate-900 mb-4"
               >
                 Language
               </label>
               <div className="space-y-2">
                 {languages.map((lang) => (
-                  <motion.button
+                  <button
                     key={lang.id}
                     onClick={() => handleLanguageChange(lang.id)}
-                    whileHover={{ x: 4 }}
                     className={`w-full text-left px-4 py-3 rounded-lg transition-all ${
                       selectedLanguage === lang.id
-                        ? "bg-void-800 border border-ember-500 text-ember-50 shadow-glow-sm animate-pulse-amber"
-                        : "bg-void-900/50 border border-void-700 text-void-400 hover:text-ember-400 hover:border-ember-500/30"
+                        ? "bg-sky-50 border border-sky-200 text-brand-700 font-medium"
+                        : "bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300"
                     }`}
                   >
                     {lang.name}
-                  </motion.button>
+                  </button>
                 ))}
               </div>
             </div>
 
-            <div className="glass-dark p-6 rounded-2xl border border-ember-500/10">
+            <div className="glass p-6 rounded-2xl border border-slate-200">
               <label
                 htmlFor="tts-voice"
-                className="block text-sm font-semibold text-ember-50 mb-4"
+                className="block text-sm font-semibold text-slate-900 mb-4"
               >
                 Voice
               </label>
               <div className="space-y-2">
                 {voices[selectedLanguage] &&
                   voices[selectedLanguage].map((voice) => (
-                    <motion.button
+                    <button
                       key={voice.id}
                       onClick={() => handleVoiceChange(voice.id)}
-                      whileHover={{ x: 4 }}
                       className={`w-full text-left px-4 py-3 rounded-lg transition-all ${
                         selectedVoice === voice.id
-                          ? "bg-void-800 border border-ember-500 text-ember-50 shadow-glow-sm animate-pulse-amber"
-                          : "bg-void-900/50 border border-void-700 text-void-400 hover:text-ember-400 hover:border-ember-500/30"
+                          ? "bg-sky-50 border border-sky-200 text-brand-700 font-medium"
+                          : "bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300"
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-medium">{voice.name}</span>
+                        <span>{voice.name}</span>
                         <span className="text-xs opacity-70">{voice.type}</span>
                       </div>
-                    </motion.button>
+                    </button>
                   ))}
               </div>
             </div>
           </div>
 
-          <div className="glass-dark p-6 rounded-2xl border border-ember-500/10 space-y-6">
+          <div className="glass p-6 rounded-2xl border border-slate-200 space-y-6">
             <div>
               <div className="flex items-center justify-between mb-3">
-                <label className="text-sm font-semibold text-ember-50">
+                <label className="text-sm font-semibold text-slate-900">
                   Speed
                 </label>
-                <span className="text-sm text-ember-400 font-medium">
+                <span className="text-sm text-slate-600 font-medium">
                   {speed.toFixed(2)}x
                 </span>
               </div>
@@ -352,9 +340,9 @@ const TextToSpeech = () => {
                 step="0.1"
                 value={speed}
                 onChange={(e) => setSpeed(parseFloat(e.target.value))}
-                className="w-full h-2 bg-void-800 rounded-lg appearance-none cursor-pointer accent-ember-500"
+                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-500"
               />
-              <div className="flex justify-between text-xs text-void-500 mt-2">
+              <div className="flex justify-between text-xs text-slate-400 mt-2">
                 <span>0.5x</span>
                 <span>2x</span>
               </div>
@@ -362,24 +350,22 @@ const TextToSpeech = () => {
           </div>
 
           {isLoading ? (
-            <div className="w-full mt-4">
-              <VortexLoader />
+            <div className="w-full mt-4 flex items-center justify-center py-4 bg-sky-50 rounded-xl border border-sky-200 text-sky-600">
+              Generating...
             </div>
           ) : (
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            <button
               onClick={handleGenerateAudio}
               disabled={!text.trim()}
-              className={`w-full py-4 mt-4 rounded-xl font-bold text-white flex items-center justify-center gap-2 transition-all ${
+              className={`w-full py-4 mt-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${
                 !text.trim()
-                  ? "bg-void-800 text-void-500 cursor-not-allowed border border-void-700"
-                  : "bg-liquid-fire shadow-glow-ember hover:shadow-[0_0_30px_rgba(255,166,46,0.6)] border border-ember-400/50"
+                  ? "bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200"
+                  : "bg-sky-500 text-white hover:bg-sky-600 shadow-sm"
               }`}
             >
               <Volume2 size={20} />
               Forge Audio
-            </motion.button>
+            </button>
           )}
 
           {(generationStatus || generationError) && (
@@ -393,23 +379,19 @@ const TextToSpeech = () => {
               {generationError || generationStatus}
             </div>
           )}
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
+        <div
           className="lg:col-span-1"
         >
-          <div className="glass-dark p-6 rounded-2xl border border-ember-500/20 sticky top-24 space-y-6">
-            <h3 className="text-lg font-semibold text-ember-50">Audio Preview</h3>
+          <div className="glass p-6 rounded-2xl border border-slate-200 sticky top-24 space-y-6">
+            <h3 className="text-lg font-semibold text-slate-900">Audio Preview</h3>
 
             {audioUrl ? (
               <>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
+                    <button
                       onClick={() => {
                         if (isPlaying) {
                           audioRef.current?.pause();
@@ -421,11 +403,11 @@ const TextToSpeech = () => {
                         }
                         setIsPlaying(!isPlaying);
                       }}
-                      className="w-12 h-12 rounded-full bg-liquid-fire shadow-glow-ember flex items-center justify-center text-white hover:shadow-[0_0_20px_rgba(255,166,46,0.8)]"
+                      className="w-12 h-12 rounded-full bg-sky-500 hover:bg-sky-600 shadow-sm flex items-center justify-center text-white transition-colors"
                     >
                       <Play size={20} fill="white" />
-                    </motion.button>
-                    <span className="text-sm text-ember-400">
+                    </button>
+                    <span className="text-sm text-slate-600">
                       {isPlaying ? "Playing..." : "Ready to play"}
                     </span>
                   </div>
@@ -439,49 +421,45 @@ const TextToSpeech = () => {
                   />
                 </div>
 
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                <button
                   onClick={handleDownload}
-                  className="w-full py-3 bg-void-800 border border-ember-500/30 rounded-lg font-medium text-ember-50 hover:bg-void-700 hover:border-ember-500/50 hover:shadow-glow-sm flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-white border border-slate-200 rounded-lg font-medium text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
                 >
                   <Download size={18} />
                   Download MP3
-                </motion.button>
+                </button>
 
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                <button
                   onClick={handleGenerateAudio}
                   disabled={isLoading || !text.trim()}
                   className={`w-full py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-all ${
                     isLoading || !text.trim()
-                      ? "bg-void-800 text-void-500 cursor-not-allowed border border-void-700"
-                      : "bg-liquid-fire text-white shadow-glow-sm hover:shadow-[0_0_20px_rgba(255,166,46,0.6)] border border-ember-400/50"
+                      ? "bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200"
+                      : "bg-sky-500 text-white hover:bg-sky-600 shadow-sm"
                   }`}
                 >
                   <Volume2 size={18} />
                   {isLoading ? "Generating..." : "Generate New Audio"}
-                </motion.button>
+                </button>
 
-                <div className="bg-void-900/50 border border-void-800 rounded-lg p-4 space-y-2">
+                <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-void-400">Voice:</span>
-                    <span className="text-ember-50 font-medium">
+                    <span className="text-slate-500">Voice:</span>
+                    <span className="text-slate-900 font-medium">
                       {voices[selectedLanguage]?.find(
                         (v) => v.id === selectedVoice,
                       )?.name || "Unknown"}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-void-400">Speed:</span>
-                    <span className="text-ember-50 font-medium">
+                    <span className="text-slate-500">Speed:</span>
+                    <span className="text-slate-900 font-medium">
                       {speed.toFixed(2)}x
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-void-400">Characters:</span>
-                    <span className="text-ember-50 font-medium">
+                    <span className="text-slate-500">Characters:</span>
+                    <span className="text-slate-900 font-medium">
                       {text.length}
                     </span>
                   </div>
@@ -489,26 +467,22 @@ const TextToSpeech = () => {
               </>
             ) : (
               <div className="py-12 text-center">
-                <motion.div
-                  animate={{ y: [0, 10, 0] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="mb-4"
-                >
-                  <Volume2 size={40} className="text-void-600 mx-auto" />
-                </motion.div>
-                <p className="text-void-500">Generate audio to preview here</p>
+                <div className="mb-4">
+                  <Volume2 size={40} className="text-slate-300 mx-auto" />
+                </div>
+                <p className="text-slate-500">Generate audio to preview here</p>
               </div>
             )}
 
-            <div className="glass-dark border border-crimson-500/20 rounded-lg p-4 space-y-2 bg-crimson-500/5 shadow-glow-sm">
+            <div className="glass border border-sky-200 rounded-lg p-4 space-y-2 bg-sky-50 shadow-sm">
               <div className="flex gap-2">
                 <AlertCircle
                   size={18}
-                  className="text-crimson-400 flex-shrink-0 mt-0.5"
+                  className="text-sky-600 flex-shrink-0 mt-0.5"
                 />
                 <div>
-                  <p className="text-xs font-medium text-crimson-300 mb-1">Tips</p>
-                  <ul className="text-xs text-crimson-200/60 space-y-1">
+                  <p className="text-xs font-medium text-brand-800 mb-1">Tips</p>
+                  <ul className="text-xs text-brand-700/80 space-y-1">
                     <li>Max 5000 characters per request</li>
                     <li>
                       Playback speed changes preview and download review only
@@ -521,7 +495,7 @@ const TextToSpeech = () => {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

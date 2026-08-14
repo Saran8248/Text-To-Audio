@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "../utils/motion";
 import {
   Upload,
   FileAudio,
@@ -368,10 +367,7 @@ const MergeAudio = () => {
   return (
     <div className="space-y-8 max-w-4xl">
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex justify-between items-start"
+      <div className="flex justify-between items-start"
       >
         <div>
           <h1 className="text-4xl font-bold text-white mb-2">Merge Audio</h1>
@@ -381,23 +377,18 @@ const MergeAudio = () => {
           </p>
         </div>
         {tracks.length > 0 && (
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            onClick={resetAll}
+          <button onClick={resetAll}
             className="flex items-center gap-1.5 px-4 py-2 border border-red-500/20 bg-red-500/5 text-red-400 rounded-xl text-sm font-medium hover:bg-red-500/10 transition-all"
           >
             <RefreshCw size={15} />
             Reset All
-          </motion.button>
+          </button>
         )}
-      </motion.div>
+      </div>
 
       {/* Screen 1: File Uploader */}
       {tracks.length === 0 ? (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          onDragEnter={handleDrag}
+        <div onDragEnter={handleDrag}
           onDragOver={handleDrag}
           onDragLeave={handleDrag}
           onDrop={handleDrop}
@@ -426,22 +417,16 @@ const MergeAudio = () => {
             Select or Drag & Drop audio clips to combine them one after another
             into a single file.
           </p>
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="px-6 py-3 rounded-2xl bg-blue-500 text-white font-medium hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/25"
+          <button className="px-6 py-3 rounded-2xl bg-blue-500 text-white font-medium hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/25"
           >
             Select Audio Files
-          </motion.button>
-        </motion.div>
+          </button>
+        </div>
       ) : (
         /* Screen 2: Track Editor & Merger */
         <div className="space-y-6">
           {/* Controls Bar */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 glass rounded-2xl border border-white/10 gap-4"
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 glass rounded-2xl border border-white/10 gap-4"
           >
             <div className="flex items-center gap-4">
               <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-300 font-medium">
@@ -474,14 +459,11 @@ const MergeAudio = () => {
             </div>
 
             <div className="flex gap-3 w-full sm:w-auto">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => fileInputRef.current.click()}
+              <button onClick={() => fileInputRef.current.click()}
                 className="flex-1 sm:flex-none px-4 py-2 border border-white/10 hover:bg-white/5 rounded-xl text-sm font-medium text-white transition-colors"
               >
                 + Add Track
-              </motion.button>
+              </button>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -491,28 +473,22 @@ const MergeAudio = () => {
                 onChange={handleFileSelect}
               />
             </div>
-          </motion.div>
+          </div>
 
           {/* Track List */}
           <div className="space-y-3">
-            <AnimatePresence initial={false}>
+            
               {tracks.map((track, idx) => (
-                <motion.div
-                  key={track.id}
-                  initial={{ opacity: 0, x: -30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 30 }}
-                  layout
+                <div
+                  key={track.id} layout
                   className="flex items-center gap-4 p-4 glass rounded-2xl border border-white/10 group"
                 >
                   {/* Delete Button */}
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    onClick={() => deleteTrack(track.id)}
+                  <button onClick={() => deleteTrack(track.id)}
                     className="p-2 border border-red-500/20 bg-red-500/5 text-red-400 rounded-xl hover:bg-red-500/15"
                   >
                     <Trash2 size={16} />
-                  </motion.button>
+                  </button>
 
                   {/* Track Details */}
                   <div className="flex-1 min-w-0">
@@ -553,38 +529,29 @@ const MergeAudio = () => {
                       <ArrowDown size={15} />
                     </button>
                   </div>
-                </motion.div>
+                </div>
               ))}
-            </AnimatePresence>
+            
           </div>
 
           {/* Merge Trigger Button */}
           {!mergedUrl && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex justify-end pt-2"
+            <div className="flex justify-end pt-2"
             >
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleMerge}
+              <button onClick={handleMerge}
                 disabled={isMerging || tracks.length < 2}
                 className="px-8 py-3 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 font-medium text-white hover:shadow-lg disabled:opacity-50"
               >
                 {isMerging ? "Merging Audio..." : "Merge Tracks"}
-              </motion.button>
-            </motion.div>
+              </button>
+            </div>
           )}
         </div>
       )}
 
       {/* Screen 3: Merged Results Panel */}
       {mergedUrl && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="glass p-6 rounded-3xl border border-emerald-500/20 bg-emerald-500/5 space-y-6"
+        <div className="glass p-6 rounded-3xl border border-emerald-500/20 bg-emerald-500/5 space-y-6"
         >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
@@ -608,9 +575,7 @@ const MergeAudio = () => {
               onEnded={() => setIsPlaying(false)}
               className="hidden"
             />
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              onClick={handlePlayToggle}
+            <button onClick={handlePlayToggle}
               className="w-12 h-12 rounded-full bg-blue-500 hover:bg-blue-600 flex items-center justify-center text-white"
             >
               {isPlaying ? (
@@ -618,7 +583,7 @@ const MergeAudio = () => {
               ) : (
                 <Play className="ml-0.5" size={20} />
               )}
-            </motion.button>
+            </button>
 
             <div className="flex-1 text-sm font-medium text-white truncate">
               Merged-Audio-{tracks.length}-Tracks.wav
@@ -635,7 +600,7 @@ const MergeAudio = () => {
               </a>
             </div>
           </div>
-        </motion.div>
+        </div>
       )}
     </div>
   );

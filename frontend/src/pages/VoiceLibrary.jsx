@@ -1,5 +1,4 @@
 import React, { useState, useRef } from "react";
-import { motion } from "../utils/motion";
 import { Heart, Play, Music, Filter } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -165,23 +164,15 @@ const VoiceLibrary = () => {
   });
 
   const VoiceCard = ({ voice, index }) => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
-      whileHover={{ y: -5 }}
-      className="glass p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all group cursor-pointer"
+    <div className="glass p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all group cursor-pointer"
     >
       <div className="flex items-start justify-between mb-4">
         <div>
           <h3 className="text-lg font-bold text-white mb-1">{voice.name}</h3>
           <p className="text-sm text-gray-400">{voice.language}</p>
         </div>
-        <motion.button
-          onClick={() => toggleFavorite(voice.id)}
-          whileHover={{ scale: 1.2 }}
-          whileTap={{ scale: 0.9 }}
-          className={`p-2 rounded-lg transition-colors ${
+        <button
+          onClick={() => toggleFavorite(voice.id)} className={`p-2 rounded-lg transition-colors ${
             favorites.has(voice.id)
               ? "bg-red-500/20 text-red-400"
               : "bg-white/5 text-gray-400 hover:text-red-400"
@@ -191,7 +182,7 @@ const VoiceLibrary = () => {
             size={20}
             fill={favorites.has(voice.id) ? "currentColor" : "none"}
           />
-        </motion.button>
+        </button>
       </div>
 
       <div className="space-y-3 mb-4">
@@ -210,39 +201,30 @@ const VoiceLibrary = () => {
         </div>
       </div>
 
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={() =>
+      <button onClick={() =>
           playingId === voice.id ? stopPlayback() : playSample(voice)
         }
         className="w-full py-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg font-medium text-white hover:shadow-lg hover:shadow-blue-500/30 flex items-center justify-center gap-2 group-hover:shadow-lg"
       >
         <Play size={16} fill="white" />
         {playingId === voice.id ? "Stop" : "Play Sample"}
-      </motion.button>
-    </motion.div>
+      </button>
+    </div>
   );
 
   return (
     <div className="space-y-8">
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
+      <div className="mb-8"
       >
         <h1 className="text-4xl font-bold text-white mb-2">Voice Library</h1>
         <p className="text-gray-400">
           Choose from our collection of natural-sounding voices
         </p>
-      </motion.div>
+      </div>
 
       {/* Filters */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="glass p-6 rounded-2xl border border-white/10"
+      <div className="glass p-6 rounded-2xl border border-white/10"
       >
         <div className="flex items-center gap-2 mb-4">
           <Filter size={20} className="text-blue-400" />
@@ -256,20 +238,18 @@ const VoiceLibrary = () => {
             </label>
             <div className="flex gap-2 flex-wrap">
               {["all", "Male", "Female"].map((gender) => (
-                <motion.button
+                <button
                   key={gender}
                   onClick={() =>
                     setSelectedGender(gender === "all" ? "all" : gender)
-                  }
-                  whileHover={{ scale: 1.05 }}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                  } className={`px-4 py-2 rounded-lg font-medium transition-all ${
                     selectedGender === gender
                       ? "bg-blue-500 text-white"
                       : "bg-white/10 text-gray-300 hover:bg-white/20"
                   }`}
                 >
                   {gender === "all" ? "All" : gender}
-                </motion.button>
+                </button>
               ))}
             </div>
           </div>
@@ -290,25 +270,23 @@ const VoiceLibrary = () => {
                 "Tamil",
                 "Arabic (UAE)",
               ].map((lang) => (
-                <motion.button
+                <button
                   key={lang}
                   onClick={() =>
                     setSelectedLanguage(lang === "all" ? "all" : lang)
-                  }
-                  whileHover={{ scale: 1.05 }}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                  } className={`px-4 py-2 rounded-lg font-medium transition-all ${
                     selectedLanguage === lang
                       ? "bg-blue-500 text-white"
                       : "bg-white/10 text-gray-300 hover:bg-white/20"
                   }`}
                 >
                   {lang === "all" ? "All" : lang}
-                </motion.button>
+                </button>
               ))}
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Voice Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -318,14 +296,11 @@ const VoiceLibrary = () => {
       </div>
 
       {filteredVoices.length === 0 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center py-12"
+        <div className="text-center py-12"
         >
           <Music size={48} className="text-gray-600 mx-auto mb-4" />
           <p className="text-gray-400 text-lg">No voices match your filters</p>
-        </motion.div>
+        </div>
       )}
     </div>
   );

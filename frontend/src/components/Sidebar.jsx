@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { motion } from "../utils/motion";
 import {
   Menu,
   X,
@@ -39,37 +38,28 @@ const Sidebar = ({ user, onLogout }) => {
       {/* Mobile Toggle */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-50 md:hidden p-2 rounded-lg bg-void-800 border border-ember-500/20 text-ember-100 hover:bg-void-700 shadow-glow-sm"
+        className="fixed top-4 left-4 z-50 md:hidden p-2 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 shadow-sm"
       >
         {isOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
 
       {/* Backdrop */}
       {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={() => setIsOpen(false)}
+        <div onClick={() => setIsOpen(false)}
           className="fixed inset-0 bg-black/40 backdrop-blur-sm z-30 md:hidden"
         />
       )}
 
       {/* Sidebar */}
-      <motion.div
-        initial={{ x: -300 }}
-        animate={{ x: isOpen ? 0 : -300 }}
-        transition={{ type: "spring", damping: 20 }}
-        className="fixed left-0 top-0 h-screen w-64 glass-dark border-r border-ember-500/20 z-40 md:z-20 md:translate-x-0 md:relative md:h-full"
+      <div
+        className={`fixed left-0 top-0 h-screen w-64 bg-white border-r border-slate-200 z-40 md:z-20 transition-transform duration-300 md:translate-x-0 md:relative md:h-full ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
       >
         <div className="flex flex-col h-full p-6">
           {/* Logo */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-3 mb-12 mt-8 md:mt-0"
-          >
-            <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-ember-500/10 ring-1 ring-ember-500/30 flex items-center justify-center shadow-glow-sm">
+          <div className="flex items-center gap-3 mb-12 mt-8 md:mt-0">
+            <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-sky-50 flex items-center justify-center border border-brand-100">
               <img
                 src="/terra-tern-logo.png"
                 alt="Terra Tern"
@@ -77,61 +67,50 @@ const Sidebar = ({ user, onLogout }) => {
               />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-ember-50 tracking-wide uppercase">Terra Tern</h1>
-              <p className="text-xs text-ember-400">Team Shringika</p>
+              <h1 className="text-xl font-bold text-slate-900 tracking-wide uppercase">Terra Tern</h1>
+              <p className="text-xs text-slate-500">Team Shringika</p>
             </div>
-          </motion.div>
+          </div>
 
           {/* Navigation */}
           <nav className="flex-1 space-y-2 overflow-y-auto pr-1">
-            {menuItems.map((item, idx) => {
+            {menuItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.path);
               return (
-                <motion.div
-                  key={item.name}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.05 }}
-                >
+                <div key={item.name}>
                   <Link
                     to={item.path}
                     onClick={() => window.innerWidth < 768 && setIsOpen(false)}
                     className={`relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
                       active
-                        ? "bg-liquid-fire text-white shadow-glow-ember"
-                        : "text-void-400 hover:text-ember-50 hover:bg-void-800/50 hover:shadow-glow-sm"
+                        ? "bg-sky-500 text-white shadow-sm"
+                        : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
                     }`}
                   >
                     <Icon
                       size={20}
-                      className={
-                        active ? "text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]" : "group-hover:text-ember-400 transition-colors"
-                      }
+                      className={active ? "text-white" : "group-hover:text-sky-500 transition-colors"}
                     />
                     <span className="font-medium flex items-center gap-2 flex-1 min-w-0 truncate">
                       {item.name}
                       {item.isNew && (
-                        <span className="px-1.5 py-0.5 rounded text-[8px] font-extrabold bg-ember-500/20 text-ember-400 border border-ember-500/25 tracking-widest uppercase scale-90 shadow-glow-sm">
+                        <span className="px-1.5 py-0.5 rounded text-[8px] font-extrabold bg-brand-100 text-sky-600 border border-sky-200 tracking-widest uppercase scale-90">
                           New
                         </span>
                       )}
                     </span>
                     {active && (
-                      <motion.div
-                        layoutId="activeIndicator"
-                        className="absolute right-0 w-1 h-6 bg-ember-100 rounded-l-full shadow-[0_0_10px_#ffa62e]"
-                      />
+                      <div className="absolute right-0 w-1 h-6 bg-white rounded-l-full" />
                     )}
                   </Link>
-                </motion.div>
+                </div>
               );
             })}
           </nav>
 
-
         </div>
-      </motion.div>
+      </div>
 
       {/* Desktop overlay when sidebar is open */}
       {!isOpen && <div className="hidden md:block w-64" />}

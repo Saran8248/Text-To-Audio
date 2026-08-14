@@ -11,11 +11,11 @@
 html {
   @apply scroll-smooth;
   scroll-behavior: smooth;
-  background-color: #0a0a0a;
+  background-color: #f8fafc; /* slate-50 */
 }
 
 body {
-  @apply bg-void-950 text-ember-50 font-sans antialiased;
+  @apply bg-slate-50 text-slate-900 font-sans antialiased;
   margin: 0;
   font-family:
     "Inter",
@@ -40,27 +40,27 @@ code {
     monospace;
 }
 
-/* Smoky Glassmorphism effect */
+/* Professional Glassmorphism effect */
 .glass {
-  @apply bg-void-900/60 backdrop-blur-xl border border-ember-500/10 rounded-2xl shadow-glow-sm;
+  @apply bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl shadow-soft;
 }
 
 .glass-sm {
-  @apply bg-void-900/50 backdrop-blur-lg border border-ember-500/5 rounded-xl;
+  @apply bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl shadow-sm;
 }
 
 .glass-dark {
-  @apply bg-void-950/80 backdrop-blur-2xl border border-ember-500/20 rounded-2xl;
+  @apply bg-white backdrop-blur-lg border border-slate-200 rounded-2xl shadow-elevated;
 }
 
 /* Gradient text */
 .gradient-text {
-  @apply bg-liquid-fire bg-clip-text text-transparent;
+  @apply bg-gradient-to-r from-brand-500 to-brand-700 bg-clip-text text-transparent;
 }
 
 /* Smooth gradients */
 .gradient-border {
-  @apply border border-transparent bg-liquid-fire bg-clip-border p-[1px];
+  @apply border border-transparent bg-gradient-to-r from-brand-500 to-brand-700 bg-clip-border p-[1px];
 }
 
 /* Loading animation */
@@ -85,14 +85,14 @@ code {
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-void-900;
+  @apply bg-slate-100;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-void-700 rounded-full hover:bg-void-800 border border-ember-900/20;
+  @apply bg-slate-300 rounded-full hover:bg-slate-400;
 }
 
 /* Selection color */
 ::selection {
-  @apply bg-ember-600/30 text-ember-50;
+  @apply bg-brand-200 text-brand-900;
 }

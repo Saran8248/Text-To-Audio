@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { motion } from "../utils/motion";
 import { Search, Volume2 } from "lucide-react";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -53,10 +52,7 @@ const History = () => {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
+      <div className="mb-8"
       >
         <h1 className="text-4xl font-bold text-white mb-2">
           Generation History
@@ -64,13 +60,10 @@ const History = () => {
         <p className="text-gray-400">
           View and manage your previously generated audio files
         </p>
-      </motion.div>
+      </div>
 
       {/* Search & Filter */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="glass p-6 rounded-2xl border border-white/10"
+      <div className="glass p-6 rounded-2xl border border-white/10"
       >
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -82,22 +75,16 @@ const History = () => {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={handleRefreshHistory}
+            <button onClick={handleRefreshHistory}
               className="px-4 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-400"
             >
               Refresh
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={handleClearHistory}
+            </button>
+            <button onClick={handleClearHistory}
               className="px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-400"
             >
               Clear History
-            </motion.button>
+            </button>
           </div>
         </div>
 
@@ -136,47 +123,39 @@ const History = () => {
                 "ja-JP",
                 "uk-UA",
               ].map((filter) => (
-                <motion.button
+                <button
                   key={filter}
-                  onClick={() => setSelectedFilter(filter)}
-                  whileHover={{ scale: 1.05 }}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                  onClick={() => setSelectedFilter(filter)} className={`px-4 py-2 rounded-lg font-medium transition-all ${
                     selectedFilter === filter
                       ? "bg-blue-500 text-white"
                       : "bg-white/10 text-gray-300 hover:bg-white/20"
                   }`}
                 >
                   {filter === "all" ? "All Languages" : filter}
-                </motion.button>
+                </button>
               ))}
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* History List */}
       {isLoading ? (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="glass p-6 rounded-2xl border border-white/10 text-center"
+        <div className="glass p-6 rounded-2xl border border-white/10 text-center"
         >
           <p className="text-white font-medium">
             Loading generation history...
           </p>
-        </motion.div>
+        </div>
       ) : filteredHistory.length === 0 ? (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center py-12"
+        <div className="text-center py-12"
         >
           <Volume2 size={48} className="text-gray-600 mx-auto mb-4" />
           <p className="text-gray-400 text-lg">No audio history found</p>
           <p className="text-sm text-gray-500 mt-2">
             Try refreshing or changing the filter to show more results.
           </p>
-        </motion.div>
+        </div>
       ) : (
         <div className="space-y-3">
           {filteredHistory.map((item, idx) => {
@@ -184,12 +163,8 @@ const History = () => {
             const language =
               item.voice?.split("-").slice(0, 2).join("-") || "Unknown";
             return (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: idx * 0.05 }}
-                className="glass p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all group"
+              <div
+                key={item.id} className="glass p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all group"
               >
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="flex-1 min-w-0">
@@ -219,30 +194,24 @@ const History = () => {
                     </div>
                   </div>
                   <div className="flex gap-2 flex-wrap">
-                    <motion.button
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() =>
+                    <button onClick={() =>
                         toast.info("Playback is not available in this preview")
                       }
                       className="px-4 py-2 bg-white/5 text-white rounded-lg border border-white/10 hover:bg-white/10"
                     >
                       Play
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() =>
+                    </button>
+                    <button onClick={() =>
                         toast.success("Saved entry copied to clipboard") &&
                         navigator.clipboard.writeText(item.text)
                       }
                       className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400"
                     >
                       Copy Text
-                    </motion.button>
+                    </button>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>

@@ -14,14 +14,12 @@ import MergeAudio from './pages/MergeAudio';
 import MergeWord from './pages/MergeWord';
 import MultiSpeaker from './pages/MultiSpeaker';
 import AudioToText from './pages/AudioToText';
-import EmberBackground from './components/EmberBackground';
 
 const ProtectedLayout = ({ user, onLogout, onUpdateUser }) => (
-  <div className="flex h-screen bg-void-950 text-ember-50 relative overflow-hidden">
-    <EmberBackground />
+  <div className="flex h-screen bg-slate-50 text-slate-900 relative overflow-hidden">
     <Sidebar user={user} onLogout={onLogout} />
     <div className="flex flex-col flex-1 overflow-hidden z-10 relative">
-      <Navbar user={user} onLogout={onLogout} theme="dark" onToggleTheme={() => {}} />
+      <Navbar user={user} onLogout={onLogout} theme="light" onToggleTheme={() => {}} />
       <main className="flex-1 overflow-y-auto z-10 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Routes>
@@ -84,8 +82,7 @@ function App() {
         rtl={false}
         pauseOnFocusLoss
         draggable
-        pauseOnHover
-        theme="dark"
+        theme="light"
       />
     </Router>
   );

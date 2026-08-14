@@ -46,7 +46,7 @@ const Sidebar = ({ user, onLogout }) => {
       {/* Backdrop */}
       {isOpen && (
         <div onClick={() => setIsOpen(false)}
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-30 md:hidden"
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-30 md:hidden"
         />
       )}
 

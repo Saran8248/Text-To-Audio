@@ -207,14 +207,14 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
     value,
     onChange,
   }) => (
-    <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 shadow-sm rounded-lg border border-white/5 hover:border-white/10">
+    <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 shadow-sm rounded-lg border border-slate-200 hover:border-slate-200">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
           <Icon size={20} className="text-blue-400" />
         </div>
         <div>
-          <p className="font-medium text-white">{label}</p>
-          <p className="text-xs text-gray-400 mt-1">{description}</p>
+          <p className="font-medium text-slate-900">{label}</p>
+          <p className="text-xs text-slate-600 mt-1">{description}</p>
         </div>
       </div>
       <button onClick={onChange}
@@ -232,16 +232,16 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
     <div className="space-y-8 max-w-4xl">
       {/* Header */}
       <div >
-        <h1 className="text-4xl font-bold text-white mb-2">Settings</h1>
-        <p className="text-gray-400">
+        <h1 className="text-4xl font-bold text-slate-900 mb-2">Settings</h1>
+        <p className="text-slate-600">
           Manage your profile, preferences, security, and contact support
         </p>
       </div>
 
       {/* Profile Settings */}
-      <div className="glass p-6 rounded-2xl border border-white/10"
+      <div className="glass p-6 rounded-2xl border border-slate-200"
       >
-        <h3 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
+        <h3 className="text-xl font-semibold text-slate-900 mb-6 flex items-center gap-2">
           <User className="text-blue-400" size={22} />
           Profile Settings
         </h3>
@@ -251,7 +251,7 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
           <div className="flex flex-col items-center gap-3">
             <div
               onClick={handleAvatarClick}
-              className="relative w-32 h-32 rounded-full border-2 border-white/10 bg-white/5 overflow-hidden group cursor-pointer hover:border-blue-400 transition-all flex items-center justify-center"
+              className="relative w-32 h-32 rounded-full border-2 border-slate-200 bg-slate-50 overflow-hidden group cursor-pointer hover:border-blue-400 transition-all flex items-center justify-center"
             >
               {profile.avatarUrl ? (
                 <img
@@ -260,11 +260,11 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <span className="text-4xl font-bold text-gray-300">
+                <span className="text-4xl font-bold text-slate-600">
                   {getInitials(profile.name)}
                 </span>
               )}
-              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1 text-white">
+              <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1 text-slate-900">
                 <Camera size={20} />
                 <span className="text-xs">Change</span>
               </div>
@@ -276,13 +276,13 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
               className="hidden"
               onChange={handleFileChange}
             />
-            <p className="text-xs text-gray-500">Max size: 2MB (JPG/PNG)</p>
+            <p className="text-xs text-slate-500">Max size: 2MB (JPG/PNG)</p>
           </div>
 
           {/* Profile Form Details */}
           <div className="flex-1 space-y-4 w-full">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-slate-600 mb-2">
                 Email Address
               </label>
               <input
@@ -291,11 +291,11 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
                 onChange={(e) =>
                   setProfile({ ...profile, email: e.target.value })
                 }
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:border-blue-400 focus:outline-none"
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder-slate-400 focus:border-blue-400 focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-slate-600 mb-2">
                 Full Name
               </label>
               <input
@@ -304,7 +304,7 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
                 onChange={(e) =>
                   setProfile({ ...profile, name: e.target.value })
                 }
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:border-blue-400 focus:outline-none"
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder-slate-400 focus:border-blue-400 focus:outline-none"
               />
             </div>
             <button onClick={handleProfileSave}
@@ -317,9 +317,9 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
       </div>
 
       {/* Security & Password Changing (Professional Form) */}
-      <div className="glass p-6 rounded-2xl border border-white/10"
+      <div className="glass p-6 rounded-2xl border border-slate-200"
       >
-        <h3 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
+        <h3 className="text-xl font-semibold text-slate-900 mb-6 flex items-center gap-2">
           <Shield className="text-blue-400" size={22} />
           Security & Password
         </h3>
@@ -327,7 +327,7 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
         <form onSubmit={handlePasswordChange} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-slate-600 mb-2">
                 New Password
               </label>
               <div className="relative">
@@ -341,12 +341,12 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
                     })
                   }
                   placeholder="Minimum 6 characters"
-                  className="w-full px-4 py-3 pr-12 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:border-blue-400 focus:outline-none"
+                  className="w-full px-4 py-3 pr-12 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder-slate-400 focus:border-blue-400 focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((current) => !current)}
-                  className="absolute inset-y-0 right-3 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 hover:bg-white/10 hover:text-white focus:outline-none"
+                  className="absolute inset-y-0 right-3 my-auto flex h-9 w-9 items-center justify-center rounded-full text-slate-600 hover:bg-slate-50 hover:text-slate-900 focus:outline-none"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -354,7 +354,7 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-slate-600 mb-2">
                 Confirm New Password
               </label>
               <div className="relative">
@@ -368,12 +368,12 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
                     })
                   }
                   placeholder="Confirm new password"
-                  className="w-full px-4 py-3 pr-12 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:border-blue-400 focus:outline-none"
+                  className="w-full px-4 py-3 pr-12 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder-slate-400 focus:border-blue-400 focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword((current) => !current)}
-                  className="absolute inset-y-0 right-3 my-auto flex h-9 w-9 items-center justify-center rounded-full text-gray-400 hover:bg-white/10 hover:text-white focus:outline-none"
+                  className="absolute inset-y-0 right-3 my-auto flex h-9 w-9 items-center justify-center rounded-full text-slate-600 hover:bg-slate-50 hover:text-slate-900 focus:outline-none"
                 >
                   {showConfirmPassword ? (
                     <EyeOff size={18} />
@@ -392,7 +392,7 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
           </button>
         </form>
 
-        <div className="mt-6 pt-6 border-t border-white/10">
+        <div className="mt-6 pt-6 border-t border-slate-200">
           <SettingToggle
             icon={Lock}
             label="Two-Factor Authentication"
@@ -404,19 +404,19 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
       </div>
 
       {/* Preferences */}
-      <div className="glass p-6 rounded-2xl border border-white/10"
+      <div className="glass p-6 rounded-2xl border border-slate-200"
       >
-        <h3 className="text-xl font-semibold text-white mb-6">Preferences</h3>
+        <h3 className="text-xl font-semibold text-slate-900 mb-6">Preferences</h3>
         <div className="space-y-4">
           {/* Default Voice */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-slate-600 mb-2">
               Default Voice
             </label>
             <select
               value={settings.defaultVoice}
               onChange={(e) => handleChange("defaultVoice", e.target.value)}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:border-blue-400 focus:outline-none"
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:border-blue-400 focus:outline-none"
             >
               <option value="en-US-JennyNeural">
                 Jenny (English US Female)
@@ -507,7 +507,7 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
 
           {/* Default Speed */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-slate-600 mb-2">
               Default Speed
             </label>
             <div className="flex items-center gap-4">
@@ -520,7 +520,7 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
                 onChange={(e) =>
                   handleChange("defaultSpeed", parseFloat(e.target.value))
                 }
-                className="flex-1 h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                className="flex-1 h-2 bg-slate-50 rounded-lg appearance-none cursor-pointer accent-blue-500"
               />
               <span className="text-sm font-medium text-blue-400 min-w-12">
                 {settings.defaultSpeed.toFixed(2)}x
@@ -530,7 +530,7 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
 
           {/* Theme */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-3">
+            <label className="block text-sm font-medium text-slate-600 mb-3">
               Theme
             </label>
             <div className="flex gap-3">
@@ -562,9 +562,9 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
       </div>
 
       {/* Notifications */}
-      <div className="glass p-6 rounded-2xl border border-white/10"
+      <div className="glass p-6 rounded-2xl border border-slate-200"
       >
-        <h3 className="text-xl font-semibold text-white mb-6">Notifications</h3>
+        <h3 className="text-xl font-semibold text-slate-900 mb-6">Notifications</h3>
         <div className="space-y-4">
           <SettingToggle
             icon={Bell}
@@ -584,22 +584,22 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
       </div>
 
       {/* Help & Customer Support (Contact Support) */}
-      <div className="glass p-6 rounded-2xl border border-white/10"
+      <div className="glass p-6 rounded-2xl border border-slate-200"
       >
-        <h3 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
+        <h3 className="text-xl font-semibold text-slate-900 mb-6 flex items-center gap-2">
           <HelpCircle className="text-blue-400" size={22} />
           Customer Support
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Support Details */}
-          <div className="md:col-span-1 space-y-4 text-gray-400 text-sm">
+          <div className="md:col-span-1 space-y-4 text-slate-600 text-sm">
             <p>
               Have questions or running into issues? Send a direct message to
               our support team.
             </p>
             <div className="pt-2">
-              <span className="font-medium text-white block">
+              <span className="font-medium text-slate-900 block">
                 Email Support
               </span>
               <a
@@ -610,7 +610,7 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
               </a>
             </div>
             <div>
-              <span className="font-medium text-white block">Availability</span>
+              <span className="font-medium text-slate-900 block">Availability</span>
               <span>Mon - Fri, 9:00 AM - 5:00 PM EST</span>
             </div>
           </div>
@@ -621,7 +621,7 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
             className="md:col-span-2 space-y-4"
           >
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-slate-600 mb-2">
                 Subject
               </label>
               <input
@@ -631,11 +631,11 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
                   setSupportState({ ...supportState, subject: e.target.value })
                 }
                 placeholder="What do you need help with?"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:border-blue-400 focus:outline-none"
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder-slate-400 focus:border-blue-400 focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-slate-600 mb-2">
                 Message
               </label>
               <textarea
@@ -645,7 +645,7 @@ const Settings = ({ user, onUpdateUser, theme, onThemeChange, onLogout }) => {
                 }
                 placeholder="Describe your issue or feedback in detail..."
                 rows="4"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:border-blue-400 focus:outline-none resize-none"
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder-slate-400 focus:border-blue-400 focus:outline-none resize-none"
               />
             </div>
             <button type="submit"

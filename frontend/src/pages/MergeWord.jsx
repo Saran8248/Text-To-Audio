@@ -289,8 +289,8 @@ const MergeWord = () => {
       <div className="flex justify-between items-start"
       >
         <div>
-          <h1 className="text-4xl font-bold text-white mb-2">Merge Word</h1>
-          <p className="text-gray-400">
+          <h1 className="text-4xl font-bold text-slate-900 mb-2">Merge Word</h1>
+          <p className="text-slate-600">
             Combine Word documents (.docx) and Text files (.txt) into a single Word file.
           </p>
         </div>
@@ -328,10 +328,10 @@ const MergeWord = () => {
           <div className="w-16 h-16 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-6">
             <Upload className="text-blue-400" size={28} />
           </div>
-          <h3 className="text-2xl font-semibold text-white mb-2">
+          <h3 className="text-2xl font-semibold text-slate-900 mb-2">
             Merge Word Files Online - Join DOCX Free
           </h3>
-          <p className="text-gray-400 mb-6 max-w-sm">
+          <p className="text-slate-600 mb-6 max-w-sm">
             Select or Drag & Drop Word (.docx) or plain text (.txt) files to combine them.
           </p>
           <button className="px-6 py-3 rounded-2xl bg-blue-500 text-white font-medium hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/25"
@@ -343,16 +343,16 @@ const MergeWord = () => {
         /* Screen 2: Document Editor & Merger */
         <div className="space-y-6">
           {/* Controls Bar */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-5 glass rounded-2xl border border-white/10 gap-6"
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-5 glass rounded-2xl border border-slate-200 gap-6"
           >
             {/* Merge Options */}
             <div className="flex flex-wrap items-center gap-6">
               {/* Alignment Control */}
               <div className="flex flex-col gap-1.5">
-                <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider">
+                <span className="text-xs text-slate-600 font-semibold uppercase tracking-wider">
                   Text Alignment
                 </span>
-                <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
+                <div className="flex bg-slate-50 p-1 rounded-xl border border-slate-200">
                   {[
                     { id: "left", icon: AlignLeft, label: "Left" },
                     { id: "center", icon: AlignCenter, label: "Center" },
@@ -381,10 +381,10 @@ const MergeWord = () => {
 
               {/* Merge Type Control */}
               <div className="flex flex-col gap-1.5">
-                <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider">
+                <span className="text-xs text-slate-600 font-semibold uppercase tracking-wider">
                   Merging Separation
                 </span>
-                <div className="flex bg-white/5 p-1 rounded-xl border border-white/10 text-sm font-medium">
+                <div className="flex bg-slate-50 p-1 rounded-xl border border-slate-200 text-sm font-medium">
                   {[
                     { id: "page-break", label: "Page Break" },
                     { id: "continuous", label: "Continuous" },
@@ -409,7 +409,7 @@ const MergeWord = () => {
 
             <div className="flex gap-3 w-full md:w-auto self-end md:self-auto">
               <button onClick={() => fileInputRef.current.click()}
-                className="flex-1 md:flex-none px-4 py-2 border border-white/10 hover:bg-white/5 rounded-xl text-sm font-medium text-white transition-colors"
+                className="flex-1 md:flex-none px-4 py-2 border border-slate-200 hover:bg-slate-50 rounded-xl text-sm font-medium text-slate-900 transition-colors"
               >
                 + Add Files
               </button>
@@ -430,7 +430,7 @@ const MergeWord = () => {
               {documents.map((doc, idx) => (
                 <div
                   key={doc.id} layout
-                  className="flex items-center gap-4 p-4 glass rounded-2xl border border-white/10 group"
+                  className="flex items-center gap-4 p-4 glass rounded-2xl border border-slate-200 group"
                 >
                   {/* Delete Button */}
                   <button onClick={() => deleteDocument(doc.id)}
@@ -445,10 +445,10 @@ const MergeWord = () => {
                       <FileText size={20} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <span className="text-sm font-medium text-white truncate block">
+                      <span className="text-sm font-medium text-slate-900 truncate block">
                         {doc.name}
                       </span>
-                      <span className="text-xs text-gray-500 block mt-0.5">
+                      <span className="text-xs text-slate-500 block mt-0.5">
                         {doc.size}
                       </span>
                     </div>
@@ -459,14 +459,14 @@ const MergeWord = () => {
                     <button
                       onClick={() => moveDocument(idx, -1)}
                       disabled={idx === 0}
-                      className="p-1.5 rounded-lg border border-white/10 hover:bg-white/5 text-gray-400 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent"
+                      className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 hover:text-slate-900 disabled:opacity-30 disabled:hover:bg-transparent"
                     >
                       <ArrowUp size={15} />
                     </button>
                     <button
                       onClick={() => moveDocument(idx, 1)}
                       disabled={idx === documents.length - 1}
-                      className="p-1.5 rounded-lg border border-white/10 hover:bg-white/5 text-gray-400 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent"
+                      className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 hover:text-slate-900 disabled:opacity-30 disabled:hover:bg-transparent"
                     >
                       <ArrowDown size={15} />
                     </button>
@@ -500,21 +500,21 @@ const MergeWord = () => {
               <CheckCircle className="text-emerald-400" size={20} />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">
+              <h3 className="text-lg font-bold text-slate-900">
                 Merge Completed successfully!
               </h3>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-slate-600">
                 Your single merged Word document is ready for download.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 gap-4">
+          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-200 gap-4">
             <div className="w-12 h-12 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
               <FileCheck size={24} />
             </div>
 
-            <div className="flex-1 text-sm font-medium text-white truncate">
+            <div className="flex-1 text-sm font-medium text-slate-900 truncate">
               Merged-Document-{documents.length}-Files.doc
             </div>
 

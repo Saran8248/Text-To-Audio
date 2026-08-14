@@ -164,12 +164,12 @@ const VoiceLibrary = () => {
   });
 
   const VoiceCard = ({ voice, index }) => (
-    <div className="glass p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all group cursor-pointer"
+    <div className="glass p-6 rounded-2xl border border-slate-200 hover:border-slate-200 transition-all group cursor-pointer"
     >
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h3 className="text-lg font-bold text-white mb-1">{voice.name}</h3>
-          <p className="text-sm text-gray-400">{voice.language}</p>
+          <h3 className="text-lg font-bold text-slate-900 mb-1">{voice.name}</h3>
+          <p className="text-sm text-slate-600">{voice.language}</p>
         </div>
         <button
           onClick={() => toggleFavorite(voice.id)} className={`p-2 rounded-lg transition-colors ${
@@ -217,23 +217,23 @@ const VoiceLibrary = () => {
       {/* Header */}
       <div className="mb-8"
       >
-        <h1 className="text-4xl font-bold text-white mb-2">Voice Library</h1>
-        <p className="text-gray-400">
+        <h1 className="text-4xl font-bold text-slate-900 mb-2">Voice Library</h1>
+        <p className="text-slate-600">
           Choose from our collection of natural-sounding voices
         </p>
       </div>
 
       {/* Filters */}
-      <div className="glass p-6 rounded-2xl border border-white/10"
+      <div className="glass p-6 rounded-2xl border border-slate-200"
       >
         <div className="flex items-center gap-2 mb-4">
           <Filter size={20} className="text-blue-400" />
-          <h3 className="text-lg font-semibold text-white">Filters</h3>
+          <h3 className="text-lg font-semibold text-slate-900">Filters</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Gender Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-3">
+            <label className="block text-sm font-medium text-slate-600 mb-3">
               Gender
             </label>
             <div className="flex gap-2 flex-wrap">
@@ -256,7 +256,7 @@ const VoiceLibrary = () => {
 
           {/* Language Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-3">
+            <label className="block text-sm font-medium text-slate-600 mb-3">
               Language
             </label>
             <div className="flex gap-2 flex-wrap">
@@ -298,8 +298,8 @@ const VoiceLibrary = () => {
       {filteredVoices.length === 0 && (
         <div className="text-center py-12"
         >
-          <Music size={48} className="text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-400 text-lg">No voices match your filters</p>
+          <Music size={48} className="text-slate-500 mx-auto mb-4" />
+          <p className="text-slate-600 text-lg">No voices match your filters</p>
         </div>
       )}
     </div>

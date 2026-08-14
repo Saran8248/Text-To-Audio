@@ -370,8 +370,8 @@ const MergeAudio = () => {
       <div className="flex justify-between items-start"
       >
         <div>
-          <h1 className="text-4xl font-bold text-white mb-2">Merge Audio</h1>
-          <p className="text-gray-400">
+          <h1 className="text-4xl font-bold text-slate-900 mb-2">Merge Audio</h1>
+          <p className="text-slate-600">
             Combine audio clips sequentially into a single file with
             professional crossfade.
           </p>
@@ -410,10 +410,10 @@ const MergeAudio = () => {
           <div className="w-16 h-16 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-6">
             <Upload className="text-blue-400" size={28} />
           </div>
-          <h3 className="text-2xl font-semibold text-white mb-2">
+          <h3 className="text-2xl font-semibold text-slate-900 mb-2">
             Merge Audio Files Online - Join Tracks Free
           </h3>
-          <p className="text-gray-400 mb-6 max-w-sm">
+          <p className="text-slate-600 mb-6 max-w-sm">
             Select or Drag & Drop audio clips to combine them one after another
             into a single file.
           </p>
@@ -426,15 +426,15 @@ const MergeAudio = () => {
         /* Screen 2: Track Editor & Merger */
         <div className="space-y-6">
           {/* Controls Bar */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 glass rounded-2xl border border-white/10 gap-4"
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 glass rounded-2xl border border-slate-200 gap-4"
           >
             <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-300 font-medium">
+              <label className="flex items-center gap-2 cursor-pointer text-sm text-slate-600 font-medium">
                 <input
                   type="checkbox"
                   checked={crossfade}
                   onChange={(e) => setCrossfade(e.target.checked)}
-                  className="w-4 h-4 rounded border-white/10 bg-white/5 text-blue-500 focus:ring-0 focus:ring-offset-0"
+                  className="w-4 h-4 rounded border-slate-200 bg-slate-50 text-blue-500 focus:ring-0 focus:ring-offset-0"
                 />
                 Crossfade (seconds):
               </label>
@@ -449,7 +449,7 @@ const MergeAudio = () => {
                     onChange={(e) =>
                       setCrossfadeDuration(parseFloat(e.target.value))
                     }
-                    className="w-24 h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                    className="w-24 h-1.5 bg-slate-50 rounded-lg appearance-none cursor-pointer accent-blue-500"
                   />
                   <span className="text-xs font-semibold text-blue-400 min-w-8">
                     {crossfadeDuration}s
@@ -460,7 +460,7 @@ const MergeAudio = () => {
 
             <div className="flex gap-3 w-full sm:w-auto">
               <button onClick={() => fileInputRef.current.click()}
-                className="flex-1 sm:flex-none px-4 py-2 border border-white/10 hover:bg-white/5 rounded-xl text-sm font-medium text-white transition-colors"
+                className="flex-1 sm:flex-none px-4 py-2 border border-slate-200 hover:bg-slate-50 rounded-xl text-sm font-medium text-slate-900 transition-colors"
               >
                 + Add Track
               </button>
@@ -481,7 +481,7 @@ const MergeAudio = () => {
               {tracks.map((track, idx) => (
                 <div
                   key={track.id} layout
-                  className="flex items-center gap-4 p-4 glass rounded-2xl border border-white/10 group"
+                  className="flex items-center gap-4 p-4 glass rounded-2xl border border-slate-200 group"
                 >
                   {/* Delete Button */}
                   <button onClick={() => deleteTrack(track.id)}
@@ -494,20 +494,20 @@ const MergeAudio = () => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1.5">
                       <FileAudio size={16} className="text-blue-400" />
-                      <span className="text-sm font-medium text-white truncate">
+                      <span className="text-sm font-medium text-slate-900 truncate">
                         {track.name}
                       </span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-slate-500">
                         {track.size}
                       </span>
                     </div>
 
                     {/* Waveform Drawing */}
-                    <div className="bg-white/5 border border-white/5 rounded-lg p-1 h-12 flex items-center">
+                    <div className="bg-slate-50 border border-slate-200 rounded-lg p-1 h-12 flex items-center">
                       <AudioWaveform buffer={track.buffer} />
                     </div>
 
-                    <div className="text-[11px] text-gray-400 mt-1">
+                    <div className="text-[11px] text-slate-600 mt-1">
                       {calculateTrackTimeline(idx)}
                     </div>
                   </div>
@@ -517,14 +517,14 @@ const MergeAudio = () => {
                     <button
                       onClick={() => moveTrack(idx, -1)}
                       disabled={idx === 0}
-                      className="p-1.5 rounded-lg border border-white/10 hover:bg-white/5 text-gray-400 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent"
+                      className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 hover:text-slate-900 disabled:opacity-30 disabled:hover:bg-transparent"
                     >
                       <ArrowUp size={15} />
                     </button>
                     <button
                       onClick={() => moveTrack(idx, 1)}
                       disabled={idx === tracks.length - 1}
-                      className="p-1.5 rounded-lg border border-white/10 hover:bg-white/5 text-gray-400 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent"
+                      className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 hover:text-slate-900 disabled:opacity-30 disabled:hover:bg-transparent"
                     >
                       <ArrowDown size={15} />
                     </button>
@@ -558,17 +558,17 @@ const MergeAudio = () => {
               <CheckCircle className="text-emerald-400" size={20} />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">
+              <h3 className="text-lg font-bold text-slate-900">
                 Merge Completed successfully!
               </h3>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-slate-600">
                 Your single merged audio track is ready for download.
               </p>
             </div>
           </div>
 
           {/* Custom audio player */}
-          <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 gap-4">
+          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-200 gap-4">
             <audio
               ref={audioRef}
               src={mergedUrl}
@@ -585,7 +585,7 @@ const MergeAudio = () => {
               )}
             </button>
 
-            <div className="flex-1 text-sm font-medium text-white truncate">
+            <div className="flex-1 text-sm font-medium text-slate-900 truncate">
               Merged-Audio-{tracks.length}-Tracks.wav
             </div>
 

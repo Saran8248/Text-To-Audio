@@ -28,8 +28,8 @@ const APIKeys = () => {
     <div className="space-y-8">
       {/* Header */}
       <div >
-        <h1 className="text-4xl font-bold text-white mb-2">API Keys</h1>
-        <p className="text-gray-400">
+        <h1 className="text-4xl font-bold text-slate-900 mb-2">API Keys</h1>
+        <p className="text-slate-600">
           Manage your API keys for accessing the Text-to-Speech service
         </p>
       </div>
@@ -45,14 +45,14 @@ const APIKeys = () => {
       <div className="space-y-4">
         {keys.map((apiKey, idx) => (
           <div
-            key={apiKey.id} className="glass p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all"
+            key={apiKey.id} className="glass p-6 rounded-2xl border border-slate-200 hover:border-slate-200 transition-all"
           >
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
               <div>
-                <h3 className="text-lg font-semibold text-white mb-1">
+                <h3 className="text-lg font-semibold text-slate-900 mb-1">
                   {apiKey.name}
                 </h3>
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-slate-600">
                   Created on {apiKey.created}
                 </p>
               </div>
@@ -61,17 +61,17 @@ const APIKeys = () => {
               </div>
             </div>
 
-            <div className="mb-4 p-4 bg-white/5 rounded-lg border border-white/10">
-              <p className="text-sm text-gray-300 font-medium">
+            <div className="mb-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
+              <p className="text-sm text-slate-600 font-medium">
                 API key values are hidden in the UI for security.
               </p>
             </div>
 
             {/* Info */}
-            <div className="flex items-center justify-between text-xs text-gray-400">
+            <div className="flex items-center justify-between text-xs text-slate-600">
               <span>Last used: {apiKey.lastUsed}</span>
               <button onClick={() => deleteKey(apiKey.id)}
-                className="p-2 hover:bg-red-500/20 rounded-lg text-gray-400 hover:text-red-400 transition-colors"
+                className="p-2 hover:bg-red-500/20 rounded-lg text-slate-600 hover:text-red-400 transition-colors"
               >
                 <Trash2 size={16} />
               </button>
@@ -81,24 +81,24 @@ const APIKeys = () => {
       </div>
 
       {/* Documentation */}
-      <div className="glass p-6 rounded-2xl border border-white/10"
+      <div className="glass p-6 rounded-2xl border border-slate-200"
       >
-        <h3 className="text-lg font-semibold text-white mb-4">
+        <h3 className="text-lg font-semibold text-slate-900 mb-4">
           API Documentation
         </h3>
-        <div className="space-y-4 text-gray-300">
+        <div className="space-y-4 text-slate-600">
           <div>
-            <p className="font-medium text-white mb-2">Authentication</p>
+            <p className="font-medium text-slate-900 mb-2">Authentication</p>
             <p className="text-sm">
               Include your API key in the Authorization header:
             </p>
-            <code className="block mt-2 p-3 bg-dark-800 rounded text-sm text-gray-200 overflow-x-auto">
+            <code className="block mt-2 p-3 bg-dark-800 rounded text-sm text-slate-600 overflow-x-auto">
               Authorization: Bearer your_api_key_here
             </code>
           </div>
           <div>
-            <p className="font-medium text-white mb-2">Example Request</p>
-            <code className="block p-3 bg-dark-800 rounded text-sm text-gray-200 overflow-x-auto">
+            <p className="font-medium text-slate-900 mb-2">Example Request</p>
+            <code className="block p-3 bg-dark-800 rounded text-sm text-slate-600 overflow-x-auto">
               {`POST /api/tts/generate
 {
   "text": "Hello world",

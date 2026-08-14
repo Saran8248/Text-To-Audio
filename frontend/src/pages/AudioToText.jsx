@@ -314,8 +314,8 @@ const AudioToText = () => {
       {/* Header Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Audio to Text Conversion</h1>
-          <p className="text-gray-400">
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Audio to Text Conversion</h1>
+          <p className="text-slate-600">
             Upload conversation or monologue audio files and transcribe them with automated speaker diarization.
           </p>
         </div>
@@ -346,10 +346,10 @@ const AudioToText = () => {
           </div>
           {file ? (
             <div>
-              <h3 className="text-2xl font-semibold text-white mb-2">
+              <h3 className="text-2xl font-semibold text-slate-900 mb-2">
                 {file.name}
               </h3>
-              <p className="text-gray-400 mb-6">
+              <p className="text-slate-600 mb-6">
                 Size: {(file.size / (1024 * 1024)).toFixed(2)} MB • Ready to convert
               </p>
               <div className="flex justify-center gap-3">
@@ -359,7 +359,7 @@ const AudioToText = () => {
                     e.stopPropagation();
                     fileInputRef.current.click();
                   }}
-                  className="px-5 py-2.5 rounded-xl glass hover:bg-white/10 text-white font-medium text-sm transition-all"
+                  className="px-5 py-2.5 rounded-xl glass hover:bg-slate-50 text-slate-900 font-medium text-sm transition-all"
                 >
                   Change Audio File
                 </button>
@@ -377,10 +377,10 @@ const AudioToText = () => {
             </div>
           ) : (
             <div>
-              <h3 className="text-2xl font-semibold text-white mb-2">
+              <h3 className="text-2xl font-semibold text-slate-900 mb-2">
                 Select Audio File for Speech Recognition
               </h3>
-              <p className="text-gray-400 mb-6 max-w-sm mx-auto">
+              <p className="text-slate-600 mb-6 max-w-sm mx-auto">
                 Drag and drop your audio clip (.mp3, .wav, .m4a) here, or click to browse local files.
               </p>
               <button
@@ -394,15 +394,15 @@ const AudioToText = () => {
         </div>
       ) : isTranscribing ? (
         /* Screen 2: Transcribing Loader */
-        <div className="flex flex-col items-center justify-center p-20 glass rounded-3xl border border-white/10"
+        <div className="flex flex-col items-center justify-center p-20 glass rounded-3xl border border-slate-200"
         >
           <div className="relative w-20 h-20 mb-8">
-            <div className="absolute inset-0 rounded-full border-4 border-white/5" />
+            <div className="absolute inset-0 rounded-full border-4 border-slate-200" />
             <div className="absolute inset-0 rounded-full border-4 border-t-blue-500 border-r-purple-500 animate-spin" />
           </div>
-          <h3 className="text-2xl font-bold text-white mb-2">Converting Speech to Text</h3>
+          <h3 className="text-2xl font-bold text-slate-900 mb-2">Converting Speech to Text</h3>
           <p className="text-blue-400 font-medium animate-pulse">{progressStatus}</p>
-          <p className="text-xs text-gray-500 mt-4 max-w-xs text-center">
+          <p className="text-xs text-slate-500 mt-4 max-w-xs text-center">
             This might take up to a minute depending on your audio length. Please keep this tab open.
           </p>
         </div>
@@ -411,18 +411,18 @@ const AudioToText = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Transcript Display Box */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="glass p-6 rounded-3xl border border-white/10 flex flex-col h-[520px]"
+            <div className="glass p-6 rounded-3xl border border-slate-200 flex flex-col h-[520px]"
             >
-              <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-4 mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-blue-500/15 flex items-center justify-center">
                     <FileAudio className="text-blue-400" size={20} />
                   </div>
                   <div>
-                    <h3 className="font-bold text-white truncate max-w-[200px] sm:max-w-md">
+                    <h3 className="font-bold text-slate-900 truncate max-w-[200px] sm:max-w-md">
                       {file?.name || "Transcription Result"}
                     </h3>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-slate-600">
                       {transcriptData.is_monologue ? "Monologue Transcript" : "Multiple Speakers Diarized"}
                     </p>
                   </div>
@@ -449,7 +449,7 @@ const AudioToText = () => {
               {/* Transcript Text List Area */}
               <div className="flex-1 overflow-y-auto space-y-4 pr-2">
                 {transcriptData.segments.length === 0 ? (
-                  <p className="text-gray-400 text-center py-10">No speech detected in this audio file.</p>
+                  <p className="text-slate-600 text-center py-10">No speech detected in this audio file.</p>
                 ) : (
                   transcriptData.segments
                     .filter((seg) => selectedSpeaker === "all" || seg.speaker === selectedSpeaker)
@@ -457,7 +457,7 @@ const AudioToText = () => {
                       <div key={idx} className="flex gap-4 items-start group">
                         {/* Avatar */}
                         {!transcriptData.is_monologue && (
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0 mt-1 ${
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-slate-900 shrink-0 mt-1 ${
                             seg.speaker === "Speaker 1"
                               ? "bg-gradient-to-r from-blue-500 to-indigo-500"
                               : "bg-gradient-to-r from-purple-500 to-pink-500"
@@ -470,16 +470,16 @@ const AudioToText = () => {
                           {/* Timing and Speaker Header */}
                           <div className="flex items-center gap-2 mb-1">
                             {!transcriptData.is_monologue && (
-                              <span className="text-xs font-bold text-white">{seg.speaker}</span>
+                              <span className="text-xs font-bold text-slate-900">{seg.speaker}</span>
                             )}
-                            <span className="text-[10px] text-gray-500 flex items-center gap-1 font-mono">
+                            <span className="text-[10px] text-slate-500 flex items-center gap-1 font-mono">
                               <Clock size={10} />
                               {formatTime(seg.start)} - {formatTime(seg.end)}
                             </span>
                           </div>
                           
                           {/* Text bubble */}
-                          <p className="text-sm text-gray-300 bg-white/5 border border-white/5 px-4 py-2.5 rounded-2xl leading-relaxed">
+                          <p className="text-sm text-slate-600 bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-2xl leading-relaxed">
                             {seg.text}
                           </p>
                         </div>
@@ -493,15 +493,15 @@ const AudioToText = () => {
           {/* Side Controls Boxes */}
           <div className="space-y-6">
             {/* Box 1: Exporter Control */}
-            <div className="glass p-6 rounded-3xl border border-white/10 space-y-4"
+            <div className="glass p-6 rounded-3xl border border-slate-200 space-y-4"
             >
-              <h3 className="font-bold text-white text-lg flex items-center gap-2">
+              <h3 className="font-bold text-slate-900 text-lg flex items-center gap-2">
                 <Download size={18} className="text-blue-400" />
                 Export & Download
               </h3>
               
               <div className="space-y-3">
-                <label className="text-xs text-gray-400 font-medium">Export Document Type</label>
+                <label className="text-xs text-slate-600 font-medium">Export Document Type</label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
                     { id: "pdf", name: "PDF Document" },
@@ -527,7 +527,7 @@ const AudioToText = () => {
               <div className="pt-2 flex flex-col gap-2">
                 <button
                   onClick={handleCopyAll}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-white/10 hover:bg-white/5 font-medium text-white transition-colors"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 font-medium text-slate-900 transition-colors"
                 >
                   <Copy size={16} />
                   Copy Selected Text
@@ -544,13 +544,13 @@ const AudioToText = () => {
 
             {/* Box 2: Speaker Filter Selection (Shows only for multi-speaker/conversation audio) */}
             {!transcriptData.is_monologue && (
-              <div className="glass p-6 rounded-3xl border border-white/10 space-y-4"
+              <div className="glass p-6 rounded-3xl border border-slate-200 space-y-4"
               >
-                <h3 className="font-bold text-white text-lg flex items-center gap-2">
+                <h3 className="font-bold text-slate-900 text-lg flex items-center gap-2">
                   <Filter size={18} className="text-purple-400" />
                   Speaker Filter
                 </h3>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-slate-600">
                   Select a speaker to isolate their text in the display and download.
                 </p>
 
@@ -591,7 +591,7 @@ const AudioToText = () => {
                 setFile(null);
                 setTranscriptData(null);
               }}
-              className="w-full py-3 rounded-2xl glass hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white text-sm font-medium transition-colors flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-2xl glass hover:bg-slate-50 border border-slate-200 text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors flex items-center justify-center gap-2"
             >
               <RefreshCw size={14} />
               Transcribe Another Audio File

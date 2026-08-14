@@ -52,7 +52,7 @@ const StatCard = ({ icon: Icon, label, value, change, gradient }) => (
       <div
         className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} p-3 mb-4 shadow-sm`}
       >
-        <Icon size={24} className="text-white" />
+        <Icon size={24} className="text-slate-900" />
       </div>
       <p className="text-slate-500 text-sm font-medium mb-2">{label}</p>
       <p className="text-3xl font-bold text-slate-900 mb-2">{value}</p>

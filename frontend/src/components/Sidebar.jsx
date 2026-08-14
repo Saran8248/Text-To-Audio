@@ -23,7 +23,6 @@ const Sidebar = ({ user, onLogout }) => {
     { name: "Dashboard", icon: Home, path: "/" },
     { name: "Single Speaker", icon: Mic2, path: "/tts" },
     { name: "Multi Speaker", icon: Users, path: "/multi-speaker", isNew: true },
-    { name: "Voice Library", icon: Music, path: "/voices" },
     { name: "Merge Audio", icon: GitMerge, path: "/merge" },
     { name: "Merge Word", icon: Files, path: "/merge-word" },
     { name: "Audio to Text", icon: FileText, path: "/transcribe", isNew: true },

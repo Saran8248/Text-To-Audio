@@ -49,22 +49,25 @@ const StatCard = ({ icon: Icon, label, value, change, gradient }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
-    whileHover={{ y: -5 }}
-    className="glass p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all"
+    whileHover={{ y: -8, scale: 1.02 }}
+    className="relative group p-[1px] rounded-2xl overflow-hidden shadow-glow-sm"
   >
-    <div
-      className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} p-3 mb-4`}
-    >
-      <Icon size={24} className="text-white" />
-    </div>
-    <p className="text-gray-400 text-sm font-medium mb-2">{label}</p>
-    <p className="text-3xl font-bold text-white mb-2">{value}</p>
-    {typeof change === "number" && (
-      <div className="flex items-center gap-1 text-green-400 text-sm">
-        <ArrowUpRight size={16} />
-        <span>{change}% vs last month</span>
+    <div className="absolute inset-0 bg-liquid-fire opacity-20 group-hover:opacity-100 transition-opacity animate-liquid-ripple"></div>
+    <div className="relative h-full glass-dark p-6 rounded-2xl border border-ember-500/10">
+      <div
+        className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} p-3 mb-4`}
+      >
+        <Icon size={24} className="text-ember-50" />
       </div>
-    )}
+      <p className="text-ember-400/80 text-sm font-medium mb-2">{label}</p>
+      <p className="text-3xl font-bold text-ember-50 mb-2">{value}</p>
+      {typeof change === "number" && (
+        <div className="flex items-center gap-1 text-ember-500 text-sm font-semibold">
+          <ArrowUpRight size={16} />
+          <span>{change}% vs last month</span>
+        </div>
+      )}
+    </div>
   </motion.div>
 );
 
@@ -158,16 +161,17 @@ const Dashboard = ({ user }) => {
     <div className="space-y-8">
       {/* Welcome Banner */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="glass p-8 rounded-3xl border border-white/10 overflow-hidden relative"
+        initial={{ opacity: 0, scale: 0.95, filter: 'brightness(2)' }}
+        animate={{ opacity: 1, scale: 1, filter: 'brightness(1)' }}
+        transition={{ duration: 1, ease: 'easeOut' }}
+        className="glass-dark p-8 rounded-3xl border border-ember-500/20 overflow-hidden relative shadow-glow-ember"
       >
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-3xl -z-0" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-ember-500/20 to-crimson-500/20 rounded-full blur-3xl -z-0 pointer-events-none" />
         <div className="relative z-10">
-          <h1 className="text-4xl font-bold text-white mb-2">
+          <h1 className="text-4xl font-bold text-ember-50 mb-2">
             Welcome to Terra Tern
           </h1>
-          <p className="text-gray-400 mb-6">
+          <p className="text-ember-100/70 mb-6">
             You've generated {stats.thisMonth} audio files this month. Keep
             creating amazing content!
           </p>
@@ -176,7 +180,7 @@ const Dashboard = ({ user }) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate("/tts")}
-              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg font-medium text-white hover:shadow-lg hover:shadow-blue-500/30"
+              className="px-6 py-3 bg-liquid-fire animate-liquid-ripple rounded-lg font-bold text-white shadow-glow-ember"
             >
               Create New Audio
             </motion.button>
@@ -184,7 +188,7 @@ const Dashboard = ({ user }) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate("/merge")}
-              className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg font-medium text-white hover:shadow-lg hover:shadow-purple-500/30"
+              className="px-6 py-3 bg-void-800 border border-ember-500/30 rounded-lg font-medium text-ember-50 hover:bg-void-700 hover:border-ember-500/50 hover:shadow-glow-sm"
             >
               Merge Audio
             </motion.button>
@@ -192,7 +196,7 @@ const Dashboard = ({ user }) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate("/transcribe")}
-              className="px-6 py-3 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-lg font-medium text-white hover:shadow-lg hover:shadow-teal-500/30"
+              className="px-6 py-3 bg-void-800 border border-ember-500/30 rounded-lg font-medium text-ember-50 hover:bg-void-700 hover:border-ember-500/50 hover:shadow-glow-sm"
             >
               Audio to Text
             </motion.button>
@@ -200,7 +204,7 @@ const Dashboard = ({ user }) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate("/voices")}
-              className="px-6 py-3 glass border border-white/20 rounded-lg font-medium text-white hover:bg-white/10"
+              className="px-6 py-3 glass-sm border border-ember-500/20 rounded-lg font-medium text-ember-50 hover:bg-void-700/50 hover:shadow-glow-sm"
             >
               Voice Library
             </motion.button>
@@ -215,28 +219,28 @@ const Dashboard = ({ user }) => {
           label="Total Generated"
           value={stats.totalGenerated}
           change={12}
-          gradient="from-blue-500 to-cyan-500"
+          gradient="from-ember-600 to-crimson-600"
         />
         <StatCard
           icon={Zap}
           label="This Month"
           value={stats.thisMonth}
           change={8}
-          gradient="from-purple-500 to-pink-500"
+          gradient="from-ember-500 to-orange-500"
         />
         <StatCard
           icon={TrendingUp}
           label="Avg Time"
           value={stats.averageTime ? `${stats.averageTime}s` : "N/A"}
           change={-3}
-          gradient="from-green-500 to-emerald-500"
+          gradient="from-orange-500 to-crimson-500"
         />
         <StatCard
           icon={Volume2}
           label="Cached Files"
           value={stats.cacheFiles}
           change={25}
-          gradient="from-orange-500 to-red-500"
+          gradient="from-crimson-500 to-red-700"
         />
       </div>
 

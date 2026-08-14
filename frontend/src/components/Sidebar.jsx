@@ -39,7 +39,7 @@ const Sidebar = ({ user, onLogout }) => {
       {/* Mobile Toggle */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-50 md:hidden p-2 rounded-lg bg-dark-800 border border-white/10 text-white hover:bg-dark-700"
+        className="fixed top-4 left-4 z-50 md:hidden p-2 rounded-lg bg-void-800 border border-ember-500/20 text-ember-100 hover:bg-void-700 shadow-glow-sm"
       >
         {isOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
@@ -60,7 +60,7 @@ const Sidebar = ({ user, onLogout }) => {
         initial={{ x: -300 }}
         animate={{ x: isOpen ? 0 : -300 }}
         transition={{ type: "spring", damping: 20 }}
-        className="fixed left-0 top-0 h-screen w-64 glass border-r border-white/10 z-40 md:z-20 md:translate-x-0 md:relative md:h-full"
+        className="fixed left-0 top-0 h-screen w-64 glass-dark border-r border-ember-500/20 z-40 md:z-20 md:translate-x-0 md:relative md:h-full"
       >
         <div className="flex flex-col h-full p-6">
           {/* Logo */}
@@ -69,7 +69,7 @@ const Sidebar = ({ user, onLogout }) => {
             animate={{ opacity: 1, y: 0 }}
             className="flex items-center gap-3 mb-12 mt-8 md:mt-0"
           >
-            <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-white/10 ring-1 ring-white/10 flex items-center justify-center">
+            <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-ember-500/10 ring-1 ring-ember-500/30 flex items-center justify-center shadow-glow-sm">
               <img
                 src="/terra-tern-logo.png"
                 alt="Terra Tern"
@@ -77,8 +77,8 @@ const Sidebar = ({ user, onLogout }) => {
               />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white">Terra Tern</h1>
-              <p className="text-xs text-gray-400">Team Shringika</p>
+              <h1 className="text-xl font-bold text-ember-50 tracking-wide uppercase">Terra Tern</h1>
+              <p className="text-xs text-ember-400">Team Shringika</p>
             </div>
           </motion.div>
 
@@ -99,20 +99,20 @@ const Sidebar = ({ user, onLogout }) => {
                     onClick={() => window.innerWidth < 768 && setIsOpen(false)}
                     className={`relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
                       active
-                        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/20"
-                        : "text-gray-400 hover:text-white hover:bg-white/5"
+                        ? "bg-liquid-fire text-white shadow-glow-ember"
+                        : "text-void-400 hover:text-ember-50 hover:bg-void-800/50 hover:shadow-glow-sm"
                     }`}
                   >
                     <Icon
                       size={20}
                       className={
-                        active ? "text-white" : "group-hover:text-blue-400"
+                        active ? "text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]" : "group-hover:text-ember-400 transition-colors"
                       }
                     />
                     <span className="font-medium flex items-center gap-2 flex-1 min-w-0 truncate">
                       {item.name}
                       {item.isNew && (
-                        <span className="px-1.5 py-0.5 rounded text-[8px] font-extrabold bg-blue-500/20 text-blue-400 border border-blue-500/25 tracking-widest uppercase scale-90">
+                        <span className="px-1.5 py-0.5 rounded text-[8px] font-extrabold bg-ember-500/20 text-ember-400 border border-ember-500/25 tracking-widest uppercase scale-90 shadow-glow-sm">
                           New
                         </span>
                       )}
@@ -120,7 +120,7 @@ const Sidebar = ({ user, onLogout }) => {
                     {active && (
                       <motion.div
                         layoutId="activeIndicator"
-                        className="absolute right-0 w-1 h-6 bg-white rounded-l-full"
+                        className="absolute right-0 w-1 h-6 bg-ember-100 rounded-l-full shadow-[0_0_10px_#ffa62e]"
                       />
                     )}
                   </Link>

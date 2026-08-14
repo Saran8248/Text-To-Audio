@@ -7,6 +7,29 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        void: {
+          950: '#0a0a0a',
+          900: '#111111',
+          800: '#1a1a1a',
+          700: '#262626',
+        },
+        ember: {
+          50: '#fff9ed',
+          100: '#ffefd3',
+          200: '#ffdfa6',
+          300: '#ffc86d',
+          400: '#ffa62e',
+          500: '#ff8605',
+          600: '#f06400',
+          700: '#cc4a02',
+          800: '#a13b0b',
+          900: '#82320c',
+          950: '#461604',
+        },
+        crimson: {
+          500: '#dc2626',
+          600: '#b91c1c',
+        },
         dark: {
           50: '#f9fafb',
           100: '#f3f4f6',
@@ -20,37 +43,41 @@ module.exports = {
           900: '#111827',
           950: '#030712',
         },
-        accent: {
-          blue: '#3b82f6',
-          purple: '#a855f7',
-          cyan: '#06b6d4',
-          pink: '#ec4899',
-        },
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+        'liquid-fire': 'linear-gradient(135deg, #f06400 0%, #dc2626 50%, #f06400 100%)',
+      },
+      backgroundSize: {
+        '300%': '300% 300%',
       },
       backdropBlur: {
         xs: '2px',
       },
       boxShadow: {
-        'glow': '0 0 20px rgba(59, 130, 246, 0.5)',
-        'glow-lg': '0 0 30px rgba(168, 85, 247, 0.3)',
+        'glow-ember': '0 0 20px rgba(240, 100, 0, 0.5)',
+        'glow-crimson': '0 0 30px rgba(220, 38, 38, 0.4)',
+        'glow-sm': '0 0 10px rgba(240, 100, 0, 0.2)',
       },
       animation: {
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'float': 'float 3s ease-in-out infinite',
-        'shimmer': 'shimmer 2s infinite',
+        'pulse-amber': 'pulse-amber 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'liquid-ripple': 'liquid-ripple 3s ease-in-out infinite',
+        'heat-reveal': 'heat-reveal 1s cubic-bezier(0.4, 0, 0.2, 1) forwards',
       },
       keyframes: {
-        float: {
-          '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-10px)' },
+        'pulse-amber': {
+          '0%, 100%': { opacity: 1, filter: 'brightness(1)' },
+          '50%': { opacity: .8, filter: 'brightness(1.2)' },
         },
-        shimmer: {
-          '0%': { backgroundPosition: '-1000px 0' },
-          '100%': { backgroundPosition: '1000px 0' },
+        'liquid-ripple': {
+          '0%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+          '100%': { backgroundPosition: '0% 50%' },
+        },
+        'heat-reveal': {
+          '0%': { opacity: 0, transform: 'scale(0.95)', filter: 'brightness(2) contrast(1.5)' },
+          '100%': { opacity: 1, transform: 'scale(1)', filter: 'brightness(1) contrast(1)' },
         },
       },
     },

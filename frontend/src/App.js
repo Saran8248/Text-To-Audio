@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -14,16 +14,15 @@ import MergeAudio from './pages/MergeAudio';
 import MergeWord from './pages/MergeWord';
 import MultiSpeaker from './pages/MultiSpeaker';
 import AudioToText from './pages/AudioToText';
+import EmberBackground from './components/EmberBackground';
 
-
-
-
-const ProtectedLayout = ({ user, onLogout, onUpdateUser, theme, onThemeChange }) => (
-  <div className={`flex h-screen ${theme === 'light' ? 'bg-slate-100 text-slate-900' : 'bg-dark-950 text-white'}`}>
+const ProtectedLayout = ({ user, onLogout, onUpdateUser }) => (
+  <div className="flex h-screen bg-void-950 text-ember-50 relative overflow-hidden">
+    <EmberBackground />
     <Sidebar user={user} onLogout={onLogout} />
-    <div className="flex flex-col flex-1 overflow-hidden">
-      <Navbar user={user} onLogout={onLogout} theme={theme} onToggleTheme={onThemeChange} />
-      <main className={`${theme === 'light' ? 'bg-slate-100' : 'bg-gradient-to-br from-dark-950 via-dark-900 to-dark-950'} flex-1 overflow-y-auto`}>
+    <div className="flex flex-col flex-1 overflow-hidden z-10 relative">
+      <Navbar user={user} onLogout={onLogout} theme="dark" onToggleTheme={() => {}} />
+      <main className="flex-1 overflow-y-auto z-10 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Routes>
             <Route path="/" element={<Dashboard user={user} />} />
@@ -36,7 +35,7 @@ const ProtectedLayout = ({ user, onLogout, onUpdateUser, theme, onThemeChange })
             <Route path="/transcribe" element={<AudioToText />} />
             <Route path="/api-keys" element={<Navigate to="/" replace />} />
 
-            <Route path="/settings" element={<Settings user={user} onUpdateUser={onUpdateUser} theme={theme} onThemeChange={onThemeChange} onLogout={onLogout} />} />
+            <Route path="/settings" element={<Settings user={user} onUpdateUser={onUpdateUser} theme="dark" onThemeChange={() => {}} onLogout={onLogout} />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
@@ -60,19 +59,10 @@ const defaultAdminUser = {
 
 function App() {
   const [user, setUser] = useState(defaultAdminUser);
-  const [theme, setTheme] = useState(() => localStorage.getItem('terra_tern_theme') || 'dark');
-
-  useEffect(() => {
-    document.body.classList.toggle('theme-light', theme === 'light');
-    document.body.classList.toggle('theme-dark', theme === 'dark');
-    localStorage.setItem('terra_tern_theme', theme);
-  }, [theme]);
 
   const handleLogout = async () => {
     // Logout is disabled since login is removed
   };
-
-  const handleThemeToggle = () => setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
 
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
@@ -80,7 +70,7 @@ function App() {
         <Route
           path="/*"
           element={
-            <ProtectedLayout user={user} onLogout={handleLogout} onUpdateUser={setUser} theme={theme} onThemeChange={handleThemeToggle} />
+            <ProtectedLayout user={user} onLogout={handleLogout} onUpdateUser={setUser} />
           }
         />
       </Routes>
@@ -102,3 +92,4 @@ function App() {
 }
 
 export default App;
+

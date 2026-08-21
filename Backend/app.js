@@ -2338,6 +2338,7 @@ if (DATABASE_URL) {
       }
     } catch (err) {
       console.error("PostgreSQL initialization error:", err);
+      pgPool = null;
       lastPgError = {
         operation: "startup",
         message: formatPgError(err),

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Users, Cpu, CheckCircle, Download } from "lucide-react";
 import { toast } from "react-toastify";
+import { API_BASE_URL } from "../config/api";
 
 const localeNames = {
   de: "German",
@@ -28,7 +29,7 @@ const MultiSpeaker = () => {
     // Fetch available voices from backend
     const fetchVoices = async () => {
       try {
-        const response = await fetch("/api/tts/voices");
+        const response = await fetch(`${API_BASE_URL}/api/tts/voices`);
         const data = await response.json();
         const groupedVoices = data.data || {};
         const flatVoices = [];
@@ -190,7 +191,7 @@ const MultiSpeaker = () => {
 
     try {
       const token = localStorage.getItem("terra_tern_auth_token");
-      const response = await fetch("/api/tts/multi-speaker", {
+      const response = await fetch(`${API_BASE_URL}/api/tts/multi-speaker`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -47,7 +47,7 @@ const TextToSpeech = () => {
   useEffect(() => {
     const fetchVoices = async () => {
       try {
-        const response = await fetch("/api/tts/voices");
+        const response = await fetch(`${API_BASE_URL}/api/tts/voices`);
         const data = await response.json();
         const grouped = data.data || {};
         setVoices(grouped);

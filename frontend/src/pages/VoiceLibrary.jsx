@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Heart, Play, Music, Filter } from "lucide-react";
 import { toast } from "react-toastify";
+import { API_BASE_URL } from "../config/api";
 
 const VoiceLibrary = () => {
   const [favorites, setFavorites] = useState(new Set());
@@ -117,7 +118,7 @@ const VoiceLibrary = () => {
       }
 
       // Fetch dynamic audio from backend
-      const response = await fetch("/api/tts/generate", {
+      const response = await fetch(`${API_BASE_URL}/api/tts/generate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

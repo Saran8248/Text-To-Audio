@@ -19,4 +19,4 @@ if (isProduction && !configuredApiUrl) {
   );
 }
 
-export const API_BASE_URL = isProduction && isVercelHost ? defaultApiUrl : (configuredApiUrl || defaultApiUrl);
+export const API_BASE_URL = configuredApiUrl || (isProduction && isVercelHost ? '' : defaultApiUrl);

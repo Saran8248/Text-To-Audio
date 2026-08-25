@@ -50,7 +50,7 @@ const MultiSpeaker = () => {
         setVoices(flatVoices);
       } catch (err) {
         console.error("Failed to load voices:", err);
-        toast.error("Unable to retrieve voice library list.");
+        toast.error("Unable to retrieve voice library list. If the backend is waking up, please wait a minute and refresh.");
       }
     };
     fetchVoices();

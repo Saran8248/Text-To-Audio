@@ -2,7 +2,9 @@ const cluster = require("node:cluster");
 const os = require("node:os");
 
 if (cluster.isPrimary) {
-  const numCPUs = os.cpus().length;
+  // Limit workers to 2 max to prevent OOM on Render free tier (512MB RAM)
+  // while still allowing concurrent request handling.
+  const numCPUs = Math.min(os.cpus().length, 2);
   console.log(`[Load Balancer] Primary ${process.pid} is running.`);
   console.log(`[Load Balancer] Forking ${numCPUs} workers to handle traffic...`);
   

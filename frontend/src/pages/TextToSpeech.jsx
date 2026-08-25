@@ -10,6 +10,7 @@ import {
 import { toast } from "react-toastify";
 import axios from "axios";
 import { API_BASE_URL } from "../config/api";
+import { fallbackVoices } from "../config/voices";
 
 const getErrorMessage = async (error) => {
   const fallback =
@@ -45,28 +46,17 @@ const TextToSpeech = () => {
   const [voices, setVoices] = useState({});
 
   useEffect(() => {
-    const fetchVoices = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/tts/voices`);
-        const data = await response.json();
-        const grouped = data.data || {};
-        setVoices(grouped);
+    const grouped = fallbackVoices;
+    setVoices(grouped);
 
-        const locales = Object.keys(grouped);
-        if (locales.length > 0) {
-          const defaultLocale = locales.includes("en-US")
-            ? "en-US"
-            : locales[0];
-          setSelectedLanguage(defaultLocale);
-          if (grouped[defaultLocale] && grouped[defaultLocale].length > 0) {
-            setSelectedVoice(grouped[defaultLocale][0].id);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to load voices:", err);
+    const locales = Object.keys(grouped);
+    if (locales.length > 0) {
+      const defaultLocale = locales.includes("en") ? "en" : locales[0];
+      setSelectedLanguage(defaultLocale);
+      if (grouped[defaultLocale] && grouped[defaultLocale].length > 0) {
+        setSelectedVoice(grouped[defaultLocale][0].id);
       }
-    };
-    fetchVoices();
+    }
   }, []);
 
   const languageNames = {

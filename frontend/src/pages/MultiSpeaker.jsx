@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Users, Cpu, CheckCircle, Download } from "lucide-react";
 import { toast } from "react-toastify";
 import { API_BASE_URL } from "../config/api";
+import { fallbackVoices } from "../config/voices";
 
 const localeNames = {
   de: "German",
@@ -26,34 +27,29 @@ const MultiSpeaker = () => {
   const audioRef = useRef(null);
 
   useEffect(() => {
-    // Fetch available voices from backend
-    const fetchVoices = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/tts/voices`);
-        const data = await response.json();
-        const groupedVoices = data.data || {};
-        const flatVoices = [];
+    // Process voices locally
+    try {
+      const groupedVoices = fallbackVoices || {};
+      const flatVoices = [];
 
-        Object.entries(groupedVoices).forEach(([locale, list]) => {
-          if (Array.isArray(list)) {
-            list.forEach((v) => {
-              flatVoices.push({
-                shortName: v.id,
-                displayName: v.name,
-                gender: v.type,
-                locale: locale,
-              });
+      Object.entries(groupedVoices).forEach(([locale, list]) => {
+        if (Array.isArray(list)) {
+          list.forEach((v) => {
+            flatVoices.push({
+              shortName: v.id,
+              displayName: v.name,
+              gender: v.type,
+              locale: locale,
             });
-          }
-        });
+          });
+        }
+      });
 
-        setVoices(flatVoices);
-      } catch (err) {
-        console.error("Failed to load voices:", err);
-        toast.error("Unable to retrieve voice library list. If the backend is waking up, please wait a minute and refresh.");
-      }
-    };
-    fetchVoices();
+      setVoices(flatVoices);
+    } catch (err) {
+      console.error("Failed to load voices:", err);
+      toast.error("Unable to load voice library list.");
+    }
 
     return () => {
       if (mergedUrl) URL.revokeObjectURL(mergedUrl);

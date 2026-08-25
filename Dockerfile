@@ -1,40 +1,47 @@
-FROM node:20-bullseye-slim
+# Stage 1: Build the React frontend
+FROM node:20-alpine AS frontend-builder
 
-# Install Python 3, pip, and venv
-RUN apt-get update \
-  && apt-get install -y python3 python3-pip python3-venv ffmpeg \
-  && rm -rf /var/lib/apt/lists/*
+WORKDIR /app/frontend
 
-WORKDIR /usr/src/app
+COPY frontend/package*.json ./
+RUN npm install
 
-# Copy package configurations and install node modules
-COPY Backend/package.json Backend/package-lock.json ./Backend/
-RUN cd Backend && npm ci --omit=dev
+COPY frontend/ ./
+RUN npm run build
 
-COPY frontend/package.json frontend/package-lock.json ./frontend/
-RUN cd frontend && npm ci
+# Stage 2: Setup the Node backend and combine everything
+FROM node:20-alpine
 
-# Copy sources
-COPY Backend ./Backend
-COPY frontend ./frontend
+# Install Python and ffmpeg (required for edge-tts)
+RUN apk add --no-cache python3 py3-pip ffmpeg && \
+    python3 -m venv /opt/venv
 
-# Build frontend production assets
-RUN cd frontend && npm run build
+# Activate virtual environment and install python dependencies
+ENV PATH="/opt/venv/bin:$PATH"
+RUN pip3 install edge-tts
 
-# Configure Python virtual environment and paths
-RUN python3 -m venv /usr/src/app/venv
-ENV PATH="/usr/src/app/venv/bin:$PATH"
+WORKDIR /app
 
-# Install python dependencies in the virtual environment
-RUN pip install --no-cache-dir --upgrade pip \
-  && pip install --no-cache-dir -r Backend/requirements.txt
+# Install backend dependencies
+COPY Backend/package*.json ./Backend/
+RUN cd Backend && npm install --production
 
-ENV PORT=5000
-ENV NODE_ENV=production
-ENV PYTHON_EXECUTABLE=/usr/src/app/venv/bin/python
+# Copy backend source code
+COPY Backend/ ./Backend/
 
-WORKDIR /usr/src/app/Backend
+# Copy built frontend static files from Stage 1
+COPY --from=frontend-builder /app/frontend/build ./frontend/build
 
+# Create cache directory
+RUN mkdir -p /app/Backend/cache
+
+# Expose backend port
 EXPOSE 5000
 
-CMD ["npm", "start"]
+# Set environment variables for production
+ENV NODE_ENV=production
+ENV PORT=5000
+ENV PYTHON_EXECUTABLE=/opt/venv/bin/python
+
+# Start the backend server (which will serve both API and frontend UI)
+CMD ["node", "Backend/server.js"]

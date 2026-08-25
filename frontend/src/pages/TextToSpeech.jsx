@@ -147,47 +147,20 @@ const TextToSpeech = () => {
     setGenerationError("");
     setGenerationStatus("Generating audio...");
     try {
-      const initResponse = await axios.post(
+      const response = await axios.post(
         `${API_BASE_URL}/api/tts/generate`,
         {
           text: text.trim(),
           voice: selectedVoice,
           language: languageCode,
         },
-        { timeout: 30000 }
+        {
+          responseType: "blob",
+          timeout: 60000,
+        },
       );
 
-      const jobId = initResponse.data?.jobId;
-      if (!jobId) throw new Error("Failed to initialize audio generation job");
-
-      setGenerationStatus("Job queued. Generating audio...");
-
-      let isCompleted = false;
-      let attempts = 0;
-      while (!isCompleted && attempts < 60) {
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        attempts++;
-        
-        const jobRes = await axios.get(`${API_BASE_URL}/api/tts/jobs/${jobId}`);
-        const status = jobRes.data.status;
-        
-        if (status === "completed") {
-          isCompleted = true;
-        } else if (status === "failed") {
-          throw new Error(jobRes.data.error || "Audio generation failed on server");
-        } else {
-          setGenerationStatus(`Processing... (${status})`);
-        }
-      }
-      
-      if (!isCompleted) throw new Error("Job timed out while waiting for completion");
-
-      const audioResponse = await axios.get(
-        `${API_BASE_URL}/api/tts/jobs/${jobId}/download`,
-        { responseType: "blob", timeout: 60000 }
-      );
-
-      const url = window.URL.createObjectURL(audioResponse.data);
+      const url = window.URL.createObjectURL(response.data);
       if (audioUrl) {
         window.URL.revokeObjectURL(audioUrl);
       }

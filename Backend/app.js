@@ -4,8 +4,6 @@ const path = require("node:path");
 const { spawn, spawnSync } = require("node:child_process");
 const crypto = require("node:crypto");
 const cors = require("cors");
-const { MongoClient } = require("mongodb");
-const { Pool } = require("pg");
 const multer = require("multer");
 
 const storage = multer.diskStorage({
@@ -25,20 +23,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 let cachedUsers = null;
-let pgPool = null;
-let lastPgError = null;
-
-function formatPgError(err) {
-  if (!err) return "";
-  let msg = err.message || err.detail || String(err);
-  if (err.errors && Array.isArray(err.errors)) {
-    msg +=
-      " [Nested: " +
-      err.errors.map((e) => e.message || String(e)).join(", ") +
-      "]";
-  }
-  return msg;
-}
 
 const app = express();
 const edgeTtsScript = path.join(__dirname, "edge_tts_generator.py");
@@ -1594,32 +1578,7 @@ app.post(
   })
 );
 
-// New API endpoints
-
 // Generate TTS audio
-app.get("/api/tts/jobs/:id", async (req, res) => {
-  try {
-    const job = await getJob(req.params.id);
-    if (!job) return res.status(404).json({ error: "NOT_FOUND", message: "Job not found" });
-    res.json(job);
-  } catch (error) {
-    res.status(500).json({ error: "SERVER_ERROR", message: error.message });
-  }
-});
-
-app.get("/api/tts/jobs/:id/download", async (req, res) => {
-  try {
-    const job = await getJob(req.params.id);
-    if (!job) return res.status(404).json({ error: "NOT_FOUND", message: "Job not found" });
-    if (job.status !== "completed") return res.status(400).json({ error: "NOT_READY", message: "Job is not completed yet" });
-    
-    const result = typeof job.result === 'string' ? JSON.parse(job.result) : job.result;
-    res.download(result.filePath, "audio.mp3");
-  } catch (error) {
-    res.status(500).json({ error: "SERVER_ERROR", message: error.message });
-  }
-});
-
 app.post(
   "/api/tts/generate",
   validateTTSRequest,
@@ -1637,29 +1596,30 @@ app.post(
         engine,
         req.body.language || "en",
       );
-      
-      const payload = {
-        text,
+
+      const { filePath, fromCache } = await generateAudio(
         cleanedText,
         selectedVoice,
         cacheKey,
-        engine,
-        language: req.body.language || "en"
-      };
-      
-      const userId = req.user ? req.user.id : null;
-      const jobId = await createJob('tts', payload, userId);
-      
-      res.status(202).json({
-        message: "Job created",
-        jobId: jobId,
-        status: "pending"
+        { engine, language: req.body.language || "en" },
+      );
+
+      if (!fromCache) {
+        addToHistory(text, selectedVoice, "success", req.user ? req.user.id : null);
+      }
+
+      res.setHeader("Content-Type", "audio/mpeg");
+      res.download(filePath, "audio.mp3", (downloadErr) => {
+        if (downloadErr && !res.headersSent) {
+          console.error("Error sending audio file:", downloadErr);
+        }
       });
     } catch (error) {
-      console.error("Error queueing audio generation:", error);
+      console.error("Error generating audio:", error);
+      addToHistory(text, selectedVoice, "failure", req.user ? req.user.id : null);
       res.status(500).json({
-        error: "QUEUE_FAILED",
-        message: error.message || "Failed to queue audio generation",
+        error: "GENERATION_FAILED",
+        message: error.message || "Failed to generate audio",
       });
     }
   }),
@@ -1752,20 +1712,59 @@ app.post(
     }
 
     try {
-      const payload = { turns };
-      const userId = req.user ? req.user.id : null;
-      const jobId = await createJob('multi-speaker', payload, userId);
-      
-      res.status(202).json({
-        message: "Multi-speaker job created",
-        jobId: jobId,
-        status: "pending"
+      const buffers = [];
+
+      for (let i = 0; i < turns.length; i++) {
+        const turn = turns[i];
+        const selectedVoice = resolveVoice(turn.voice);
+        const engine = resolveEngine(selectedVoice);
+        const ttsText = preprocessTextForTTS(turn.text, selectedVoice);
+        const cacheKey = generateCacheKey(ttsText, selectedVoice, engine, "en");
+
+        if (i > 0) {
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        }
+
+        const { filePath } = await generateAudio(
+          ttsText,
+          selectedVoice,
+          cacheKey,
+          { engine },
+        );
+
+        const buffer = fs.readFileSync(filePath);
+        buffers.push(buffer);
+      }
+
+      const mergedBuffer = Buffer.concat(buffers);
+      const mergedFileName = `multi-speaker-${Date.now()}-${Math.random().toString(36).slice(2)}.mp3`;
+      const mergedFilePath = path.join(CACHE_DIR, mergedFileName);
+      fs.writeFileSync(mergedFilePath, mergedBuffer);
+
+      addToHistory(
+        `Multi-Speaker Conversation (${turns.length} turns)`,
+        "Multi-Speaker",
+        "success",
+        req.user ? req.user.id : null
+      );
+
+      res.setHeader("Content-Type", "audio/mpeg");
+      res.download(mergedFilePath, "merged_conversation.mp3", (downloadErr) => {
+        if (downloadErr && !res.headersSent) {
+          console.error("Error sending merged audio:", downloadErr);
+        }
       });
     } catch (error) {
-      console.error("Error queueing multi-speaker audio:", error);
+      console.error("Multi-speaker generation failed:", error);
+      addToHistory(
+        "Multi-Speaker Conversation (Failed)",
+        "Multi-Speaker",
+        "failure",
+        req.user ? req.user.id : null
+      );
       res.status(500).json({
-        error: "QUEUE_FAILED",
-        message: error.message || "Failed to queue multi-speaker generation",
+        error: "GENERATION_FAILED",
+        message: error.message || "Failed to generate multi-speaker audio",
       });
     }
   }),
@@ -2125,266 +2124,7 @@ setInterval(processNextJob, 2000);
 
 // --- END QUEUE SYSTEM ---
 
-let db = null;
-const MONGODB_URI = process.env.MONGODB_URI;
-const DATABASE_URL = process.env.DATABASE_URL || process.env.POSTGRES_URL;
-
-if (DATABASE_URL) {
-  console.log("Attempting to connect to PostgreSQL database...");
-  pgPool = new Pool({
-    connectionString: DATABASE_URL,
-    ssl:
-      process.env.NODE_ENV === "production"
-        ? { rejectUnauthorized: false }
-        : false,
-  });
-
-  (async () => {
-    let client;
-    try {
-      client = await pgPool.connect();
-      const { rows: dbInfo } = await client.query(
-        "SELECT current_database(), current_user",
-      );
-      console.log(
-        `Connected to PostgreSQL database: "${dbInfo[0].current_database}" as user: "${dbInfo[0].current_user}"`,
-      );
-      console.log("Connected to PostgreSQL successfully! Adjusting schema...");
-
-      // Create tables automatically if they do not exist
-      await client.query(`
-        CREATE TABLE IF NOT EXISTS users (
-          id VARCHAR(100) PRIMARY KEY,
-          name VARCHAR(100),
-          email VARCHAR(150) UNIQUE,
-          password VARCHAR(255),
-          role VARCHAR(50) DEFAULT 'user',
-          access_status VARCHAR(50) DEFAULT 'approved',
-          password_hash VARCHAR(255),
-          password_salt VARCHAR(255),
-          profile JSONB,
-          sessions JSONB DEFAULT '[]'::jsonb,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
-      `);
-
-      await client.query(`
-        CREATE TABLE IF NOT EXISTS audio_jobs (
-          id VARCHAR(100) PRIMARY KEY,
-          user_id VARCHAR(100),
-          type VARCHAR(50),
-          payload JSONB,
-          status VARCHAR(50),
-          result JSONB,
-          error TEXT,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
-      `);
-
-      await client.query(`
-        CREATE TABLE IF NOT EXISTS audio_history (
-          id SERIAL PRIMARY KEY,
-          user_id VARCHAR(100),
-          text TEXT,
-          voice VARCHAR(100),
-          language VARCHAR(50),
-          gender VARCHAR(50),
-          status VARCHAR(50),
-          timestamp VARCHAR(100),
-          audio_file VARCHAR(255),
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-        );
-      `);
-
-      // Drop foreign key constraint first to prevent conflict during alter
-      await client.query(`
-        ALTER TABLE audio_history DROP CONSTRAINT IF EXISTS audio_history_user_id_fkey;
-      `);
-
-      // Safely drop the default serial sequence on users.id column if it exists
-      await client
-        .query(
-          `
-        ALTER TABLE users ALTER COLUMN id DROP DEFAULT;
-      `,
-        )
-        .catch((e) =>
-          console.log(
-            "users.id sequence default already dropped or not present",
-          ),
-        );
-
-      // Alter users.id column using explicit cast to character varying
-      await client.query(`
-        ALTER TABLE users ALTER COLUMN id TYPE VARCHAR(100) USING id::VARCHAR(100);
-      `);
-
-      // Add missing metadata columns to users table
-      await client.query(`
-        ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(50) DEFAULT 'user';
-        ALTER TABLE users ADD COLUMN IF NOT EXISTS access_status VARCHAR(50) DEFAULT 'approved';
-        ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash VARCHAR(255);
-        ALTER TABLE users ADD COLUMN IF NOT EXISTS password_salt VARCHAR(255);
-        ALTER TABLE users ADD COLUMN IF NOT EXISTS profile JSONB;
-        ALTER TABLE users ADD COLUMN IF NOT EXISTS sessions JSONB DEFAULT '[]'::jsonb;
-      `);
-
-      // Alter audio_history.user_id using explicit cast to character varying
-      await client.query(`
-        ALTER TABLE audio_history ALTER COLUMN user_id TYPE VARCHAR(100) USING user_id::VARCHAR(100);
-      `);
-
-      // Add missing metadata columns to audio_history table
-      await client.query(`
-        ALTER TABLE audio_history ADD COLUMN IF NOT EXISTS gender VARCHAR(50);
-        ALTER TABLE audio_history ADD COLUMN IF NOT EXISTS status VARCHAR(50);
-        ALTER TABLE audio_history ADD COLUMN IF NOT EXISTS timestamp VARCHAR(100);
-      `);
-
-      // Re-add foreign key constraint with cascade on delete
-      await client.query(`
-        ALTER TABLE audio_history ADD CONSTRAINT audio_history_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
-      `);
-
-      console.log("PostgreSQL schema adjusted and verified.");
-
-      // Fetch users from PostgreSQL into local cache
-      const { rows: pgUsers } = await client.query("SELECT * FROM users");
-      if (pgUsers && pgUsers.length > 0) {
-        cachedUsers = pgUsers.map((row) =>
-          normalizeUser({
-            id: row.id,
-            name: row.name,
-            email: row.email,
-            role: row.role,
-            accessStatus: row.access_status,
-            passwordHash: row.password_hash,
-            passwordSalt: row.password_salt,
-            profile:
-              typeof row.profile === "string"
-                ? JSON.parse(row.profile)
-                : row.profile,
-            sessions:
-              typeof row.sessions === "string"
-                ? JSON.parse(row.sessions)
-                : row.sessions,
-            joined: row.created_at
-              ? new Date(row.created_at).toISOString()
-              : new Date().toISOString(),
-          }),
-        );
-        console.log(
-          `Loaded ${cachedUsers.length} users from PostgreSQL into memory cache.`,
-        );
-      } else {
-        console.log(
-          "PostgreSQL users table is empty. Syncing local users to PostgreSQL...",
-        );
-        const currentUsers = loadUsers();
-        if (currentUsers.length > 0) {
-          for (const user of currentUsers) {
-            await client.query(
-              `INSERT INTO users (id, name, email, role, access_status, password_hash, password_salt, profile, sessions, created_at)
-               VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-              [
-                String(user.id),
-                user.name,
-                user.email,
-                user.role,
-                user.accessStatus,
-                user.passwordHash || "",
-                user.passwordSalt || "",
-                JSON.stringify(user.profile || {}),
-                JSON.stringify(user.sessions || []),
-                user.joined ? new Date(user.joined) : new Date(),
-              ],
-            );
-          }
-        }
-      }
-
-      // Fetch history records from PostgreSQL
-      const { rows: pgHistory } = await client.query(
-        "SELECT * FROM audio_history ORDER BY created_at DESC LIMIT 100",
-      );
-      if (pgHistory && pgHistory.length > 0) {
-        const historyList = pgHistory.map((row) => ({
-          id: row.id,
-          user_id: row.user_id,
-          text: row.text,
-          voice: row.voice,
-          language: row.language,
-          gender: row.gender,
-          status: row.status,
-          timestamp:
-            row.timestamp ||
-            (row.created_at
-              ? new Date(row.created_at).toISOString()
-              : new Date().toISOString()),
-        }));
-        fs.writeFileSync(HISTORY_FILE, JSON.stringify(historyList, null, 2));
-        console.log(
-          `Loaded ${historyList.length} history records from PostgreSQL.`,
-        );
-      }
-    } catch (err) {
-      console.error("PostgreSQL initialization error:", err);
-      pgPool = null;
-      lastPgError = {
-        operation: "startup",
-        message: formatPgError(err),
-        timestamp: new Date().toISOString(),
-      };
-    } finally {
-      if (client) client.release();
-    }
-
-    ensureDefaultAdminUser();
-  })().catch((err) => {
-    console.error("Unhandled async PG error:", err);
-    lastPgError = {
-      operation: "unhandledStartup",
-      message: formatPgError(err),
-      timestamp: new Date().toISOString(),
-    };
-    ensureDefaultAdminUser();
-  });
-} else if (MONGODB_URI) {
-  console.log("Attempting to connect to MongoDB Atlas...");
-  MongoClient.connect(MONGODB_URI)
-    .then((client) => {
-      db = client.db();
-      console.log("Connected to MongoDB successfully!");
-      return db.collection("users").find({}).toArray();
-    })
-    .then((dbUsers) => {
-      if (dbUsers && dbUsers.length > 0) {
-        cachedUsers = dbUsers.map(({ _id, ...user }) => normalizeUser(user));
-        console.log(
-          `Loaded ${cachedUsers.length} users from MongoDB into memory cache.`,
-        );
-      } else {
-        console.log(
-          "MongoDB users collection is empty. Backing up local users to MongoDB...",
-        );
-        const currentUsers = loadUsers();
-        if (currentUsers.length > 0) {
-          return db.collection("users").insertMany(currentUsers);
-        }
-      }
-    })
-    .then(() => {
-      ensureDefaultAdminUser();
-    })
-    .catch((err) => {
-      console.error("MongoDB initialization failed:", err);
-      ensureDefaultAdminUser();
-    });
-} else {
-  ensureDefaultAdminUser();
-}
+ensureDefaultAdminUser();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

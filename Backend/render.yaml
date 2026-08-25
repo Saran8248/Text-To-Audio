@@ -12,4 +12,4 @@ services:
       - key: NODE_ENV
         value: "production"
       - key: PYTHON_EXECUTABLE
-        value: "/usr/bin/python3"
+        value: "/usr/src/app/venv/bin/python"

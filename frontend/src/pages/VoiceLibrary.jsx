@@ -118,22 +118,39 @@ const VoiceLibrary = () => {
       }
 
       // Fetch dynamic audio from backend
-      const response = await fetch(`${API_BASE_URL}/api/tts/generate`, {
+      const initResponse = await fetch(`${API_BASE_URL}/api/tts/generate`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          text: sampleText,
-          voice: voice.id,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: sampleText, voice: voice.id }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to generate voice sample");
+      if (!initResponse.ok) throw new Error("Failed to initialize voice sample");
+      
+      const initData = await initResponse.json();
+      const jobId = initData.jobId;
+      if (!jobId) throw new Error("No job ID returned");
+      
+      let isCompleted = false;
+      let attempts = 0;
+      while (!isCompleted && attempts < 30) {
+        await new Promise(r => setTimeout(r, 2000));
+        attempts++;
+        const jobRes = await fetch(`${API_BASE_URL}/api/tts/jobs/${jobId}`);
+        const jobData = await jobRes.json();
+        
+        if (jobData.status === "completed") {
+          isCompleted = true;
+        } else if (jobData.status === "failed") {
+          throw new Error("Sample generation failed");
+        }
       }
+      
+      if (!isCompleted) throw new Error("Sample generation timed out");
 
-      const blob = await response.blob();
+      const downloadRes = await fetch(`${API_BASE_URL}/api/tts/jobs/${jobId}/download`);
+      if (!downloadRes.ok) throw new Error("Failed to download sample");
+
+      const blob = await downloadRes.blob();
       const audioUrl = URL.createObjectURL(blob);
 
       const a = new Audio(audioUrl);

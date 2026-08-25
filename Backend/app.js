@@ -558,66 +558,7 @@ function saveUsers(users) {
     console.error("Failed to save users locally:", error);
   }
 
-  if (db) {
-    db.collection("users")
-      .deleteMany({})
-      .then(() => {
-        if (cachedUsers.length > 0) {
-          return db.collection("users").insertMany(cachedUsers);
-        }
-      })
-      .then(() => {
-        console.log(
-          `Successfully backed up ${cachedUsers.length} users to MongoDB in background.`,
-        );
-      })
-      .catch((err) => {
-        console.error("Failed to sync users to MongoDB:", err);
-      });
-  }
 
-  if (pgPool) {
-    (async () => {
-      const client = await pgPool.connect();
-      try {
-        await client.query("BEGIN");
-        await client.query("DELETE FROM users");
-        for (const user of cachedUsers) {
-          await client.query(
-            `INSERT INTO users (id, name, email, password, role, access_status, password_hash, password_salt, profile, sessions, created_at)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
-            [
-              String(user.id),
-              user.name,
-              user.email,
-              "",
-              user.role,
-              user.accessStatus,
-              user.passwordHash || "",
-              user.passwordSalt || "",
-              JSON.stringify(user.profile || {}),
-              JSON.stringify(user.sessions || []),
-              user.joined ? new Date(user.joined) : new Date(),
-            ],
-          );
-        }
-        await client.query("COMMIT");
-        console.log(
-          `Successfully backed up ${cachedUsers.length} users to PostgreSQL in background.`,
-        );
-      } catch (err) {
-        await client.query("ROLLBACK");
-        console.error("Failed to sync users to PostgreSQL:", err);
-        lastPgError = {
-          operation: "saveUsers",
-          message: formatPgError(err),
-          timestamp: new Date().toISOString(),
-        };
-      } finally {
-        client.release();
-      }
-    })().catch((err) => console.error("Unhandled error in PG saveUsers:", err));
-  }
 }
 
 function hashPassword(password, salt = crypto.randomBytes(16).toString("hex")) {
@@ -1173,31 +1114,7 @@ function addToHistory(text, voice, status = "success", userId = null) {
   saveHistory(history);
   pruneAudioFiles();
 
-  if (pgPool) {
-    pgPool
-      .query(
-        `INSERT INTO audio_history (user_id, text, voice, language, gender, status, timestamp, audio_file)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-        [
-          userId,
-          newRecord.text,
-          newRecord.voice,
-          newRecord.language,
-          newRecord.gender,
-          newRecord.status,
-          newRecord.timestamp,
-          `cache/${voice}-${Date.now()}.mp3`,
-        ],
-      )
-      .catch((err) => {
-        console.error("Failed to insert history to PostgreSQL:", err);
-        lastPgError = {
-          operation: "addToHistory",
-          message: formatPgError(err),
-          timestamp: new Date().toISOString(),
-        };
-      });
-  }
+
 }
 
 // Routes
@@ -1212,11 +1129,7 @@ app.get("/health", (req, res) => {
     python: {
       executable: defaultPythonExecutable || null,
       edgeTtsAvailable: Boolean(resolvePythonExecutable("edge_tts")),
-    },
-    postgres: {
-      connected: Boolean(pgPool),
-      lastError: lastPgError,
-    },
+    }
   });
 });
 
@@ -1982,147 +1895,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// --- QUEUE SYSTEM ---
-const localJobs = new Map();
-let isProcessingQueue = false;
 
-async function createJob(type, payload, userId) {
-  const jobId = Date.now().toString() + "-" + Math.round(Math.random() * 1000).toString();
-  if (pgPool) {
-    await pgPool.query(
-      "INSERT INTO audio_jobs (id, user_id, type, payload, status) VALUES ($1, $2, $3, $4, 'pending')",
-      [jobId, userId, type, JSON.stringify(payload)]
-    );
-  } else {
-    localJobs.set(jobId, { id: jobId, user_id: userId, type, payload, status: 'pending', created_at: new Date().toISOString() });
-  }
-  return jobId;
-}
-
-async function getJob(jobId) {
-  if (pgPool) {
-    const { rows } = await pgPool.query("SELECT * FROM audio_jobs WHERE id = $1", [jobId]);
-    return rows[0] || null;
-  } else {
-    return localJobs.get(jobId) || null;
-  }
-}
-
-async function updateJobStatus(jobId, status, result = null, error = null) {
-  if (pgPool) {
-    await pgPool.query(
-      "UPDATE audio_jobs SET status = $1, result = $2, error = $3, updated_at = NOW() WHERE id = $4",
-      [status, result ? JSON.stringify(result) : null, error, jobId]
-    );
-  } else {
-    const job = localJobs.get(jobId);
-    if (job) {
-      job.status = status;
-      job.result = result;
-      job.error = error;
-      job.updated_at = new Date().toISOString();
-    }
-  }
-}
-
-async function processNextJob() {
-  if (isProcessingQueue) return;
-  isProcessingQueue = true;
-  
-  try {
-    let job = null;
-    if (pgPool) {
-      const client = await pgPool.connect();
-      try {
-        await client.query("BEGIN");
-        const { rows } = await client.query("SELECT * FROM audio_jobs WHERE status = 'pending' ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED");
-        if (rows.length > 0) {
-          job = rows[0];
-          await client.query("UPDATE audio_jobs SET status = 'processing' WHERE id = $1", [job.id]);
-        }
-        await client.query("COMMIT");
-      } catch (err) {
-        await client.query("ROLLBACK");
-        console.error("Queue PG Error:", err);
-      } finally {
-        client.release();
-      }
-    } else {
-      for (const j of localJobs.values()) {
-        if (j.status === 'pending') {
-          job = j;
-          job.status = 'processing';
-          break;
-        }
-      }
-    }
-
-    if (!job) {
-      isProcessingQueue = false;
-      return;
-    }
-
-    console.log(`[Queue] Processing job ${job.id} (${job.type})`);
-    const payload = typeof job.payload === 'string' ? JSON.parse(job.payload) : job.payload;
-    
-    try {
-      if (job.type === 'tts') {
-        const { filePath, fromCache } = await generateAudio(
-          payload.cleanedText, payload.selectedVoice, payload.cacheKey, { engine: payload.engine, language: payload.language }
-        );
-        await updateJobStatus(job.id, 'completed', { filePath, fromCache });
-        addToHistory(payload.text, payload.selectedVoice, "success", job.user_id);
-      } else if (job.type === 'multi-speaker') {
-        const buffers = [];
-        const turns = payload.turns;
-
-        for (let i = 0; i < turns.length; i++) {
-          const turn = turns[i];
-          const selectedVoice = resolveVoice(turn.voice);
-          const engine = resolveEngine(selectedVoice);
-          const ttsText = preprocessTextForTTS(turn.text, selectedVoice);
-          const cacheKey = generateCacheKey(ttsText, selectedVoice, engine, "en");
-
-          if (i > 0) {
-            await new Promise((resolve) => setTimeout(resolve, 500));
-          }
-
-          const { filePath } = await generateAudio(
-            ttsText,
-            selectedVoice,
-            cacheKey,
-            { engine }
-          );
-
-          const buffer = fs.readFileSync(filePath);
-          buffers.push(buffer);
-        }
-
-        const mergedBuffer = Buffer.concat(buffers);
-        const mergedFileName = `multi-speaker-${Date.now()}-${Math.random().toString(36).slice(2)}.mp3`;
-        const mergedFilePath = path.join(CACHE_DIR, mergedFileName);
-        fs.writeFileSync(mergedFilePath, mergedBuffer);
-
-        await updateJobStatus(job.id, 'completed', { filePath: mergedFilePath, fromCache: false });
-        addToHistory(`Multi-Speaker Conversation (${turns.length} turns)`, "Multi-Speaker", "success", job.user_id);
-      }
-    } catch (err) {
-      console.error(`[Queue] Job ${job.id} failed:`, err);
-      await updateJobStatus(job.id, 'failed', null, err.message);
-      if (job.type === 'tts') addToHistory(payload.text, payload.selectedVoice, "failure", job.user_id);
-      else if (job.type === 'multi-speaker') addToHistory(`Multi-Speaker Conversation (${payload.turns.length} turns)`, "Multi-Speaker", "failure", job.user_id);
-    }
-    
-    isProcessingQueue = false;
-    processNextJob();
-  } catch (error) {
-    console.error("[Queue] Fatal error in processing loop:", error);
-    isProcessingQueue = false;
-  }
-}
-setInterval(processNextJob, 2000);
-
-// --- END QUEUE SYSTEM ---
 
 ensureDefaultAdminUser();
 

@@ -191,7 +191,7 @@ const MultiSpeaker = () => {
 
     try {
       const token = localStorage.getItem("terra_tern_auth_token");
-      const response = await fetch(`${API_BASE_URL}/api/tts/multi-speaker`, {
+      const initResponse = await fetch(`${API_BASE_URL}/api/tts/multi-speaker`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -203,14 +203,40 @@ const MultiSpeaker = () => {
         }),
       });
 
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        throw new Error(
-          errData.message || "Server error occurred during generation.",
-        );
+      if (!initResponse.ok) {
+        const errData = await initResponse.json().catch(() => ({}));
+        throw new Error(errData.message || "Server error occurred during generation.");
       }
+      
+      const initData = await initResponse.json();
+      const jobId = initData.jobId;
+      if (!jobId) throw new Error("No job ID returned");
+      
+      toast.update(generateToast, { render: "Job queued. Generating audio...", type: "info", isLoading: true });
+      
+      let isCompleted = false;
+      let attempts = 0;
+      while (!isCompleted && attempts < 90) { // multi-speaker takes longer
+        await new Promise(r => setTimeout(r, 2000));
+        attempts++;
+        const jobRes = await fetch(`${API_BASE_URL}/api/tts/jobs/${jobId}`);
+        const jobData = await jobRes.json();
+        
+        if (jobData.status === "completed") {
+          isCompleted = true;
+        } else if (jobData.status === "failed") {
+          throw new Error(jobData.error || "Generation failed on server");
+        } else {
+          toast.update(generateToast, { render: `Processing... (${jobData.status})`, type: "info", isLoading: true });
+        }
+      }
+      
+      if (!isCompleted) throw new Error("Generation timed out while waiting");
 
-      const audioBlob = await response.blob();
+      const downloadRes = await fetch(`${API_BASE_URL}/api/tts/jobs/${jobId}/download`);
+      if (!downloadRes.ok) throw new Error("Failed to download audio file");
+
+      const audioBlob = await downloadRes.blob();
       const url = URL.createObjectURL(audioBlob);
 
       setMergedUrl(url);

@@ -1752,61 +1752,20 @@ app.post(
     }
 
     try {
-      const buffers = [];
-
-      for (let i = 0; i < turns.length; i++) {
-        const turn = turns[i];
-        const selectedVoice = resolveVoice(turn.voice);
-        const engine = resolveEngine(selectedVoice);
-
-        // Preprocess text (transliterate non-German umlauts, format German numbers)
-        const ttsText = preprocessTextForTTS(turn.text, selectedVoice);
-
-        const cacheKey = generateCacheKey(ttsText, selectedVoice, engine, "en");
-
-        if (i > 0) {
-          // Sleep for 500ms to prevent rate limiting Edge TTS connections
-          await new Promise((resolve) => setTimeout(resolve, 500));
-        }
-
-        const { filePath } = await generateAudio(
-          ttsText,
-          selectedVoice,
-          cacheKey,
-          { engine },
-        );
-
-        const buffer = fs.readFileSync(filePath);
-        buffers.push(buffer);
-      }
-
-      const mergedBuffer = Buffer.concat(buffers);
-      const mergedFileName = `multi-speaker-${Date.now()}-${Math.random().toString(36).slice(2)}.mp3`;
-      const mergedFilePath = path.join(CACHE_DIR, mergedFileName);
-      fs.writeFileSync(mergedFilePath, mergedBuffer);
-
-      addToHistory(
-        `Multi-Speaker Conversation (${turns.length} turns)`,
-        "Multi-Speaker",
-        "success",
-      );
-
-      res.setHeader("Content-Type", "audio/mpeg");
-      res.download(mergedFilePath, "merged_conversation.mp3", (downloadErr) => {
-        if (downloadErr && !res.headersSent) {
-          console.error("Error sending merged audio:", downloadErr);
-        }
+      const payload = { turns };
+      const userId = req.user ? req.user.id : null;
+      const jobId = await createJob('multi-speaker', payload, userId);
+      
+      res.status(202).json({
+        message: "Multi-speaker job created",
+        jobId: jobId,
+        status: "pending"
       });
     } catch (error) {
-      console.error("Multi-speaker generation failed:", error);
-      addToHistory(
-        "Multi-Speaker Conversation (Failed)",
-        "Multi-Speaker",
-        "failure",
-      );
+      console.error("Error queueing multi-speaker audio:", error);
       res.status(500).json({
-        error: "GENERATION_FAILED",
-        message: error.message || "Failed to generate multi-speaker audio",
+        error: "QUEUE_FAILED",
+        message: error.message || "Failed to queue multi-speaker generation",
       });
     }
   }),
@@ -2114,11 +2073,45 @@ async function processNextJob() {
         );
         await updateJobStatus(job.id, 'completed', { filePath, fromCache });
         addToHistory(payload.text, payload.selectedVoice, "success", job.user_id);
+      } else if (job.type === 'multi-speaker') {
+        const buffers = [];
+        const turns = payload.turns;
+
+        for (let i = 0; i < turns.length; i++) {
+          const turn = turns[i];
+          const selectedVoice = resolveVoice(turn.voice);
+          const engine = resolveEngine(selectedVoice);
+          const ttsText = preprocessTextForTTS(turn.text, selectedVoice);
+          const cacheKey = generateCacheKey(ttsText, selectedVoice, engine, "en");
+
+          if (i > 0) {
+            await new Promise((resolve) => setTimeout(resolve, 500));
+          }
+
+          const { filePath } = await generateAudio(
+            ttsText,
+            selectedVoice,
+            cacheKey,
+            { engine }
+          );
+
+          const buffer = fs.readFileSync(filePath);
+          buffers.push(buffer);
+        }
+
+        const mergedBuffer = Buffer.concat(buffers);
+        const mergedFileName = `multi-speaker-${Date.now()}-${Math.random().toString(36).slice(2)}.mp3`;
+        const mergedFilePath = path.join(CACHE_DIR, mergedFileName);
+        fs.writeFileSync(mergedFilePath, mergedBuffer);
+
+        await updateJobStatus(job.id, 'completed', { filePath: mergedFilePath, fromCache: false });
+        addToHistory(`Multi-Speaker Conversation (${turns.length} turns)`, "Multi-Speaker", "success", job.user_id);
       }
     } catch (err) {
       console.error(`[Queue] Job ${job.id} failed:`, err);
       await updateJobStatus(job.id, 'failed', null, err.message);
       if (job.type === 'tts') addToHistory(payload.text, payload.selectedVoice, "failure", job.user_id);
+      else if (job.type === 'multi-speaker') addToHistory(`Multi-Speaker Conversation (${payload.turns.length} turns)`, "Multi-Speaker", "failure", job.user_id);
     }
     
     isProcessingQueue = false;

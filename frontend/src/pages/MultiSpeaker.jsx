@@ -200,9 +200,13 @@ const MultiSpeaker = () => {
       });
 
       const audioBlob = await response.blob();
-      const url = URL.createObjectURL(audioBlob);
+      const mp3Blob = new Blob([audioBlob], { type: "audio/mpeg" });
+      const url = URL.createObjectURL(mp3Blob);
 
       setMergedUrl(url);
+      if (audioRef.current) {
+        audioRef.current.load();
+      }
       toast.dismiss(generateToast);
       toast.success("Conversation audio successfully generated!");
     } catch (err) {

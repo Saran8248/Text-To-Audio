@@ -129,7 +129,8 @@ const VoiceLibrary = () => {
       });
 
       const blob = await response.blob();
-      const audioUrl = URL.createObjectURL(blob);
+      const mp3Blob = new Blob([blob], { type: "audio/mpeg" });
+      const audioUrl = URL.createObjectURL(mp3Blob);
 
       const a = new Audio(audioUrl);
       audioRef.current = a;

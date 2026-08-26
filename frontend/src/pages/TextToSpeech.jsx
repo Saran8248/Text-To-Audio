@@ -152,11 +152,15 @@ const TextToSpeech = () => {
       });
 
       const audioBlob = await response.blob();
-      const url = window.URL.createObjectURL(audioBlob);
+      const mp3Blob = new Blob([audioBlob], { type: "audio/mpeg" });
+      const url = window.URL.createObjectURL(mp3Blob);
       if (audioUrl) {
         window.URL.revokeObjectURL(audioUrl);
       }
       setAudioUrl(url);
+      if (audioRef.current) {
+        audioRef.current.load();
+      }
       setGenerationStatus("Audio is ready to preview or download.");
       toast.success("Audio generated successfully!");
       setIsPlaying(false);

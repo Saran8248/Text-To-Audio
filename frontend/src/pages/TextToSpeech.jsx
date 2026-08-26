@@ -10,6 +10,7 @@ import {
 import { toast } from "react-toastify";
 import axios from "axios";
 import { API_BASE_URL } from "../config/api";
+import { apiFetch } from "../utils/apiHelper";
 import { fallbackVoices } from "../config/voices";
 
 const getErrorMessage = async (error) => {
@@ -28,7 +29,7 @@ const getErrorMessage = async (error) => {
   }
 
   if (error.message === "Network Error" || error.code === "ERR_NETWORK") {
-    return "Could not connect to the server. Please ensure the backend server is running on port 5000.";
+    return "Unable to connect to the audio server. Please wait a moment and try again (the server might be starting up).";
   }
 
   return data?.message || error.message || fallback;
@@ -141,20 +142,17 @@ const TextToSpeech = () => {
     setGenerationError("");
     setGenerationStatus("Generating audio...");
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/tts/generate`,
-        {
+      const response = await apiFetch(`/api/tts/generate`, {
+        method: "POST",
+        body: JSON.stringify({
           text: text.trim(),
           voice: selectedVoice,
           language: languageCode,
-        },
-        {
-          responseType: "blob",
-          timeout: 60000,
-        },
-      );
+        })
+      });
 
-      const url = window.URL.createObjectURL(response.data);
+      const audioBlob = await response.blob();
+      const url = window.URL.createObjectURL(audioBlob);
       if (audioUrl) {
         window.URL.revokeObjectURL(audioUrl);
       }
@@ -163,10 +161,17 @@ const TextToSpeech = () => {
       toast.success("Audio generated successfully!");
       setIsPlaying(false);
     } catch (error) {
-      const message = await getErrorMessage(error);
-      setGenerationError(message);
-      setGenerationStatus("");
-      toast.error(message);
+      console.error("API Request Failed:", error);
+      let errorMessage = "Generation failed.";
+      if (error.message?.includes("Failed to fetch") || error.message?.includes("NetworkError") || error.message?.includes("network request failed")) {
+        errorMessage = "Unable to connect to the audio server. Please wait a moment and try again (the server might be starting up).";
+      } else if (error.message?.includes("API error")) {
+        errorMessage = error.message.replace("API error ", "");
+      } else {
+        errorMessage = await getErrorMessage(error);
+      }
+      setGenerationError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

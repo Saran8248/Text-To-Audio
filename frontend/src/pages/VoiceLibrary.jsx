@@ -148,8 +148,10 @@ const VoiceLibrary = () => {
     } catch (err) {
       console.error("Playback error", err);
       let errorMessage = "Playback failed. Tap again to try.";
-      if (err.message?.includes("Failed to fetch") || err.message?.includes("NetworkError") || err.message?.includes("API error")) {
+      if (err.message?.includes("Failed to fetch") || err.message?.includes("NetworkError")) {
         errorMessage = "Unable to connect to the audio server. Please wait a moment and try again (the server might be starting up).";
+      } else if (err.message?.includes("API error")) {
+        errorMessage = err.message.replace("API error ", "");
       }
       toast.error(errorMessage);
       stopPlayback();

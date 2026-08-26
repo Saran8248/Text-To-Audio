@@ -212,6 +212,8 @@ const MultiSpeaker = () => {
       let errorMessage = err.message || "Generation failed.";
       if (errorMessage.includes("Failed to fetch") || errorMessage.includes("NetworkError")) {
         errorMessage = "Unable to connect to the audio server. Please wait a moment and try again (the server might be starting up).";
+      } else if (errorMessage.includes("API error")) {
+        errorMessage = errorMessage.replace("API error ", "");
       }
       
       toast.error(errorMessage);

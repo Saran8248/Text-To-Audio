@@ -10,7 +10,7 @@ const normalizeApiUrl = (url) => {
 
 const isProduction = process.env.NODE_ENV === 'production';
 const configuredApiUrl = normalizeApiUrl(process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_API_URL);
-const renderBackendUrl = 'https://text-to-audio-ow4o.onrender.com';
+const renderBackendUrl = 'https://text-to-audio-1.onrender.com';
 
 if (!configuredApiUrl) {
   console.warn(

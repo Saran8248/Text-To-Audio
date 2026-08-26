@@ -161,14 +161,10 @@ const TextToSpeech = () => {
       toast.success("Audio generated successfully!");
       setIsPlaying(false);
     } catch (error) {
-      console.error("API Request Failed:", error);
-      let errorMessage = "Generation failed.";
-      if (error.message?.includes("Failed to fetch") || error.message?.includes("NetworkError") || error.message?.includes("network request failed")) {
-        errorMessage = "Unable to connect to the audio server. Please wait a moment and try again (the server might be starting up).";
-      } else if (error.message?.includes("API error")) {
-        errorMessage = error.message.replace("API error ", "");
-      } else {
-        errorMessage = await getErrorMessage(error);
+      console.error("TTS API Error:", error);
+      let errorMessage = error.message || "Generation failed.";
+      if (error.message?.includes("Failed to fetch") || error.message?.includes("NetworkError") || error.message?.includes("Load failed")) {
+        errorMessage = "Network connection failed. Could not reach audio server.";
       }
       setGenerationError(errorMessage);
       toast.error(errorMessage);

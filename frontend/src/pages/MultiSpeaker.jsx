@@ -206,14 +206,12 @@ const MultiSpeaker = () => {
       toast.dismiss(generateToast);
       toast.success("Conversation audio successfully generated!");
     } catch (err) {
-      console.error("API Request Failed:", err);
+      console.error("MultiSpeaker API Error:", err);
       toast.dismiss(generateToast);
       
       let errorMessage = err.message || "Generation failed.";
-      if (errorMessage.includes("Failed to fetch") || errorMessage.includes("NetworkError")) {
-        errorMessage = "Unable to connect to the audio server. Please wait a moment and try again (the server might be starting up).";
-      } else if (errorMessage.includes("API error")) {
-        errorMessage = errorMessage.replace("API error ", "");
+      if (errorMessage.includes("Failed to fetch") || errorMessage.includes("NetworkError") || errorMessage.includes("Load failed")) {
+        errorMessage = "Network connection failed. Could not reach audio server.";
       }
       
       toast.error(errorMessage);

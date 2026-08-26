@@ -5,19 +5,19 @@ const normalizeApiUrl = (url) => {
   if (/^[a-zA-Z][a-zA-Z\d+-.]*:/.test(trimmed)) {
     return trimmed;
   }
-  return `http://${trimmed}`;
+  return `https://${trimmed}`;
 };
 
-const isProduction = process.env.NODE_ENV === 'production';
-const configuredApiUrl = normalizeApiUrl(process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_API_URL);
 const renderBackendUrl = 'https://text-to-audio-1.onrender.com';
 
-if (!configuredApiUrl) {
-  console.warn(
-    'REACT_APP_API_BASE_URL is not configured. Falling back to the default Render backend.'
-  );
-}
+let envApiUrl = null;
+try {
+  if (typeof process !== 'undefined' && process.env) {
+    envApiUrl = process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_API_URL || process.env.VITE_API_URL;
+  }
+} catch (e) {}
 
+const configuredApiUrl = normalizeApiUrl(envApiUrl);
 const isVercelHost = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
 
 export const API_BASE_URL = configuredApiUrl || (isVercelHost ? '' : renderBackendUrl);

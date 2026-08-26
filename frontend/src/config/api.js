@@ -9,14 +9,13 @@ const normalizeApiUrl = (url) => {
 };
 
 const isProduction = process.env.NODE_ENV === 'production';
-const isVercelHost = typeof window !== 'undefined' && /\.vercel\.app$/.test(window.location.hostname);
 const configuredApiUrl = normalizeApiUrl(process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_API_URL);
-const defaultApiUrl = isProduction ? '' : 'http://localhost:5000';
+const renderBackendUrl = 'https://text-to-audio-ow4o.onrender.com';
 
-if (isProduction && !configuredApiUrl) {
+if (!configuredApiUrl) {
   console.warn(
-    'REACT_APP_API_BASE_URL is not set. Using same-origin API requests in production.'
+    'REACT_APP_API_BASE_URL is not configured. Falling back to the default Render backend.'
   );
 }
 
-export const API_BASE_URL = configuredApiUrl || (isProduction && isVercelHost ? '' : defaultApiUrl);
+export const API_BASE_URL = configuredApiUrl || renderBackendUrl;

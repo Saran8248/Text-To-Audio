@@ -1900,7 +1900,7 @@ app.use((err, req, res, next) => {
 ensureDefaultAdminUser();
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`🎵 Server running on port ${PORT}`);
   console.log(`Cache directory: ${CACHE_DIR}`);
   console.log(`History file: ${HISTORY_FILE}`);

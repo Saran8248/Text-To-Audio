@@ -27,6 +27,10 @@ const getErrorMessage = async (error) => {
     }
   }
 
+  if (error.message === "Network Error" || error.code === "ERR_NETWORK") {
+    return "Could not connect to the server. Please ensure the backend server is running on port 5000.";
+  }
+
   return data?.message || error.message || fallback;
 };
 

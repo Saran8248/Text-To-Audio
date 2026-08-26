@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Users, Cpu, CheckCircle, Download } from "lucide-react";
 import { toast } from "react-toastify";
 import { API_BASE_URL } from "../config/api";
+import { apiFetch } from "../utils/apiHelper";
 import { fallbackVoices } from "../config/voices";
 
 const localeNames = {
@@ -187,10 +188,9 @@ const MultiSpeaker = () => {
 
     try {
       const token = localStorage.getItem("terra_tern_auth_token");
-      const response = await fetch(`${API_BASE_URL}/api/tts/multi-speaker`, {
+      const response = await apiFetch(`/api/tts/multi-speaker`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
@@ -199,13 +199,6 @@ const MultiSpeaker = () => {
         }),
       });
 
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        throw new Error(
-          errData.message || "Server error occurred during generation.",
-        );
-      }
-
       const audioBlob = await response.blob();
       const url = URL.createObjectURL(audioBlob);
 
@@ -213,9 +206,15 @@ const MultiSpeaker = () => {
       toast.dismiss(generateToast);
       toast.success("Conversation audio successfully generated!");
     } catch (err) {
-      console.error(err);
+      console.error("API Request Failed:", err);
       toast.dismiss(generateToast);
-      toast.error(err.message || "Generation failed.");
+      
+      let errorMessage = err.message || "Generation failed.";
+      if (errorMessage.includes("Failed to fetch") || errorMessage.includes("NetworkError")) {
+        errorMessage = "Unable to connect to the audio server. Please wait a moment and try again (the server might be starting up).";
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setIsGenerating(false);
     }

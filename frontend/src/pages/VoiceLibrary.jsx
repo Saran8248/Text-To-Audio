@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { Heart, Play, Music, Filter } from "lucide-react";
 import { toast } from "react-toastify";
 import { API_BASE_URL } from "../config/api";
+import { apiFetch } from "../utils/apiHelper";
 
 const VoiceLibrary = () => {
   const [favorites, setFavorites] = useState(new Set());
@@ -118,16 +119,17 @@ const VoiceLibrary = () => {
       }
 
       // Fetch dynamic audio from backend
-      const response = await fetch(`${API_BASE_URL}/api/tts/generate`, {
+      const response = await apiFetch(`/api/tts/generate`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: sampleText, voice: voice.id }),
+        body: JSON.stringify({
+          text: sampleText,
+          voice: voice.id,
+          language: langLower
+        }),
       });
 
-      if (!response.ok) throw new Error("Failed to fetch voice sample");
-      
-      const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
+      const blob = await response.blob();
+      const audioUrl = URL.createObjectURL(blob);
 
       const a = new Audio(audioUrl);
       audioRef.current = a;
@@ -145,7 +147,11 @@ const VoiceLibrary = () => {
       }
     } catch (err) {
       console.error("Playback error", err);
-      toast.error("Playback failed. Tap again to try.");
+      let errorMessage = "Playback failed. Tap again to try.";
+      if (err.message?.includes("Failed to fetch") || err.message?.includes("NetworkError") || err.message?.includes("API error")) {
+        errorMessage = "Unable to connect to the audio server. Please wait a moment and try again (the server might be starting up).";
+      }
+      toast.error(errorMessage);
       stopPlayback();
     }
   };

@@ -460,43 +460,33 @@ const configuredAllowedOrigins = (
   .map((origin) => origin.trim().replace(/\/+$/, ""))
   .filter(Boolean);
 
-const corsOptions =
-  configuredAllowedOrigins.length > 0
-    ? {
-        origin(origin, callback) {
-          if (
-            !origin ||
-            configuredAllowedOrigins.includes(origin.replace(/\/+$/, ""))
-          ) {
-            callback(null, true);
-            return;
-          }
-          callback(new Error(`Origin not allowed by CORS: ${origin}`));
-        },
-        credentials: true,
-        methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-        allowedHeaders: ["Content-Type", "Authorization", "Accept"],
-        preflightContinue: false,
-        optionsSuccessStatus: 204,
-      }
-    : {
-        origin: true,
-        credentials: true,
-        methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-        allowedHeaders: ["Content-Type", "Authorization", "Accept"],
-        preflightContinue: false,
-        optionsSuccessStatus: 204,
-      };
-
-if (isProduction && configuredAllowedOrigins.length === 0) {
-  console.warn(
-    "CORS: no FRONTEND_URL or CORS_ORIGINS configured in production; allowing browser requests from any origin.",
-  );
-}
+const corsOptions = {
+  origin: true,
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "Accept",
+    "Origin",
+    "X-Requested-With",
+    "Range",
+  ],
+  exposedHeaders: [
+    "Content-Range",
+    "Accept-Ranges",
+    "Content-Length",
+    "Content-Type",
+  ],
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+};
 
 // Middleware
 app.use(cors(corsOptions));
-app.use(express.json({ limit: "64kb" }));
+app.options("*", cors(corsOptions));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 function normalizeUser(user) {
   return {

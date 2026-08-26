@@ -18,4 +18,6 @@ if (!configuredApiUrl) {
   );
 }
 
-export const API_BASE_URL = configuredApiUrl || renderBackendUrl;
+const isVercelHost = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
+
+export const API_BASE_URL = configuredApiUrl || (isVercelHost ? '' : renderBackendUrl);

@@ -20,4 +20,5 @@ try {
 const configuredApiUrl = normalizeApiUrl(envApiUrl);
 const isVercelHost = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
 
-export const API_BASE_URL = configuredApiUrl || (isVercelHost ? '' : renderBackendUrl);
+// Force direct connection to backend on Vercel to avoid 502 proxy timeouts
+export const API_BASE_URL = configuredApiUrl || renderBackendUrl;

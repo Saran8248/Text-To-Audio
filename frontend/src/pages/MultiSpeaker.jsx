@@ -16,7 +16,7 @@ const localeNames = {
 
 const MultiSpeaker = () => {
   const [conversationText, setConversationText] = useState(
-    "Tom: Hallo Anna.\nAnna: Hallo Tom.\nNarrator: Beide gehen ins Restaurant.\nTom: Ich möchte Pizza.\nAnna: Ich nehme Pasta.",
+    "Tom: Hello Anna.\nAnna: Hello Tom.\nNarrator: Both go to the restaurant.\nTom: I would like some Pizza.\nAnna: I'll have Pasta.",
   );
   const [voices, setVoices] = useState([]);
   const [voiceMapping, setVoiceMapping] = useState({});
@@ -94,27 +94,27 @@ const MultiSpeaker = () => {
             lower.includes("female") ||
             lower.includes("girl")
           ) {
-            newMapping[speaker] = "de-DE-KatjaNeural";
+            newMapping[speaker] = "en-US-AriaNeural";
           } else if (
             lower.includes("tom") ||
             lower.includes("male") ||
             lower.includes("boy")
           ) {
-            newMapping[speaker] = "de-DE-ConradNeural";
+            newMapping[speaker] = "en-US-GuyNeural";
           } else if (
             lower.includes("narrator") ||
             lower.includes("story") ||
             lower.includes("erzähler")
           ) {
-            newMapping[speaker] = "de-DE-AmalaNeural";
+            newMapping[speaker] = "en-GB-LibbyNeural";
           } else {
-            newMapping[speaker] = "de-DE-KillianNeural";
+            newMapping[speaker] = "en-GB-RyanNeural";
           }
         }
 
         const voiceId = newMapping[speaker];
         const voiceObj = voices.find((v) => v.shortName === voiceId);
-        const fullLocale = voiceObj ? voiceObj.locale : (voiceId.split("-").slice(0, 2).join("-") || "de");
+        const fullLocale = voiceObj ? voiceObj.locale : (voiceId.split("-").slice(0, 2).join("-") || "en");
         newLanguages[speaker] = fullLocale.split("-")[0];
       });
 
@@ -292,7 +292,7 @@ const MultiSpeaker = () => {
                     {/* Language Dropdown */}
                     <div className="flex-1 relative">
                       <select
-                        value={speakerLanguages[speaker] || "de"}
+                        value={speakerLanguages[speaker] || "en"}
                         onChange={(e) =>
                           handleLanguageChange(speaker, e.target.value)
                         }
@@ -325,7 +325,7 @@ const MultiSpeaker = () => {
                         className="w-full pl-4 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:border-sky-500 focus:outline-none appearance-none cursor-pointer text-sm font-medium hover:border-slate-300"
                       >
                         {voices
-                          .filter((v) => v.locale.startsWith(speakerLanguages[speaker] || "de"))
+                          .filter((v) => v.locale.startsWith(speakerLanguages[speaker] || "en"))
                           .map((voice) => (
                             <option
                               key={voice.shortName}
@@ -418,3 +418,7 @@ const MultiSpeaker = () => {
 };
 
 export default MultiSpeaker;
+
+
+
+

@@ -11,25 +11,6 @@ import { toast } from "react-toastify";
 import { apiFetch } from "../utils/apiHelper";
 import { fallbackVoices } from "../config/voices";
 
-const data = error.response?.data;
-
-  if (data instanceof Blob) {
-    try {
-      const text = await data.text();
-      const parsed = JSON.parse(text);
-      return parsed.message || parsed.error || fallback;
-    } catch {
-      return fallback;
-    }
-  }
-
-  if (error.message === "Network Error" || error.code === "ERR_NETWORK") {
-    return "Unable to connect to the audio server. Please wait a moment and try again (the server might be starting up).";
-  }
-
-  return data?.message || error.message || fallback;
-};
-
 const TextToSpeech = () => {
   const [text, setText] = useState("");
   const [audioUrl, setAudioUrl] = useState(null);

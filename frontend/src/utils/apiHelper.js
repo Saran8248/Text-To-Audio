@@ -2,7 +2,7 @@ import { API_BASE_URL } from '../config/api';
 
 export async function apiFetch(endpoint, options = {}) {
     const baseUrl = API_BASE_URL;
-    const url = `${endpoint};
+    const url = `${baseUrl}${endpoint}`;
     
     console.log("API URL:", baseUrl || "(same-origin / vercel proxy)");
     console.log("Request URL:", url);
@@ -29,7 +29,7 @@ export async function apiFetch(endpoint, options = {}) {
             } catch (err) {
                 errorText = "Could not read error response";
             }
-            throw new Error(API request failed: ${response.status} ${errorText || 'Unknown error'});
+            throw new Error(`API request failed: ${response.status} ${errorText || 'Unknown error'}`);
         }
 
         return response;
@@ -39,3 +39,5 @@ export async function apiFetch(endpoint, options = {}) {
         throw error;
     }
 }
+
+

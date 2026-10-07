@@ -4,7 +4,6 @@ import {
   X,
   Home,
   Mic2,
-  Music,
   History,
   Settings,
   GitMerge,
@@ -118,3 +117,4 @@ const Sidebar = ({ user, onLogout }) => {
 };
 
 export default Sidebar;
+

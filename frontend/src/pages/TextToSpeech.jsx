@@ -8,15 +8,10 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { toast } from "react-toastify";
-import axios from "axios";
-import { API_BASE_URL } from "../config/api";
 import { apiFetch } from "../utils/apiHelper";
 import { fallbackVoices } from "../config/voices";
 
-const getErrorMessage = async (error) => {
-  const fallback =
-    "The hosted voice service is not ready yet. Please try again shortly or contact the site owner.";
-  const data = error.response?.data;
+const data = error.response?.data;
 
   if (data instanceof Blob) {
     try {
@@ -501,3 +496,4 @@ const TextToSpeech = () => {
 };
 
 export default TextToSpeech;
+

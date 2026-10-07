@@ -1,7 +1,6 @@
 import React, { useState, useRef } from "react";
 import { Heart, Play, Music, Filter } from "lucide-react";
 import { toast } from "react-toastify";
-import { API_BASE_URL } from "../config/api";
 import { apiFetch } from "../utils/apiHelper";
 
 const VoiceLibrary = () => {
@@ -308,3 +307,4 @@ const VoiceLibrary = () => {
 };
 
 export default VoiceLibrary;
+

@@ -18,7 +18,19 @@ try {
 } catch (e) {}
 
 const configuredApiUrl = normalizeApiUrl(envApiUrl);
-const isVercelHost = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
+const isBrowser = typeof window !== 'undefined';
+const isLocalhost = isBrowser && (
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1' ||
+  window.location.hostname === '0.0.0.0' ||
+  window.location.hostname === ''
+);
 
-// Force direct connection to backend on Vercel to avoid 502 proxy timeouts
-export const API_BASE_URL = configuredApiUrl || renderBackendUrl;
+let defaultBackendUrl = renderBackendUrl;
+if (isLocalhost) {
+  defaultBackendUrl = 'http://localhost:5000';
+} else if (isBrowser && window.location.port === '5000') {
+  defaultBackendUrl = window.location.origin;
+}
+
+export const API_BASE_URL = configuredApiUrl || defaultBackendUrl;

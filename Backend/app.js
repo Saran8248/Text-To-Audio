@@ -910,7 +910,17 @@ function runGenerateAudio(text, voice, cacheKey, options = {}) {
             "--output",
             tempFilePath,
           ]
-        : [script, "--text", text, "--voice", voice, "--output", tempFilePath];
+        : [
+            script,
+            "--text",
+            text,
+            "--voice",
+            voice,
+            "--language",
+            language,
+            "--output",
+            tempFilePath,
+          ];
 
     const child = spawn(pythonExecutable, args, {
       windowsHide: true,
@@ -951,15 +961,21 @@ function runGenerateAudio(text, voice, cacheKey, options = {}) {
 
       if (code !== 0) {
         cleanupTempFile(tempFilePath);
-        reject(
-          new Error(
-            (
-              stderr ||
-              stdout ||
-              `${engine === "coqui" ? "XTTS" : "Edge TTS"} failed with exit code ${code}`
-            ).trim(),
-          ),
-        );
+        let errorMsg = (
+          stderr ||
+          stdout ||
+          `${engine === "coqui" ? "XTTS" : "Edge TTS"} failed with exit code ${code}`
+        ).trim();
+
+        if (
+          errorMsg.includes("speech.platform.bing.com") ||
+          (errorMsg.includes("403") && errorMsg.includes("Invalid response status"))
+        ) {
+          errorMsg =
+            "Microsoft Edge TTS service refused connection (403 Forbidden). Upstream datacenter IP restriction encountered.";
+        }
+
+        reject(new Error(errorMsg));
         return;
       }
 

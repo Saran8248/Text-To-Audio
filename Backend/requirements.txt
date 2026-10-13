@@ -3,3 +3,5 @@ pydub
 SpeechRecognition
 numpy
 pymp3
+gTTS>=2.5.0
+

@@ -29,6 +29,12 @@ export async function apiFetch(endpoint, options = {}) {
             } catch (err) {
                 errorText = "Could not read error response";
             }
+            if (
+                errorText.includes("wss://speech.platform.bing.com") ||
+                (errorText.includes("403") && errorText.includes("Invalid response status"))
+            ) {
+                errorText = "TTS service connection error (403 Forbidden). Microsoft Edge TTS endpoint refused the connection.";
+            }
             throw new Error(`API request failed: ${response.status} ${errorText || 'Unknown error'}`);
         }
 

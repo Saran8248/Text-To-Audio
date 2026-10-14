@@ -19,6 +19,18 @@ def parse_args():
     return parser.parse_args()
 
 def get_language_from_voice(voice, requested_language=None):
+    if voice:
+        parts = voice.split("-")
+        if parts:
+            candidate = parts[0].lower()
+            if HAS_GTTS:
+                try:
+                    if candidate in gtts_lang.tts_langs():
+                        return candidate
+                except Exception:
+                    pass
+            return candidate
+
     if requested_language:
         candidate = requested_language.strip().lower()
         if HAS_GTTS:
@@ -33,26 +45,43 @@ def get_language_from_voice(voice, requested_language=None):
                 pass
         return candidate.split("-")[0]
 
-    if voice:
-        parts = voice.split("-")
-        if parts:
-            candidate = parts[0].lower()
-            if HAS_GTTS:
-                try:
-                    if candidate in gtts_lang.tts_langs():
-                        return candidate
-                except Exception:
-                    pass
-            return candidate
-
     return "en"
+
+def get_tld_from_voice(voice):
+    if not voice:
+        return "com"
+    v = voice.lower()
+    if "en-in" in v:
+        return "co.in"
+    if "en-gb" in v:
+        return "co.uk"
+    if "en-au" in v:
+        return "com.au"
+    if "en-ca" in v:
+        return "ca"
+    if "en-za" in v:
+        return "co.za"
+    if "es-mx" in v:
+        return "com.mx"
+    if "es-es" in v:
+        return "es"
+    if "fr-ca" in v:
+        return "ca"
+    if "fr-fr" in v:
+        return "fr"
+    return "com"
 
 def generate_voice_gtts(text, voice, language, output_path):
     if not HAS_GTTS:
         raise RuntimeError("gTTS is not installed for fallback TTS")
     
     lang_code = get_language_from_voice(voice, language)
-    tts = gTTS(text=text, lang=lang_code)
+    tld = get_tld_from_voice(voice)
+    try:
+        tts = gTTS(text=text, lang=lang_code, tld=tld)
+    except Exception:
+        # If specific tld fails, try default
+        tts = gTTS(text=text, lang=lang_code)
     tts.save(output_path)
     if not (os.path.exists(output_path) and os.path.getsize(output_path) > 0):
         if os.path.exists(output_path):
@@ -89,17 +118,14 @@ async def generate_voice(text, voice, output_path, language=None):
                 raise Exception("Generated audio file was empty")
         except Exception as exc:
             last_error = exc
-            err_msg = str(exc)
-            # If Microsoft blocked the connection with 403 Forbidden, retrying will not bypass the block
-            if "403" in err_msg or "Invalid response status" in err_msg:
-                break
             if attempt < max_retries - 1:
-                # Backoff delay before retry (1.5s, 3s)
-                await asyncio.sleep(1.5 * (attempt + 1))
+                # Backoff delay before retry (1s, 2s)
+                await asyncio.sleep(1.0 * (attempt + 1))
             
     # If Edge TTS failed (e.g. 403 Forbidden datacenter block), gracefully fall back to gTTS
     if HAS_GTTS:
         try:
+            print(f"[TTS Fallback Warning] Edge TTS failed for voice '{voice}' ({last_error}). Falling back to gTTS.", file=sys.stderr)
             generate_voice_gtts(text, voice, language, output_path)
             return
         except Exception as fallback_exc:

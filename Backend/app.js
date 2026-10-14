@@ -864,7 +864,14 @@ function processQueue() {
 
 function generateAudio(text, voice, cacheKey, options = {}) {
   if (fs.existsSync(cacheKey)) {
-    return Promise.resolve({ filePath: cacheKey, fromCache: true });
+    try {
+      const stats = fs.statSync(cacheKey);
+      if (stats.size > 1000) {
+        return Promise.resolve({ filePath: cacheKey, fromCache: true });
+      } else {
+        fs.unlinkSync(cacheKey);
+      }
+    } catch (e) {}
   }
   return new Promise((resolve, reject) => {
     generationQueue.push({ text, voice, cacheKey, options, resolve, reject });
@@ -877,7 +884,14 @@ function runGenerateAudio(text, voice, cacheKey, options = {}) {
   return new Promise((resolve, reject) => {
     // Check cache first
     if (fs.existsSync(cacheKey)) {
-      return resolve({ filePath: cacheKey, fromCache: true });
+      try {
+        const stats = fs.statSync(cacheKey);
+        if (stats.size > 1000) {
+          return resolve({ filePath: cacheKey, fromCache: true });
+        } else {
+          fs.unlinkSync(cacheKey);
+        }
+      } catch (e) {}
     }
 
     const fileName = `audio-${Date.now()}-${Math.random().toString(36).slice(2)}.mp3`;
@@ -1574,32 +1588,37 @@ app.post(
       if (!line) continue;
 
       // 1. Check for speaker definition metadata line (e.g. speaker: saran)
-      const speakerDefineMatch = line.match(/^(speaker|char|character|voice|speaker\s*name|name|voice\s*name|person)\s*:\s*([\p{L}\p{N}\s_-]+)$/iu);
+      const speakerDefineMatch = line.match(/^(speaker|char|character|voice|speaker\s*name|name|voice\s*name|person)\s*[:\-–—]\s*([*#_~\[]*[\p{L}\p{N}\s_-]+?[*#_~\]]*)$/iu);
       if (speakerDefineMatch) {
-        const speakerName = speakerDefineMatch[2].trim();
+        const speakerName = speakerDefineMatch[2].replace(/^[*#_~\[\s]+|[*#_~\]\s]+$/g, "").trim();
         currentSpeaker = speakerName;
-        const foundKey = Object.keys(voiceMapping).find(k => k.toLowerCase() === speakerName.toLowerCase());
-        currentVoice = foundKey ? voiceMapping[foundKey] : (voiceMapping["Narrator"] || Object.values(voiceMapping)[0] || "en-US-JennyNeural");
+        const foundKey = Object.keys(voiceMapping).find(k => k.trim().toLowerCase() === speakerName.toLowerCase());
+        currentVoice = foundKey ? voiceMapping[foundKey] : (voiceMapping[speakerName] || voiceMapping["Narrator"] || Object.values(voiceMapping)[0] || "en-US-JennyNeural");
         continue; // Skip generating audio for the metadata line itself
       }
 
-      // 2. Regular speaker line (e.g. Saran: Hello)
-      const match = line.match(/^([\p{L}\p{N}\s_-]+):(.*)$/u);
+      // 2. Regular speaker line (e.g. Saran: Hello, **Mark**: Hello, [Narrator]: Hello)
+      const match = line.match(/^([*#_~\[]*[\p{L}\p{N}\s_-]+?[*#_~\]]*)\s*[:\-–—]\s*(.*)$/u);
       let matchedSpeaker = null;
+      let rawSpeaker = null;
       if (match) {
-        const potentialSpeaker = match[1].trim();
-        const foundKey = Object.keys(voiceMapping).find(k => k.toLowerCase() === potentialSpeaker.toLowerCase());
+        rawSpeaker = match[1].replace(/^[*#_~\[\s]+|[*#_~\]\s]+$/g, "").trim();
+        const foundKey = Object.keys(voiceMapping).find(k => k.trim().toLowerCase() === rawSpeaker.toLowerCase());
         if (foundKey) {
           matchedSpeaker = foundKey;
         }
       }
 
-      const isWordSpeaker = match && !/^\d+$/.test(match[1].trim());
+      const isWordSpeaker = rawSpeaker && !/^\d+$/.test(rawSpeaker);
 
       if (match && (matchedSpeaker || isWordSpeaker)) {
-        const speaker = matchedSpeaker || match[1].trim();
+        const speaker = matchedSpeaker || rawSpeaker;
         const speech = match[2].trim();
-        const voice = voiceMapping[speaker] || voiceMapping["Narrator"] || Object.values(voiceMapping)[0] || "en-US-JennyNeural";
+        const voice = (matchedSpeaker && voiceMapping[matchedSpeaker]) ||
+                      voiceMapping[speaker] ||
+                      voiceMapping["Narrator"] ||
+                      Object.values(voiceMapping)[0] ||
+                      "en-US-JennyNeural";
         
         // Update active context speaker
         currentSpeaker = speaker;
@@ -1637,7 +1656,10 @@ app.post(
         const selectedVoice = resolveVoice(turn.voice);
         const engine = resolveEngine(selectedVoice);
         const ttsText = preprocessTextForTTS(turn.text, selectedVoice);
-        const cacheKey = generateCacheKey(ttsText, selectedVoice, engine, "en");
+        const turnLanguage = (selectedVoice.split("-")[0] || "en").toLowerCase();
+        const cacheKey = generateCacheKey(ttsText, selectedVoice, engine, turnLanguage);
+
+        console.log(`[Multi-Speaker] Generating turn ${i + 1}/${turns.length}: [${turn.speaker}] voice=${selectedVoice} (${turnLanguage})`);
 
         if (i > 0) {
           await new Promise((resolve) => setTimeout(resolve, 500));
@@ -1647,7 +1669,7 @@ app.post(
           ttsText,
           selectedVoice,
           cacheKey,
-          { engine },
+          { engine, language: turnLanguage },
         );
 
         const buffer = fs.readFileSync(filePath);

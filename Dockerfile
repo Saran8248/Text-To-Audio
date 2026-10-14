@@ -18,7 +18,7 @@ RUN apk add --no-cache python3 py3-pip ffmpeg && \
 
 # Activate virtual environment and install python dependencies
 ENV PATH="/opt/venv/bin:$PATH"
-RUN pip3 install edge-tts gTTS
+RUN pip3 install "edge-tts>=7.3.1" gTTS
 
 WORKDIR /app
 

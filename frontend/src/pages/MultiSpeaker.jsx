@@ -68,10 +68,10 @@ const MultiSpeaker = () => {
     const uniqueSpeakers = new Set();
 
     lines.forEach((line) => {
-      const match = line.trim().match(/^([\p{L}\p{N}\s_-]+):/u);
+      const match = line.trim().match(/^([*#_~\[]*[\p{L}\p{N}\s_-]+?[*#_~\]]*)\s*[:\-–—]/u);
       if (match) {
-        const potentialSpeaker = match[1].trim();
-        if (!/^\d+$/.test(potentialSpeaker)) {
+        const potentialSpeaker = match[1].replace(/^[*#_~\[\s]+|[*#_~\]\s]+$/g, "").trim();
+        if (potentialSpeaker && !/^\d+$/.test(potentialSpeaker)) {
           uniqueSpeakers.add(potentialSpeaker);
         }
       }
@@ -422,3 +422,4 @@ export default MultiSpeaker;
 
 
 
+  

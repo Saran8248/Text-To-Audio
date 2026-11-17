@@ -16,12 +16,12 @@ import MultiSpeaker from './pages/MultiSpeaker';
 import AudioToText from './pages/AudioToText';
 
 const ProtectedLayout = ({ user, onLogout, onUpdateUser }) => (
-  <div className="flex h-screen bg-slate-50 text-slate-900 relative overflow-hidden">
+  <div className="flex h-screen bg-[#f0f4f9] text-slate-900 relative overflow-hidden">
     <Sidebar user={user} onLogout={onLogout} />
     <div className="flex flex-col flex-1 overflow-hidden z-10 relative">
       <Navbar user={user} onLogout={onLogout} theme="light" onToggleTheme={() => {}} />
-      <main className="flex-1 overflow-y-auto z-10 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="flex-1 overflow-y-auto z-10 relative bg-[#f0f4f9]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <Routes>
             <Route path="/" element={<Dashboard user={user} />} />
             <Route path="/tts" element={<TextToSpeech />} />

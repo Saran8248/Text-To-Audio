@@ -50,28 +50,31 @@ const Sidebar = ({ user, onLogout }) => {
 
       {/* Sidebar */}
       <div
-        className={`fixed left-0 top-0 h-screen w-64 bg-white border-r border-slate-200 z-40 md:z-20 transition-transform duration-300 md:translate-x-0 md:relative md:h-full ${
+        className={`fixed left-0 top-0 h-screen w-64 bg-[#0b1528] text-slate-300 border-r border-slate-800/80 z-40 md:z-20 transition-transform duration-300 md:translate-x-0 md:relative md:h-full flex flex-col justify-between ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex flex-col h-full p-6">
+        <div className="flex flex-col h-full p-5">
           {/* Logo */}
-          <div className="flex items-center gap-3 mb-12 mt-8 md:mt-0">
-            <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-sky-50 flex items-center justify-center border border-brand-100">
-              <img
-                src="/terra-tern-logo.png"
-                alt="Terra Tern"
-                className="w-full h-full object-contain rounded"
-              />
+          <div className="flex items-center gap-3 mb-8 mt-6 md:mt-1 px-1">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-sky-500 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
+              <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6 text-white">
+                <path
+                  d="M19.5 4.5C17 7.2 13 9.5 9 9.5C5.8 9.5 3.5 8.2 2 6.5C3.2 10.2 6.2 12 9.2 12.8C6.8 13.8 4 13.5 2.5 12C3.8 15.2 6.8 16.8 10.2 16.5C13.8 16.2 17.5 13.8 19.5 10.5C20.8 12.8 22 16.5 22 19.5C23 15 22.8 9.8 19.5 4.5Z"
+                  fill="white"
+                />
+              </svg>
             </div>
             <div>
-              <h1 className="text-xl font-bold text-slate-900 tracking-wide uppercase">Terra Tern</h1>
-              <p className="text-xs text-slate-500">Team Shringika</p>
+              <h1 className="text-base font-extrabold text-white tracking-wider uppercase">
+                Terra Tern
+              </h1>
+              <p className="text-[11px] font-medium text-cyan-400">Team Shringika</p>
             </div>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 space-y-2 overflow-y-auto pr-1">
+          <nav className="flex-1 space-y-1.5 overflow-y-auto pr-1">
             {menuItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.path);
@@ -80,26 +83,21 @@ const Sidebar = ({ user, onLogout }) => {
                   <Link
                     to={item.path}
                     onClick={() => window.innerWidth < 768 && setIsOpen(false)}
-                    className={`relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
+                    className={`relative flex items-center gap-3.5 px-4 py-3 rounded-2xl transition-all duration-200 group text-sm font-medium ${
                       active
-                        ? "bg-sky-500 text-white shadow-sm"
-                        : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
+                        ? "bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-lg shadow-sky-500/25"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
                     }`}
                   >
                     <Icon
-                      size={20}
-                      className={active ? "text-white" : "group-hover:text-sky-500 transition-colors"}
+                      size={18}
+                      className={active ? "text-white" : "group-hover:text-cyan-400 transition-colors"}
                     />
-                    <span className="font-medium flex items-center gap-2 flex-1 min-w-0 truncate">
-                      {item.name}
-                      {item.isNew && (
-                        <span className="px-1.5 py-0.5 rounded text-[8px] font-extrabold bg-brand-100 text-sky-600 border border-sky-200 tracking-widest uppercase scale-90">
-                          New
-                        </span>
-                      )}
-                    </span>
-                    {active && (
-                      <div className="absolute right-0 w-1 h-6 bg-white rounded-l-full" />
+                    <span className="flex-1 truncate">{item.name}</span>
+                    {item.isNew && (
+                      <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-cyan-950 text-cyan-300 border border-cyan-400/30 tracking-wider uppercase">
+                        NEW
+                      </span>
                     )}
                   </Link>
                 </div>
@@ -107,6 +105,21 @@ const Sidebar = ({ user, onLogout }) => {
             })}
           </nav>
 
+          {/* Mountain Silhouette & Brand Slogan Footer */}
+          <div className="relative mt-auto pt-4 overflow-hidden border-t border-slate-800/40">
+            <svg viewBox="0 0 200 50" fill="none" className="w-full h-10 opacity-30">
+              <path d="M0 50L30 28L60 38L100 15L145 34L175 22L200 50Z" fill="#1e3a5f" />
+              <path d="M25 50L65 30L110 42L150 18L200 45V50H25Z" fill="#0f2642" />
+            </svg>
+            <div className="text-center pb-2">
+              <p className="text-[10px] font-bold tracking-[0.25em] text-slate-400 uppercase">
+                HIGHER IDEAS
+              </p>
+              <p className="text-[9px] font-semibold tracking-[0.25em] text-slate-500 uppercase mt-0.5">
+                CLEARER VOICES
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 

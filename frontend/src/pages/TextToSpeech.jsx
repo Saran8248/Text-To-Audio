@@ -6,6 +6,7 @@ import {
   Volume2,
   AlertCircle,
   RotateCcw,
+  Timer,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { apiFetch } from "../utils/apiHelper";
@@ -23,6 +24,37 @@ const TextToSpeech = () => {
   const [generationError, setGenerationError] = useState("");
   const [generationStatus, setGenerationStatus] = useState("");
   const audioRef = useRef(null);
+  const textareaRef = useRef(null);
+  const [customBreakVal, setCustomBreakVal] = useState("1.5");
+  const [showCustomInput, setShowCustomInput] = useState(false);
+
+  const insertBreak = (seconds) => {
+    const parsed = parseFloat(seconds);
+    if (isNaN(parsed) || parsed <= 0) {
+      toast.warning("Please enter a valid pause duration in seconds.");
+      return;
+    }
+    const tag = `[break: ${parsed}s]`;
+    const textarea = textareaRef.current;
+    if (!textarea) {
+      handleTextChange((text ? text + " " + tag : tag).trim());
+      return;
+    }
+    const start = textarea.selectionStart ?? text.length;
+    const end = textarea.selectionEnd ?? text.length;
+    const before = text.slice(0, start);
+    const after = text.slice(end);
+    const prefix = before.length > 0 && !before.endsWith(" ") ? " " : "";
+    const suffix = after.length > 0 && !after.startsWith(" ") ? " " : " ";
+    const inserted = `${prefix}${tag}${suffix}`;
+    const newText = before + inserted + after;
+    handleTextChange(newText);
+    setTimeout(() => {
+      textarea.focus();
+      const newPos = start + inserted.length;
+      textarea.setSelectionRange(newPos, newPos);
+    }, 0);
+  };
 
   const [voices, setVoices] = useState({});
 
@@ -209,20 +241,93 @@ const TextToSpeech = () => {
           className="lg:col-span-2 space-y-6"
         >
           <div className="glass p-6 rounded-2xl border border-slate-200 focus-within:border-sky-500 focus-within:ring-1 focus-within:ring-brand-500 transition-all duration-300 relative">
-            <div className="flex items-center justify-between mb-4 relative z-10">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-3 relative z-10">
               <label className="text-lg font-semibold text-slate-900">
                 Your Text
               </label>
-              <span className="text-sm text-slate-500">
-                {text.length} / 5000 characters
-              </span>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-xs font-medium text-slate-500 flex items-center gap-1 mr-1">
+                  <Timer size={14} className="text-sky-600" />
+                  Insert Pause:
+                </span>
+                <button
+                  type="button"
+                  onClick={() => insertBreak(1)}
+                  className="px-2.5 py-1 text-xs font-semibold bg-sky-50 border border-sky-200 text-sky-700 rounded-md hover:bg-sky-100 transition-colors shadow-sm"
+                  title="Insert 1 second break between words"
+                >
+                  +1s Break
+                </button>
+                <button
+                  type="button"
+                  onClick={() => insertBreak(2)}
+                  className="px-2.5 py-1 text-xs font-semibold bg-sky-50 border border-sky-200 text-sky-700 rounded-md hover:bg-sky-100 transition-colors shadow-sm"
+                  title="Insert 2 seconds break between words"
+                >
+                  +2s Break
+                </button>
+                <button
+                  type="button"
+                  onClick={() => insertBreak(3)}
+                  className="px-2.5 py-1 text-xs font-semibold bg-sky-50 border border-sky-200 text-sky-700 rounded-md hover:bg-sky-100 transition-colors shadow-sm"
+                  title="Insert 3 seconds break between words"
+                >
+                  +3s Break
+                </button>
+                {showCustomInput ? (
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="number"
+                      step="0.5"
+                      min="0.1"
+                      max="30"
+                      value={customBreakVal}
+                      onChange={(e) => setCustomBreakVal(e.target.value)}
+                      className="w-14 px-1.5 py-1 text-xs border border-sky-300 rounded text-slate-800 focus:outline-none"
+                      placeholder="sec"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        insertBreak(customBreakVal);
+                        setShowCustomInput(false);
+                      }}
+                      className="px-2 py-1 text-xs font-semibold bg-sky-600 text-white rounded hover:bg-sky-700 transition-colors"
+                    >
+                      Add
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowCustomInput(false)}
+                      className="px-1.5 py-1 text-xs text-slate-400 hover:text-slate-600"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowCustomInput(true)}
+                    className="px-2 py-1 text-xs font-medium bg-slate-100 border border-slate-200 text-slate-600 rounded-md hover:bg-slate-200 transition-colors"
+                  >
+                    Custom...
+                  </button>
+                )}
+              </div>
             </div>
             <textarea
+              ref={textareaRef}
               value={text}
               onChange={(e) => handleTextChange(e.target.value)}
-              placeholder="Speak your mind..."
+              placeholder="Type your text here... e.g. Hello [break: 2s] welcome to our podcast!"
               className="w-full h-48 bg-transparent border-0 p-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-0 resize-none font-mono tracking-wide relative z-10"
             />
+            <div className="flex flex-wrap items-center justify-between text-xs text-slate-500 mt-2 px-1 gap-2 relative z-10">
+              <span className="flex items-center gap-1 text-sky-700 bg-sky-50 px-2.5 py-1 rounded border border-sky-100">
+                💡 Tip: Click pause buttons above or type <code className="font-mono font-bold text-sky-800">[break: 1s]</code>, <code className="font-mono font-bold text-sky-800">[break: 2s]</code>, or <code className="font-mono font-bold text-sky-800">[break: 3s]</code> anywhere between words or sentences.
+              </span>
+              <span className="text-slate-400">{text.length} / 5000 chars</span>
+            </div>
             <div className="flex gap-2 mt-4 relative z-10">
               <button
                 onClick={handleCopyText}

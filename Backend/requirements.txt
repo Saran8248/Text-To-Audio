@@ -4,4 +4,5 @@ SpeechRecognition
 numpy
 pymp3
 gTTS>=2.5.0
+av>=11.0.0
 

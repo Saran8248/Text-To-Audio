@@ -68,10 +68,12 @@ const MultiSpeaker = () => {
     const uniqueSpeakers = new Set();
 
     lines.forEach((line) => {
+      // eslint-disable-next-line no-useless-escape
       const match = line.trim().match(/^([*#_~\[]*[\p{L}\p{N}\s_-]+?[*#_~\]]*)\s*[:\-–—]/u);
       if (match) {
+        // eslint-disable-next-line no-useless-escape
         const potentialSpeaker = match[1].replace(/^[*#_~\[\s]+|[*#_~\]\s]+$/g, "").trim();
-        if (potentialSpeaker && !/^\d+$/.test(potentialSpeaker)) {
+        if (potentialSpeaker && !/^\d+$/.test(potentialSpeaker) && !["break", "pause", "silence"].includes(potentialSpeaker.toLowerCase())) {
           uniqueSpeakers.add(potentialSpeaker);
         }
       }

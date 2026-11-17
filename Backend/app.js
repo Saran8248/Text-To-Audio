@@ -815,7 +815,11 @@ function preprocessTextForTTS(text, voice) {
       '8': 'acht',
       '9': 'neun'
     };
-    processed = processed.replace(/\d/g, (digit) => ` ${germanDigits[digit]} `).replace(/\s+/g, " ");
+    // Replace digits only outside tags like [break: ...], (break: ...), or <break ...>
+    processed = processed.replace(/(\[[^\]]*\]|\([^\)]*\)|<[^>]*>)|(\d)/g, (match, tag, digit) => {
+      if (tag) return tag;
+      return ` ${germanDigits[digit]} `;
+    }).replace(/\s+/g, " ");
   }
   return processed;
 }
@@ -829,7 +833,7 @@ const generateCacheKey = (
 ) => {
   const hash = crypto
     .createHash("md5")
-    .update(`${text}|${voice}|${engine}|${language}`)
+    .update(`${text}|${voice}|${engine}|${language}|v2`)
     .digest("hex");
   return path.join(CACHE_DIR, `${hash}.mp3`);
 };
@@ -1609,7 +1613,10 @@ app.post(
         }
       }
 
-      const isWordSpeaker = rawSpeaker && !/^\d+$/.test(rawSpeaker);
+      const isWordSpeaker =
+        rawSpeaker &&
+        !/^\d+$/.test(rawSpeaker) &&
+        !["break", "pause", "silence"].includes(rawSpeaker.toLowerCase());
 
       if (match && (matchedSpeaker || isWordSpeaker)) {
         const speaker = matchedSpeaker || rawSpeaker;

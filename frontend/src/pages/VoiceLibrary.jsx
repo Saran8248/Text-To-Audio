@@ -1,7 +1,8 @@
 import React, { useState, useRef } from "react";
-import { Heart, Play, Music, Filter } from "lucide-react";
+import { Heart, Play, Music, Filter, Sparkles } from "lucide-react";
 import { toast } from "react-toastify";
 import { apiFetch } from "../utils/apiHelper";
+import HeroBanner from "../components/HeroBanner";
 
 const VoiceLibrary = () => {
   const [favorites, setFavorites] = useState(new Set());
@@ -23,30 +24,20 @@ const VoiceLibrary = () => {
     { id: "en-US-AriaNeural", name: "Aria", language: "English", type: "Female", accent: "United States", style: "Warm", url: "https://example.com/aria.wav" },
     { id: "en-GB-LibbyNeural", name: "Libby", language: "English", type: "Female", accent: "United Kingdom", style: "Natural", url: "https://example.com/libby.wav" },
     { id: "en-AU-NatashaNeural", name: "Natasha", language: "English", type: "Female", accent: "Australia", style: "Natural", url: "https://example.com/natasha.wav" },
-    { id: "en-IN-NeerjaNeural", name: "Neerja", language: "English", type: "Female", accent: "India", style: "Natural", url: "https://example.com/neerja.wav" },
-    { id: "en-US-GuyNeural", name: "Guy", language: "English", type: "Male", accent: "United States", style: "Natural", url: "https://example.com/guy.wav" },
-    { id: "en-GB-RyanNeural", name: "Ryan", language: "English", type: "Male", accent: "United Kingdom", style: "Natural", url: "https://example.com/ryan.wav" },
-    { id: "en-AU-WilliamMultilingualNeural", name: "William", language: "English", type: "Male", accent: "Australia", style: "Natural", url: "https://example.com/william.wav" },
+    { id: "en-IN-NeerjaNeural", name: "Neerja", language: "English", type: "Female", accent: "India", style: "Friendly", url: "https://example.com/neerja.wav" },
+    { id: "en-US-GuyNeural", name: "Guy", language: "English", type: "Male", accent: "United States", style: "Confident", url: "https://example.com/guy.wav" },
+    { id: "en-GB-RyanNeural", name: "Ryan", language: "English", type: "Male", accent: "United Kingdom", style: "Professional", url: "https://example.com/ryan.wav" },
+    { id: "en-AU-WilliamNeural", name: "William", language: "English", type: "Male", accent: "Australia", style: "Warm", url: "https://example.com/william.wav" },
     { id: "en-IN-PrabhatNeural", name: "Prabhat", language: "English", type: "Male", accent: "India", style: "Natural", url: "https://example.com/prabhat.wav" },
-
-    // Spanish (8)
-    { id: "es-ES-ElviraNeural", name: "Elvira", language: "Spanish", type: "Female", accent: "Spain", style: "Natural", url: "https://example.com/elvira.wav" },
-    { id: "es-ES-XimenaNeural", name: "Ximena", language: "Spanish", type: "Female", accent: "Spain", style: "Natural", url: "https://example.com/ximena.wav" },
-    { id: "es-MX-DaliaNeural", name: "Dalia", language: "Spanish", type: "Female", accent: "Mexico", style: "Natural", url: "https://example.com/dalia.wav" },
-    { id: "es-US-PalomaNeural", name: "Paloma", language: "Spanish", type: "Female", accent: "United States", style: "Natural", url: "https://example.com/paloma.wav" },
-    { id: "es-ES-AlvaroNeural", name: "Alvaro", language: "Spanish", type: "Male", accent: "Spain", style: "Natural", url: "https://example.com/alvaro.wav" },
-    { id: "es-MX-JorgeNeural", name: "Jorge", language: "Spanish", type: "Male", accent: "Mexico", style: "Natural", url: "https://example.com/jorge.wav" },
-    { id: "es-US-AlonsoNeural", name: "Alonso", language: "Spanish", type: "Male", accent: "United States", style: "Natural", url: "https://example.com/alonso.wav" },
-    { id: "es-CO-GonzaloNeural", name: "Gonzalo", language: "Spanish", type: "Male", accent: "Colombia", style: "Natural", url: "https://example.com/gonzalo.wav" },
 
     // French (8)
     { id: "fr-FR-DeniseNeural", name: "Denise", language: "French", type: "Female", accent: "France", style: "Natural", url: "https://example.com/denise.wav" },
-    { id: "fr-FR-EloiseNeural", name: "Eloise", language: "French", type: "Female", accent: "France", style: "Natural", url: "https://example.com/eloise.wav" },
-    { id: "fr-FR-VivienneMultilingualNeural", name: "Vivienne", language: "French", type: "Female", accent: "France", style: "Natural", url: "https://example.com/vivienne.wav" },
     { id: "fr-CA-SylvieNeural", name: "Sylvie", language: "French", type: "Female", accent: "Canada", style: "Natural", url: "https://example.com/sylvie.wav" },
+    { id: "fr-BE-CharlineNeural", name: "Charline", language: "French", type: "Female", accent: "Belgium", style: "Natural", url: "https://example.com/charline.wav" },
+    { id: "fr-CH-ArianeNeural", name: "Ariane", language: "French", type: "Female", accent: "Switzerland", style: "Natural", url: "https://example.com/ariane.wav" },
     { id: "fr-FR-HenriNeural", name: "Henri", language: "French", type: "Male", accent: "France", style: "Natural", url: "https://example.com/henri.wav" },
-    { id: "fr-FR-RemyMultilingualNeural", name: "Remy", language: "French", type: "Male", accent: "France", style: "Natural", url: "https://example.com/remy.wav" },
     { id: "fr-CA-AntoineNeural", name: "Antoine", language: "French", type: "Male", accent: "Canada", style: "Natural", url: "https://example.com/antoine.wav" },
+    { id: "fr-BE-GerardNeural", name: "Gerard", language: "French", type: "Male", accent: "Belgium", style: "Natural", url: "https://example.com/gerard.wav" },
     { id: "fr-CH-FabriceNeural", name: "Fabrice", language: "French", type: "Male", accent: "Switzerland", style: "Natural", url: "https://example.com/fabrice.wav" },
 
     // Tamil (8)
@@ -65,9 +56,9 @@ const VoiceLibrary = () => {
     { id: "ar-SA-ZariyahNeural", name: "Zariyah", language: "Arabic", type: "Female", accent: "Saudi Arabia", style: "Natural", url: "https://example.com/zariyah.wav" },
     { id: "ar-QA-AmalNeural", name: "Amal", language: "Arabic", type: "Female", accent: "Qatar", style: "Natural", url: "https://example.com/amal.wav" },
     { id: "ar-AE-HamdanNeural", name: "Hamdan", language: "Arabic", type: "Male", accent: "UAE", style: "Natural", url: "https://example.com/hamdan.wav" },
-    { id: "ar-EG-ShakirNeural", name: "Shakir", type: "Male", accent: "Egypt", style: "Natural", url: "https://example.com/shakir.wav" },
-    { id: "ar-SA-HamedNeural", name: "Hamed", type: "Male", accent: "Saudi Arabia", style: "Natural", url: "https://example.com/hamed.wav" },
-    { id: "ar-QA-MoazNeural", name: "Moaz", type: "Male", accent: "Qatar", style: "Natural", url: "https://example.com/moaz.wav" }
+    { id: "ar-EG-ShakirNeural", name: "Shakir", language: "Arabic", type: "Male", accent: "Egypt", style: "Natural", url: "https://example.com/shakir.wav" },
+    { id: "ar-SA-HamedNeural", name: "Hamed", language: "Arabic", type: "Male", accent: "Saudi Arabia", style: "Natural", url: "https://example.com/hamed.wav" },
+    { id: "ar-QA-MoazNeural", name: "Moaz", language: "Arabic", type: "Male", accent: "Qatar", style: "Natural", url: "https://example.com/moaz.wav" }
   ];
 
   const toggleFavorite = (id) => {
@@ -98,32 +89,30 @@ const VoiceLibrary = () => {
   };
 
   const playSample = async (voice) => {
-    try {
-      stopPlayback();
-      setPlayingId(voice.id);
+    stopPlayback();
+    setPlayingId(voice.id);
 
-      // Generate localized text based on the language
-      let sampleText = `Hello! I am ${voice.name}. How does my voice sound?`;
-      const langLower = (voice.language || "").toLowerCase();
-      if (langLower.includes("german")) {
-        sampleText = `Hallo! Ich bin ${voice.name}. Wie klingt meine Stimme?`;
-      } else if (langLower.includes("spanish")) {
-        sampleText = `¡Hola! Soy ${voice.name}. ¿Cómo suena mi voz?`;
-      } else if (langLower.includes("french")) {
-        sampleText = `Bonjour! Je m'appelle ${voice.name}. Comment sonne ma voix?`;
-      } else if (langLower.includes("tamil")) {
-        sampleText = `வணக்கம்! என் பெயர் ${voice.name}. என் குரல் எப்படி இருக்கிறது?`;
-      } else if (langLower.includes("arabic")) {
-        sampleText = `مرحباً! أنا ${voice.name}. كيف يبدو صوتي؟`;
+    try {
+      let sampleText = `Hello, I am ${voice.name}, ready to speak for your projects.`;
+      if (voice.language === "German") {
+        sampleText = `Hallo, ich bin ${voice.name}. Ich freue mich darauf, deinen Text vorzulesen.`;
+      } else if (voice.language === "Tamil") {
+        sampleText = `வணக்கம், நான் ${voice.name}. உங்கள் உரையை வாசிக்க நான் தயார்.`;
+      } else if (voice.language === "French") {
+        sampleText = `Bonjour, je suis ${voice.name}, prêt à donner vie à vos textes.`;
+      } else if (voice.language === "Arabic") {
+        sampleText = `مرحباً، أنا ${voice.name}، جاهز لقراءة نصوصك بصوت طبيعي.`;
       }
 
-      // Fetch dynamic audio from backend
+      const token = localStorage.getItem("terra_tern_auth_token");
       const response = await apiFetch(`/api/tts/generate`, {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           text: sampleText,
           voice: voice.id,
-          language: langLower
         }),
       });
 
@@ -148,7 +137,11 @@ const VoiceLibrary = () => {
     } catch (err) {
       console.error("VoiceLibrary Sample Error:", err);
       let errorMessage = err.message || "Playback failed. Tap again to try.";
-      if (err.message?.includes("Failed to fetch") || err.message?.includes("NetworkError") || err.message?.includes("Load failed")) {
+      if (
+        err.message?.includes("Failed to fetch") ||
+        err.message?.includes("NetworkError") ||
+        err.message?.includes("Load failed")
+      ) {
         errorMessage = "Network connection failed. Could not reach audio server.";
       }
       toast.error(errorMessage);
@@ -163,92 +156,114 @@ const VoiceLibrary = () => {
     return true;
   });
 
-  const VoiceCard = ({ voice, index }) => (
-    <div className="glass p-6 rounded-2xl border border-slate-200 hover:border-slate-200 transition-all group cursor-pointer"
-    >
-      <div className="flex items-start justify-between mb-4">
-        <div>
-          <h3 className="text-lg font-bold text-slate-900 mb-1">{voice.name}</h3>
-          <p className="text-sm text-slate-600">{voice.language}</p>
+  const VoiceCard = ({ voice }) => (
+    <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm hover:shadow-md hover:border-sky-300 transition-all group flex flex-col justify-between">
+      <div>
+        <div className="flex items-start justify-between mb-3">
+          <div>
+            <h3 className="text-base font-bold text-slate-900 mb-0.5">
+              {voice.name}
+            </h3>
+            <p className="text-xs text-slate-500">{voice.language}</p>
+          </div>
+          <button
+            onClick={() => toggleFavorite(voice.id)}
+            className={`p-2 rounded-xl transition-colors ${
+              favorites.has(voice.id)
+                ? "bg-rose-50 text-rose-500"
+                : "bg-slate-50 text-slate-400 hover:text-rose-500"
+            }`}
+            title="Favorite"
+          >
+            <Heart
+              size={16}
+              fill={favorites.has(voice.id) ? "currentColor" : "none"}
+            />
+          </button>
         </div>
-        <button
-          onClick={() => toggleFavorite(voice.id)} className={`p-2 rounded-lg transition-colors ${
-            favorites.has(voice.id)
-              ? "bg-red-500/20 text-red-400"
-              : "bg-white/5 text-gray-400 hover:text-red-400"
-          }`}
-        >
-          <Heart
-            size={20}
-            fill={favorites.has(voice.id) ? "currentColor" : "none"}
-          />
-        </button>
-      </div>
 
-      <div className="space-y-3 mb-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-medium bg-blue-500/20 text-blue-300 px-2 py-1 rounded">
+        <div className="flex flex-wrap items-center gap-1.5 mb-4">
+          <span className="text-[10px] font-semibold bg-sky-50 text-[#006699] px-2 py-0.5 rounded-full border border-sky-100">
             {voice.type}
           </span>
-          <span className="text-xs font-medium bg-purple-500/20 text-purple-300 px-2 py-1 rounded">
+          <span className="text-[10px] font-semibold bg-teal-50 text-[#009688] px-2 py-0.5 rounded-full border border-teal-100">
             {voice.accent}
           </span>
           {voice.style && (
-            <span className="text-xs font-medium bg-emerald-500/20 text-emerald-300 px-2 py-1 rounded">
+            <span className="text-[10px] font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
               {voice.style}
             </span>
           )}
         </div>
       </div>
 
-      <button onClick={() =>
+      <button
+        onClick={() =>
           playingId === voice.id ? stopPlayback() : playSample(voice)
         }
-        className="w-full py-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg font-medium text-white hover:shadow-lg hover:shadow-blue-500/30 flex items-center justify-center gap-2 group-hover:shadow-lg"
+        className="w-full py-2.5 bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 rounded-2xl font-semibold text-white text-xs shadow-md shadow-sky-500/20 flex items-center justify-center gap-1.5 transition-all"
       >
-        <Play size={16} fill="white" />
-        {playingId === voice.id ? "Stop" : "Play Sample"}
+        <Play size={14} fill="white" />
+        <span>{playingId === voice.id ? "Stop Sample" : "Play Sample"}</span>
       </button>
     </div>
   );
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="mb-8"
-      >
-        <h1 className="text-4xl font-bold text-slate-900 mb-2">Voice Library</h1>
-        <p className="text-slate-600">
-          Choose from our collection of natural-sounding voices
-        </p>
-      </div>
+    <div className="space-y-6">
+      {/* Signature Ocean-to-Teal Hero Banner */}
+      <HeroBanner
+        kicker="AI AUDIO STUDIO"
+        title="Voice Library"
+        description="Explore our curated collection of natural, production-ready Edge neural voices across 70+ languages."
+        pills={[
+          {
+            icon: Music,
+            label: "Voices",
+            value: `${voices.length}+ Active`,
+          },
+          {
+            icon: Sparkles,
+            label: "Quality",
+            value: "Neural HD",
+          },
+          {
+            icon: Heart,
+            label: "Favorites",
+            value: `${favorites.size} saved`,
+          },
+        ]}
+        sloganTop="EXPLORE"
+        sloganBottom="FIND A VOICE"
+      />
 
-      {/* Filters */}
-      <div className="glass p-6 rounded-2xl border border-slate-200"
-      >
-        <div className="flex items-center gap-2 mb-4">
-          <Filter size={20} className="text-blue-400" />
-          <h3 className="text-lg font-semibold text-slate-900">Filters</h3>
+      {/* Filters Bar */}
+      <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm space-y-4">
+        <div className="flex items-center gap-2">
+          <Filter size={18} className="text-[#006699]" />
+          <h3 className="text-sm font-bold text-slate-900">Filter Voices</h3>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {/* Gender Filter */}
           <div>
-            <label className="block text-sm font-medium text-slate-600 mb-3">
+            <label className="block text-xs font-semibold text-slate-600 mb-2">
               Gender
             </label>
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-1.5 flex-wrap">
               {["all", "Male", "Female"].map((gender) => (
                 <button
                   key={gender}
                   onClick={() =>
                     setSelectedGender(gender === "all" ? "all" : gender)
-                  } className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                  }
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                     selectedGender === gender
-                      ? "bg-blue-500 text-white"
-                      : "bg-white/10 text-gray-300 hover:bg-white/20"
+                      ? "bg-gradient-to-r from-blue-600 to-[#006699] text-white shadow-sm"
+                      : "bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100"
                   }`}
                 >
-                  {gender === "all" ? "All" : gender}
+                  {gender === "all" ? "All Genders" : gender}
                 </button>
               ))}
             </div>
@@ -256,31 +271,30 @@ const VoiceLibrary = () => {
 
           {/* Language Filter */}
           <div>
-            <label className="block text-sm font-medium text-slate-600 mb-3">
+            <label className="block text-xs font-semibold text-slate-600 mb-2">
               Language
             </label>
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-1.5 flex-wrap">
               {[
                 "all",
-                "English (US)",
-                "English (UK)",
-                "English (AU)",
+                "English",
                 "German",
                 "French",
                 "Tamil",
-                "Arabic (UAE)",
+                "Arabic",
               ].map((lang) => (
                 <button
                   key={lang}
                   onClick={() =>
                     setSelectedLanguage(lang === "all" ? "all" : lang)
-                  } className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                  }
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                     selectedLanguage === lang
-                      ? "bg-blue-500 text-white"
-                      : "bg-white/10 text-gray-300 hover:bg-white/20"
+                      ? "bg-gradient-to-r from-blue-600 to-[#006699] text-white shadow-sm"
+                      : "bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100"
                   }`}
                 >
-                  {lang === "all" ? "All" : lang}
+                  {lang === "all" ? "All Languages" : lang}
                 </button>
               ))}
             </div>
@@ -289,17 +303,21 @@ const VoiceLibrary = () => {
       </div>
 
       {/* Voice Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {filteredVoices.map((voice, idx) => (
           <VoiceCard key={voice.id} voice={voice} index={idx} />
         ))}
       </div>
 
       {filteredVoices.length === 0 && (
-        <div className="text-center py-12"
-        >
-          <Music size={48} className="text-slate-500 mx-auto mb-4" />
-          <p className="text-slate-600 text-lg">No voices match your filters</p>
+        <div className="bg-white rounded-3xl border border-slate-200/80 p-16 text-center shadow-sm">
+          <Music size={40} className="text-slate-300 mx-auto mb-3" />
+          <p className="text-slate-800 font-bold text-base">
+            No voices match your filters
+          </p>
+          <p className="text-xs text-slate-400 mt-1">
+            Try resetting the gender or language selection above.
+          </p>
         </div>
       )}
     </div>
@@ -307,4 +325,3 @@ const VoiceLibrary = () => {
 };
 
 export default VoiceLibrary;
-

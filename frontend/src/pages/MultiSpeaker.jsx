@@ -226,29 +226,129 @@ const MultiSpeaker = () => {
   };
 
   return (
-    <div className="space-y-8 max-w-4xl">
-      {/* Header */}
-      <div>
-        <h1 className="text-4xl font-bold text-slate-900 mb-2 tracking-wide uppercase">
-          Multi Speaker Script
-        </h1>
-        <p className="text-slate-600">
-          Paste your dialog conversation and map distinct voices to each speaker
-          dynamically.
-        </p>
+    <div className="space-y-6">
+      {/* Hero Banner matching the design */}
+      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#0d3b66] via-[#006699] to-[#009688] p-7 sm:p-9 text-white shadow-xl">
+        {/* Abstract Fluid Curved Wave lines in background */}
+        <svg
+          className="absolute inset-0 w-full h-full pointer-events-none opacity-25"
+          viewBox="0 0 1000 300"
+          preserveAspectRatio="none"
+        >
+          <path
+            d="M0,150 C300,50 600,280 1000,100"
+            stroke="url(#ms-wave-grad)"
+            strokeWidth="2.5"
+            fill="none"
+          />
+          <path
+            d="M0,180 C250,90 550,250 1000,130"
+            stroke="url(#ms-wave-grad)"
+            strokeWidth="2"
+            fill="none"
+          />
+          <path
+            d="M0,210 C350,120 650,220 1000,160"
+            stroke="url(#ms-wave-grad)"
+            strokeWidth="1.5"
+            fill="none"
+          />
+          <defs>
+            <linearGradient id="ms-wave-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.8" />
+              <stop offset="50%" stopColor="#22d3ee" stopOpacity="0.9" />
+              <stop offset="100%" stopColor="#ffffff" stopOpacity="0.5" />
+            </linearGradient>
+          </defs>
+        </svg>
+
+        {/* Flying Dove Silhouette Illustration */}
+        <div className="absolute right-12 top-6 pointer-events-none opacity-90 hidden sm:block">
+          <svg
+            viewBox="0 0 160 120"
+            fill="none"
+            className="w-36 h-28 text-white drop-shadow-sm"
+          >
+            <path
+              d="M142.5 18.2C130.8 28.5 113.6 37.8 96.2 38.6C82.1 39.2 70.4 34.6 60.1 27.2C50.6 20.4 42.1 11.2 31.5 5.5C28.2 3.7 24.1 2.2 20.8 4.1C18.6 5.3 18.4 8.2 19.5 10.4C24.3 20.2 34.5 28.6 44.8 34.2C53.7 39 64.2 41.5 73.6 44.7C63.2 47.9 51.5 49.8 41.2 46.8C34.7 44.9 28.3 41.3 21.6 40.2C17.4 39.5 12.8 40.8 11.2 44.8C9.8 48.2 12.5 51.7 15.6 53.6C26.5 60.4 40.3 62.1 52.8 62.8C65.4 63.5 78.4 62.2 90.5 58.4C95.2 61.5 100.2 65.2 104.5 69.8C109.8 75.5 113.2 82.8 115.8 90.2C116.8 93.1 118.2 96.2 121.2 97.4C124.6 98.8 128.2 96.7 129.5 93.4C132.8 85.1 131.2 75.2 126.8 67.5C123.6 61.9 119.1 57.2 114.2 53.1C123.8 48.2 134.1 41.5 141.2 32.8C144.5 28.8 147.2 24.1 148.8 19.1C149.2 17.8 147.6 16.2 146.4 16.5C145.1 16.8 143.7 17.4 142.5 18.2Z"
+              fill="white"
+            />
+          </svg>
+        </div>
+
+        {/* Far Right Slogan */}
+        <div className="absolute right-8 bottom-6 text-right pointer-events-none hidden md:block">
+          <p className="text-[10px] font-bold tracking-[0.25em] text-cyan-200/80 uppercase">
+            WORDS
+          </p>
+          <p className="text-[9px] font-semibold tracking-[0.25em] text-cyan-200/60 uppercase mt-0.5">
+            FIND A VOICE
+          </p>
+        </div>
+
+        {/* Banner Content */}
+        <div className="relative z-10">
+          <p className="text-xs font-bold uppercase tracking-[0.25em] text-cyan-300">
+            AI AUDIO STUDIO
+          </p>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mt-1 mb-2">
+            Multi Speaker Studio
+          </h1>
+          <p className="text-cyan-100 text-sm max-w-xl font-normal">
+            Create dynamic multi-voice conversations with production-ready Edge voices.
+          </p>
+
+          {/* 3 Frosted Stats Cards */}
+          <div className="flex flex-wrap items-center gap-3.5 mt-6">
+            <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-4 py-2.5 shadow-sm">
+              <div className="p-1.5 rounded-lg bg-white/10 text-cyan-200">
+                <Users size={18} />
+              </div>
+              <div>
+                <p className="text-[10px] text-cyan-200/80 uppercase font-medium">Speakers</p>
+                <p className="text-sm font-bold text-white leading-tight">
+                  {speakerOrder.length} detected
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-4 py-2.5 shadow-sm">
+              <div className="p-1.5 rounded-lg bg-white/10 text-cyan-200">
+                <Cpu size={18} />
+              </div>
+              <div>
+                <p className="text-[10px] text-cyan-200/80 uppercase font-medium">Format</p>
+                <p className="text-sm font-bold text-white leading-tight">MP3</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-4 py-2.5 shadow-sm">
+              <div className="p-1.5 rounded-lg bg-white/10 text-cyan-200">
+                <CheckCircle size={18} />
+              </div>
+              <div>
+                <p className="text-[10px] text-cyan-200/80 uppercase font-medium">Engine</p>
+                <p className="text-sm font-bold text-white leading-tight">Edge Neural</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Main Single Configuration Card */}
-      <div
-        className="glass p-8 rounded-3xl border border-slate-200 space-y-8 shadow-sm relative overflow-hidden"
-      >
+      <div className="bg-white rounded-3xl border border-slate-200/80 p-7 shadow-sm space-y-7">
         {/* Paste Conversation Section */}
-        <div className="relative z-10">
-          <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-3">
-            <Cpu size={24} className="text-sky-500" />
-            Script Input
-          </h3>
-          <div className="p-1 rounded-2xl bg-slate-100 border border-slate-200">
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <Cpu size={18} className="text-sky-500" />
+              Conversation Script
+            </h3>
+            <span className="text-xs font-mono text-slate-400">
+              Format: Speaker: Speech
+            </span>
+          </div>
+          <div className="rounded-2xl border border-slate-200 overflow-hidden focus-within:ring-2 focus-within:ring-sky-500/20 focus:border-sky-400 transition-all">
             <textarea
               value={conversationText}
               onChange={(e) => {
@@ -257,39 +357,44 @@ const MultiSpeaker = () => {
               }}
               placeholder="Paste your script dialog here (e.g. Tom: Hello)..."
               rows="8"
-              className="w-full px-6 py-5 bg-white rounded-[14px] text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-brand-500 resize-none font-mono text-sm leading-relaxed tracking-wide"
+              className="w-full px-5 py-4 bg-white text-slate-900 placeholder-slate-400 focus:outline-none resize-none font-mono text-sm leading-relaxed"
             />
           </div>
         </div>
 
-        {/* Detected Speakers Section (Directly Downside of the Box) */}
-        <div className="pt-8 border-t border-slate-200 space-y-6 relative z-10">
-          <h3 className="text-xl font-bold text-slate-900 flex items-center gap-3">
-            <Users size={24} className="text-sky-500" />
-            Dialogue Blocks
-          </h3>
+        {/* Detected Speakers Section */}
+        <div className="pt-6 border-t border-slate-200/80 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <Users size={18} className="text-sky-500" />
+              Speaker Voice Mapping
+            </h3>
+            <span className="text-xs text-slate-400">
+              {speakerOrder.length} {speakerOrder.length === 1 ? "speaker" : "speakers"} active
+            </span>
+          </div>
 
           {Object.keys(voiceMapping).length === 0 ? (
-            <p className="text-sm text-slate-500 italic">
-              No speakers detected. Type conversation lines (e.g. "Tom: Hallo")
-              to configure speaker voices below.
-            </p>
+            <div className="p-8 text-center bg-slate-50/70 border border-slate-200/70 rounded-2xl">
+              <p className="text-xs text-slate-500 font-medium">
+                No speakers detected. Type conversation lines (e.g. "Tom: Hello") to configure voices.
+              </p>
+            </div>
           ) : (
-            <div className="space-y-4 relative">
-              <div className="absolute inset-y-0 left-5 w-[1px] bg-slate-200 -z-10" />
+            <div className="space-y-3">
               {speakerOrder.map((speaker) => (
                 <div
                   key={speaker}
-                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 bg-white rounded-xl border border-slate-200 gap-6 shadow-sm"
+                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-slate-50/80 hover:bg-slate-50 rounded-2xl border border-slate-200/80 gap-4 transition-colors"
                 >
-                  <div className="flex items-center gap-4 min-w-[140px]">
-                    <span className="w-3 h-3 rounded-full bg-sky-500 shadow-sm ring-4 ring-brand-50" />
-                    <span className="font-bold text-slate-900 truncate text-lg tracking-wide">
+                  <div className="flex items-center gap-3 min-w-[140px]">
+                    <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-sky-400 to-blue-500 ring-4 ring-sky-100" />
+                    <span className="font-bold text-slate-900 truncate text-sm">
                       {speaker}
                     </span>
                   </div>
 
-                  <div className="flex-1 w-full max-w-lg flex flex-col sm:flex-row gap-4">
+                  <div className="flex-1 w-full flex flex-col sm:flex-row gap-3">
                     {/* Language Dropdown */}
                     <div className="flex-1 relative">
                       <select
@@ -297,20 +402,16 @@ const MultiSpeaker = () => {
                         onChange={(e) =>
                           handleLanguageChange(speaker, e.target.value)
                         }
-                        className="w-full pl-4 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:border-sky-500 focus:outline-none appearance-none cursor-pointer text-sm font-medium hover:border-slate-300"
+                        className="w-full pl-3.5 pr-8 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-400 appearance-none cursor-pointer text-xs font-semibold shadow-sm"
                       >
                         {Object.entries(localeNames).map(([locale, name]) => (
-                          <option
-                            key={locale}
-                            value={locale}
-                            className="bg-white text-slate-900"
-                          >
+                          <option key={locale} value={locale}>
                             {name}
                           </option>
                         ))}
                       </select>
-                      <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-slate-400">
-                        <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                      <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
+                        <svg className="fill-current h-3.5 w-3.5" viewBox="0 0 20 20">
                           <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
                         </svg>
                       </div>
@@ -323,22 +424,18 @@ const MultiSpeaker = () => {
                         onChange={(e) =>
                           handleVoiceChange(speaker, e.target.value)
                         }
-                        className="w-full pl-4 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:border-sky-500 focus:outline-none appearance-none cursor-pointer text-sm font-medium hover:border-slate-300"
+                        className="w-full pl-3.5 pr-8 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-400 appearance-none cursor-pointer text-xs font-semibold shadow-sm truncate"
                       >
                         {voices
                           .filter((v) => v.locale.startsWith(speakerLanguages[speaker] || "en"))
                           .map((voice) => (
-                            <option
-                              key={voice.shortName}
-                              value={voice.shortName}
-                              className="bg-white text-slate-900"
-                            >
+                            <option key={voice.shortName} value={voice.shortName}>
                               {voice.displayName} ({voice.gender})
                             </option>
                           ))}
                       </select>
-                      <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-slate-400">
-                        <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                      <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
+                        <svg className="fill-current h-3.5 w-3.5" viewBox="0 0 20 20">
                           <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
                         </svg>
                       </div>
@@ -350,65 +447,56 @@ const MultiSpeaker = () => {
           )}
         </div>
 
-        {/* Audio Generating Options & Trigger Button (Directly Downside of Speaker Config) */}
-        <div className="pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative z-10">
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-slate-500 font-medium">
-              Output Format:
+        {/* Trigger Button Row */}
+        <div className="pt-6 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-500 font-medium">Output:</span>
+            <span className="px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 text-xs font-bold text-slate-800">
+              MP3 • 24kHz Mono
             </span>
-            <label className="flex items-center gap-2 text-slate-900 font-bold text-sm cursor-pointer px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200">
-              <input
-                type="radio"
-                name="format"
-                defaultChecked
-                className="w-4 h-4 text-sky-500 border-slate-300 bg-white focus:ring-0 focus:ring-offset-0"
-              />
-              MP3
-            </label>
           </div>
 
           <button
             onClick={handleGenerateAudio}
             disabled={isGenerating || Object.keys(voiceMapping).length === 0}
-            className="w-full sm:w-auto px-10 py-4 bg-sky-500 hover:bg-sky-600 rounded-xl font-bold text-white transition-all disabled:opacity-50 shadow-sm"
+            className="w-full sm:w-auto px-8 py-3 rounded-2xl font-semibold text-sm text-white shadow-md shadow-sky-500/25 bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isGenerating ? "Forging Audio..." : "Generate Sequence"}
+            {isGenerating ? "Synthesizing Dialogue..." : "▶ Generate Conversation"}
           </button>
         </div>
       </div>
 
+      {/* Generated Audio Card */}
       {mergedUrl && (
-        <div
-          className="glass p-6 rounded-3xl border border-sky-200 bg-sky-50 space-y-4 shadow-sm relative overflow-hidden"
-        >
-          <div className="flex items-center gap-3 relative z-10">
-            <div className="w-10 h-10 rounded-full bg-brand-100 border border-sky-200 flex items-center justify-center">
+        <div className="bg-white rounded-3xl border border-sky-200 p-6 shadow-sm space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center">
               <CheckCircle className="text-sky-600" size={20} />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-900">
-                Forge Complete!
+              <h3 className="text-base font-bold text-slate-900">
+                Conversation Generated!
               </h3>
-              <p className="text-xs text-slate-600">
-                All dialogue blocks merged into a unified audio artifact.
+              <p className="text-xs text-slate-500">
+                All speaker turns merged into a single multi-character MP3 track.
               </p>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-white rounded-2xl border border-slate-200 gap-4 relative z-10 shadow-sm">
+          <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-slate-50/80 rounded-2xl border border-slate-200 gap-4">
             <audio
               ref={audioRef}
               src={mergedUrl}
               controls
-              className="w-full flex-1 rounded-lg"
+              className="w-full flex-1"
             />
 
             <a
               href={mergedUrl}
               download="merged_conversation.mp3"
-              className="flex items-center gap-2 px-5 py-2.5 bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition-all shrink-0"
+              className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl shadow-sm transition-all shrink-0"
             >
-              <Download size={16} />
+              <Download size={14} />
               Download MP3
             </a>
           </div>
